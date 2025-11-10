@@ -1,136 +1,151 @@
-'''
-adopted from 
+"""
+adopted from
 https://github.com/lllyasviel/ControlNet/blob/ed85cd1e25a5ed592f7d8178495b4483de0331bf/cldm/cldm.py
-'''
-import einops
+"""
+
 import torch
 import torch as th
 import torch.nn as nn
 
+from audioldm_train.modules.diffusionmodules.attention import SpatialTransformer
+from audioldm_train.modules.diffusionmodules.openaimodel import (
+    AttentionBlock,
+    Downsample,
+    ResBlock,
+    TimestepEmbedSequential,
+    UNetModel,
+)
+from audioldm_train.modules.latent_diffusion.ddim import DDIMSampler
+from audioldm_train.modules.latent_diffusion.ddpm import LatentDiffusion
 from audioldm_train.utilities.diffusion_util import (
     conv_nd,
     linear,
-    zero_module,
     timestep_embedding,
+    zero_module,
 )
-
-from einops import rearrange, repeat
-from torchvision.utils import make_grid
-from audioldm_train.modules.diffusionmodules.openaimodel import UNetModel, TimestepEmbedSequential, ResBlock, Downsample, AttentionBlock
-from audioldm_train.modules.diffusionmodules.attention import SpatialTransformer
-from audioldm_train.modules.latent_diffusion.ddpm import LatentDiffusion
-from audioldm_train.utilities.model_util import log_txt_as_img, exists, instantiate_from_config
-from audioldm_train.modules.latent_diffusion.ddim import DDIMSampler
+from audioldm_train.utilities.model_util import instantiate_from_config
 
 
 class ControlledUnetModel(UNetModel):
-    def forward(self, x, timesteps=None, context=None, control=None, only_mid_control=False, **kwargs):
+    """
+    modified based on differences between
+        - 'UNetModel' in StableDiffusion and 'UNetModel' in AudioLDM
+    """
+
+    def forward(
+        self,
+        x,
+        timesteps=None,
+        y=None,
+        context_list=None,
+        context_attn_mask_list=None,
+        control=None,
+        only_mid_control=False,
+        **kwargs,
+    ):
         hs = []
         with torch.no_grad():
-            t_emb = timestep_embedding(timesteps, self.model_channels, repeat_only=False)
+            t_emb = timestep_embedding(
+                timesteps, self.model_channels, repeat_only=False
+            )
             emb = self.time_embed(t_emb)
+            if getattr(self, "use_extra_film_by_concat", False):
+                assert y is not None
+                emb = th.cat([emb, self.film_emb(y)], dim=-1)
+
             h = x.type(self.dtype)
             for module in self.input_blocks:
-                h = module(h, emb, context)
+                h = module(h, emb, context_list, context_attn_mask_list)
                 hs.append(h)
-            h = self.middle_block(h, emb, context)
+            h = self.middle_block(h, emb, context_list, context_attn_mask_list)
 
         if control is not None:
-            h += control.pop()
+            h = h + control.pop()
 
-        for i, module in enumerate(self.output_blocks):
+        for module in self.output_blocks:
+            skip = hs.pop()
             if only_mid_control or control is None:
-                h = torch.cat([h, hs.pop()], dim=1)
+                h = th.cat([h, skip], dim=1)
             else:
-                h = torch.cat([h, hs.pop() + control.pop()], dim=1)
-            h = module(h, emb, context)
+                h = th.cat([h, skip + control.pop()], dim=1)
+            h = module(h, emb, context_list, context_attn_mask_list)
 
         h = h.type(x.dtype)
-        return self.out(h)
+        if self.predict_codebook_ids:
+            return self.id_predictor(h)
+        else:
+            return self.out(h)
 
 
 class ControlNet(nn.Module):
+    """
+    modified based on differences between
+        - 'ControlNet' in StableDiffusion and 'UNetModel' in StableDiffusion
+        - 'UNetModel' in StableDiffusion and 'UNetModel' in AudioLDM
+    """
+
     def __init__(
-            self,
-            image_size,
-            in_channels,
-            model_channels,
-            hint_channels,
-            num_res_blocks,
-            attention_resolutions,
-            dropout=0,
-            channel_mult=(1, 2, 4, 8),
-            conv_resample=True,
-            dims=2,
-            use_checkpoint=False,
-            use_fp16=False,
-            num_heads=-1,
-            num_head_channels=-1,
-            num_heads_upsample=-1,
-            use_scale_shift_norm=False,
-            resblock_updown=False,
-            use_new_attention_order=False,
-            use_spatial_transformer=False,  # custom transformer support
-            transformer_depth=1,  # custom transformer support
-            context_dim=None,  # custom transformer support
-            n_embed=None,  # custom support for prediction of discrete ids into codebook of first stage vq model
-            legacy=True,
-            disable_self_attentions=None,
-            num_attention_blocks=None,
-            disable_middle_self_attn=False,
-            use_linear_in_transformer=False,
+        self,
+        image_size,
+        in_channels,
+        model_channels,
+        hint_channels,
+        num_res_blocks,
+        attention_resolutions,
+        dropout=0,
+        channel_mult=(1, 2, 4, 8),
+        conv_resample=True,
+        dims=2,
+        extra_sa_layer=True,
+        num_classes=None,
+        extra_film_condition_dim=None,
+        use_checkpoint=False,
+        use_fp16=False,
+        num_heads=-1,
+        num_head_channels=-1,
+        num_heads_upsample=-1,
+        use_scale_shift_norm=False,
+        resblock_updown=False,
+        use_new_attention_order=False,
+        use_spatial_transformer=True,  # custom transformer support
+        transformer_depth=1,  # custom transformer support
+        context_dim=None,  # custom transformer support
+        n_embed=None,  # custom support for prediction of discrete ids into codebook of first stage vq model
+        legacy=True,
     ):
         super().__init__()
-        if use_spatial_transformer:
-            assert context_dim is not None, 'Fool!! You forgot to include the dimension of your cross-attention conditioning...'
-
-        if context_dim is not None:
-            assert use_spatial_transformer, 'Fool!! You forgot to use the spatial transformer for your cross-attention conditioning...'
-            from omegaconf.listconfig import ListConfig
-            if type(context_dim) == ListConfig:
-                context_dim = list(context_dim)
 
         if num_heads_upsample == -1:
             num_heads_upsample = num_heads
-
         if num_heads == -1:
-            assert num_head_channels != -1, 'Either num_heads or num_head_channels has to be set'
-
+            assert num_head_channels != -1, (
+                "Either num_heads or num_head_channels has to be set"
+            )
         if num_head_channels == -1:
-            assert num_heads != -1, 'Either num_heads or num_head_channels has to be set'
+            assert num_heads != -1, (
+                "Either num_heads or num_head_channels has to be set"
+            )
 
         self.dims = dims
         self.image_size = image_size
         self.in_channels = in_channels
         self.model_channels = model_channels
-        if isinstance(num_res_blocks, int):
-            self.num_res_blocks = len(channel_mult) * [num_res_blocks]
-        else:
-            if len(num_res_blocks) != len(channel_mult):
-                raise ValueError("provide num_res_blocks either as an int (globally constant) or "
-                                 "as a list/tuple (per-level) with the same length as channel_mult")
-            self.num_res_blocks = num_res_blocks
-        if disable_self_attentions is not None:
-            # should be a list of booleans, indicating whether to disable self-attention in TransformerBlocks or not
-            assert len(disable_self_attentions) == len(channel_mult)
-        if num_attention_blocks is not None:
-            assert len(num_attention_blocks) == len(self.num_res_blocks)
-            assert all(map(lambda i: self.num_res_blocks[i] >= num_attention_blocks[i], range(len(num_attention_blocks))))
-            print(f"Constructor of UNetModel received num_attention_blocks={num_attention_blocks}. "
-                  f"This option has LESS priority than attention_resolutions {attention_resolutions}, "
-                  f"i.e., in cases where num_attention_blocks[i] > 0 but 2**i not in attention_resolutions, "
-                  f"attention will still not be set.")
-
+        self.num_res_blocks = num_res_blocks
         self.attention_resolutions = attention_resolutions
         self.dropout = dropout
         self.channel_mult = channel_mult
         self.conv_resample = conv_resample
+        self.extra_sa_layer = extra_sa_layer
+        self.num_classes = num_classes
+        self.extra_film_condition_dim = extra_film_condition_dim
         self.use_checkpoint = use_checkpoint
         self.dtype = th.float16 if use_fp16 else th.float32
         self.num_heads = num_heads
         self.num_head_channels = num_head_channels
         self.num_heads_upsample = num_heads_upsample
         self.predict_codebook_ids = n_embed is not None
+        self.use_spatial_transformer = use_spatial_transformer
+        self.legacy = legacy
 
         time_embed_dim = model_channels * 4
         self.time_embed = nn.Sequential(
@@ -138,16 +153,18 @@ class ControlNet(nn.Module):
             nn.SiLU(),
             linear(time_embed_dim, time_embed_dim),
         )
+        self.use_extra_film_by_concat = self.extra_film_condition_dim is not None
+        if self.extra_film_condition_dim is not None:
+            self.film_emb = nn.Linear(self.extra_film_condition_dim, time_embed_dim)
 
-        self.input_blocks = nn.ModuleList(
-            [
-                TimestepEmbedSequential(
-                    conv_nd(dims, in_channels, model_channels, 3, padding=1)
-                )
-            ]
-        )
-        self.zero_convs = nn.ModuleList([self.make_zero_conv(model_channels)])
+        if context_dim is not None and not isinstance(context_dim, list):
+            context_dim = [context_dim]
+        elif context_dim is None:
+            context_dim = [None]  # At least use one spatial transformer
 
+        # TODO: check and modify for used hint data
+        # === 入力の最初にヒント（ガイド特徴）を処理する小さなネット ===
+        # 画像版 ControlNet の input_hint_block を踏襲（2D Conv）。音声も 2D（T×F）表現前提。
         self.input_hint_block = TimestepEmbedSequential(
             conv_nd(dims, hint_channels, 16, 3, padding=1),
             nn.SiLU(),
@@ -163,19 +180,30 @@ class ControlNet(nn.Module):
             nn.SiLU(),
             conv_nd(dims, 96, 256, 3, padding=1, stride=2),
             nn.SiLU(),
-            zero_module(conv_nd(dims, 256, model_channels, 3, padding=1))
+            zero_module(conv_nd(dims, 256, model_channels, 3, padding=1)),
         )
+
+        self.input_blocks = nn.ModuleList(
+            [
+                TimestepEmbedSequential(
+                    conv_nd(dims, in_channels, model_channels, 3, padding=1)
+                )
+            ]
+        )
+        self.zero_convs = nn.ModuleList([self.make_zero_conv(model_channels)])
 
         self._feature_size = model_channels
         input_block_chans = [model_channels]
         ch = model_channels
         ds = 1
         for level, mult in enumerate(channel_mult):
-            for nr in range(self.num_res_blocks[level]):
+            for _ in range(num_res_blocks):
                 layers = [
                     ResBlock(
                         ch,
-                        time_embed_dim,
+                        time_embed_dim
+                        if (not self.use_extra_film_by_concat)
+                        else time_embed_dim * 2,
                         dropout,
                         out_channels=mult * model_channels,
                         dims=dims,
@@ -191,27 +219,42 @@ class ControlNet(nn.Module):
                         num_heads = ch // num_head_channels
                         dim_head = num_head_channels
                     if legacy:
-                        # num_heads = 1
-                        dim_head = ch // num_heads if use_spatial_transformer else num_head_channels
-                    if exists(disable_self_attentions):
-                        disabled_sa = disable_self_attentions[level]
-                    else:
-                        disabled_sa = False
-
-                    if not exists(num_attention_blocks) or nr < num_attention_blocks[level]:
+                        dim_head = (
+                            ch // num_heads
+                            if use_spatial_transformer
+                            else num_head_channels
+                        )
+                    if extra_sa_layer:
                         layers.append(
-                            AttentionBlock(
+                            SpatialTransformer(
                                 ch,
-                                use_checkpoint=use_checkpoint,
-                                num_heads=num_heads,
-                                num_head_channels=dim_head,
-                                use_new_attention_order=use_new_attention_order,
-                            ) if not use_spatial_transformer else SpatialTransformer(
-                                ch, num_heads, dim_head, depth=transformer_depth, context_dim=context_dim,
-                                disable_self_attn=disabled_sa, use_linear=use_linear_in_transformer,
-                                use_checkpoint=use_checkpoint
+                                num_heads,
+                                dim_head,
+                                depth=transformer_depth,
+                                context_dim=None,
                             )
                         )
+                    for ctx_dim in context_dim:
+                        if not use_spatial_transformer:
+                            layers.append(
+                                AttentionBlock(
+                                    ch,
+                                    use_checkpoint=use_checkpoint,
+                                    num_heads=num_heads,
+                                    num_head_channels=dim_head,
+                                    use_new_attention_order=use_new_attention_order,
+                                )
+                            )
+                        else:
+                            layers.append(
+                                SpatialTransformer(
+                                    ch,
+                                    num_heads,
+                                    dim_head,
+                                    depth=transformer_depth,
+                                    context_dim=ctx_dim,
+                                )
+                            )
                 self.input_blocks.append(TimestepEmbedSequential(*layers))
                 self.zero_convs.append(self.make_zero_conv(ch))
                 self._feature_size += ch
@@ -222,7 +265,9 @@ class ControlNet(nn.Module):
                     TimestepEmbedSequential(
                         ResBlock(
                             ch,
-                            time_embed_dim,
+                            time_embed_dim
+                            if (not self.use_extra_film_by_concat)
+                            else time_embed_dim * 2,
                             dropout,
                             out_channels=out_ch,
                             dims=dims,
@@ -248,70 +293,119 @@ class ControlNet(nn.Module):
             num_heads = ch // num_head_channels
             dim_head = num_head_channels
         if legacy:
-            # num_heads = 1
             dim_head = ch // num_heads if use_spatial_transformer else num_head_channels
-        self.middle_block = TimestepEmbedSequential(
+        middle_layers = [
             ResBlock(
                 ch,
-                time_embed_dim,
+                time_embed_dim
+                if (not self.use_extra_film_by_concat)
+                else time_embed_dim * 2,
                 dropout,
                 dims=dims,
                 use_checkpoint=use_checkpoint,
                 use_scale_shift_norm=use_scale_shift_norm,
-            ),
-            AttentionBlock(
-                ch,
-                use_checkpoint=use_checkpoint,
-                num_heads=num_heads,
-                num_head_channels=dim_head,
-                use_new_attention_order=use_new_attention_order,
-            ) if not use_spatial_transformer else SpatialTransformer(  # always uses a self-attn
-                ch, num_heads, dim_head, depth=transformer_depth, context_dim=context_dim,
-                disable_self_attn=disable_middle_self_attn, use_linear=use_linear_in_transformer,
-                use_checkpoint=use_checkpoint
-            ),
+            )
+        ]
+        if extra_sa_layer:
+            middle_layers.append(
+                SpatialTransformer(
+                    ch, num_heads, dim_head, depth=transformer_depth, context_dim=None
+                )
+            )
+        for ctx_dim in context_dim:
+            if not use_spatial_transformer:
+                middle_layers.append(
+                    AttentionBlock(
+                        ch,
+                        use_checkpoint=use_checkpoint,
+                        num_heads=num_heads,
+                        num_head_channels=dim_head,
+                        use_new_attention_order=use_new_attention_order,
+                    )
+                )
+            else:
+                middle_layers.append(
+                    SpatialTransformer(
+                        ch,
+                        num_heads,
+                        dim_head,
+                        depth=transformer_depth,
+                        context_dim=ctx_dim,
+                    )
+                )
+        middle_layers.append(
             ResBlock(
                 ch,
-                time_embed_dim,
+                time_embed_dim
+                if (not self.use_extra_film_by_concat)
+                else time_embed_dim * 2,
                 dropout,
                 dims=dims,
                 use_checkpoint=use_checkpoint,
                 use_scale_shift_norm=use_scale_shift_norm,
-            ),
+            )
         )
+        self.middle_block = TimestepEmbedSequential(*middle_layers)
         self.middle_block_out = self.make_zero_conv(ch)
         self._feature_size += ch
 
-    def make_zero_conv(self, channels):
-        return TimestepEmbedSequential(zero_module(conv_nd(self.dims, channels, channels, 1, padding=0)))
+    def make_zero_conv(self, channels: int):
+        return TimestepEmbedSequential(
+            zero_module(conv_nd(self.dims, channels, channels, 1, padding=0))
+        )
 
-    def forward(self, x, hint, timesteps, context, **kwargs):
+    def forward(
+        self,
+        x,  # latent (N, C, T, F)
+        hint,
+        timesteps=None,
+        y=None,
+        context_list=None,
+        context_attn_mask_list=None,
+        **kwargs,
+    ):
         t_emb = timestep_embedding(timesteps, self.model_channels, repeat_only=False)
         emb = self.time_embed(t_emb)
 
-        guided_hint = self.input_hint_block(hint, emb, context)
+        if self.use_extra_film_by_concat:
+            assert y is not None, (
+                "must specify y if and only if the model is class-conditional or film embedding conditional"
+            )
+            emb = th.cat([emb, self.film_emb(y)], dim=-1)
+
+        guided_hint = self.input_hint_block(
+            hint, emb, context_list, context_attn_mask_list
+        )
 
         outs = []
-
         h = x.type(self.dtype)
         for module, zero_conv in zip(self.input_blocks, self.zero_convs):
+            h = module(h, emb, context_list, context_attn_mask_list)
             if guided_hint is not None:
-                h = module(h, emb, context)
-                h += guided_hint
+                h = h + guided_hint
                 guided_hint = None
-            else:
-                h = module(h, emb, context)
-            outs.append(zero_conv(h, emb, context))
+            outs.append(zero_conv(h, emb, context_list, context_attn_mask_list))
 
-        h = self.middle_block(h, emb, context)
-        outs.append(self.middle_block_out(h, emb, context))
-
+        h = self.middle_block(h, emb, context_list, context_attn_mask_list)
+        outs.append(self.middle_block_out(h, emb, context_list, context_attn_mask_list))
         return outs
 
 
 class ControlLDM(LatentDiffusion):
+    """
+    modified based on differences between
+        - 'ControlLDM' in StableDiffusion and 'LatentDiffusion' in StableDiffusion
+        - 'LatentDiffusion' in StableDiffusion and 'LatentDiffusion' in AudioLDM
+    """
 
-    def __init__(self, control_stage_config, control_key, only_mid_control, *args, **kwargs):
+    def __init__(
+        self,
+        control_stage_config,
+        control_key,  # バッチ中のヒント取得キー（例：'hint' / 'control' 等）
+        only_mid_control=False,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.control_model = instantiate_from_config(control_stage_config)
         self.control_key = control_key
@@ -319,122 +413,132 @@ class ControlLDM(LatentDiffusion):
         self.control_scales = [1.0] * 13
 
     @torch.no_grad()
-    def get_input(self, batch, k, bs=None, *args, **kwargs):
-        x, c = super().get_input(batch, self.first_stage_key, *args, **kwargs)
-        control = batch[self.control_key]
-        if bs is not None:
-            control = control[:bs]
-        control = control.to(self.device)
-        control = einops.rearrange(control, 'b h w c -> b c h w')
+    def get_input(self, batch, k, *args, **kwargs):
+        z, cond_dict = super().get_input(batch, k, *args, **kwargs)
+        assert self.control_key in batch, f"'{self.control_key}' not found in batch."
+        control = batch[self.control_key].to(self.device)
+        # TODO: check a shape of control hint
+        if control.dim() == 3:
+            control = control.unsqueeze(1)
+        else:
+            raise ValueError(f"Unexpected control hint shape: {control.shape}")
+
         control = control.to(memory_format=torch.contiguous_format).float()
-        return x, dict(c_crossattn=[c], c_concat=[control])
+        cond = dict(cond_dict=cond_dict, control_hint=control)
+        return z, cond
+
+    def _flatten_sorted(self, keys, prefix):
+        return sorted([k for k in keys if k.startswith(prefix)])
+
+    def _extract_unet_inputs_from_cond_dict(self, cond_dict):
+        """
+        TODO: check this implementation
+        AudioLDM の DiffusionWrapper が内部でしていることを最小限で再現：
+        cond_dict から y（FiLM）、context_list、context_attn_mask_list を作る。
+        （正確なキーはプロジェクト実装に合わせてください）
+        """
+        keys = list(cond_dict.keys())
+
+        # FiLM ベクトルの結合
+        film_keys = self._flatten_sorted(keys, "film")
+        y = None
+        if len(film_keys) > 0:
+            film_list = [cond_dict[k] for k in film_keys]
+            # すべて (B, D) 前提
+            y = torch.cat(film_list, dim=-1)
+
+        # Cross-Attn の context と mask
+        ctx_keys = [
+            k
+            for k in keys
+            if k.startswith("crossattn") and (not k.endswith("_attn_mask"))
+        ]
+        ctx_keys = sorted(ctx_keys)
+        context_list = [cond_dict[k] for k in ctx_keys]
+
+        mask_keys = [k for k in keys if k.endswith("_attn_mask")]
+        mask_keys = sorted(mask_keys)
+        context_attn_mask_list = (
+            [cond_dict[k] for k in mask_keys] if len(mask_keys) > 0 else None
+        )
+
+        # Concat 系（入力チャネルへ結合）を使う場合は、音声実装側の DiffusionWrapper で処理する想定
+        # ここでは U-Net に渡す 3 つだけ返せばよい
+        return y, context_list, context_attn_mask_list
 
     def apply_model(self, x_noisy, t, cond, *args, **kwargs):
-        assert isinstance(cond, dict)
+        assert isinstance(cond, dict) and "cond_dict" in cond, (
+            "cond must be {'cond_dict':..., 'control_hint':...}"
+        )
+        cond_dict = cond["cond_dict"]
+        control_hint = cond.get("control_hint", None)
+
         diffusion_model = self.model.diffusion_model
 
-        cond_txt = torch.cat(cond['c_crossattn'], 1)
+        y, context_list, context_attn_mask_list = (
+            self._extract_unet_inputs_from_cond_dict(cond_dict)
+        )
 
-        if cond['c_concat'] is None:
-            eps = diffusion_model(x=x_noisy, timesteps=t, context=cond_txt, control=None, only_mid_control=self.only_mid_control)
+        if control_hint is None:
+            control = None
         else:
-            control = self.control_model(x=x_noisy, hint=torch.cat(cond['c_concat'], 1), timesteps=t, context=cond_txt)
+            control = self.control_model(
+                x=x_noisy,
+                hint=control_hint,
+                timesteps=t,
+                y=y,
+                context_list=context_list,
+                context_attn_mask_list=context_attn_mask_list,
+            )
             control = [c * scale for c, scale in zip(control, self.control_scales)]
-            eps = diffusion_model(x=x_noisy, timesteps=t, context=cond_txt, control=control, only_mid_control=self.only_mid_control)
 
+        eps = diffusion_model(
+            x_noisy,
+            timesteps=t,
+            y=y,
+            context_list=context_list,
+            context_attn_mask_list=context_attn_mask_list,
+            control=control,
+            only_mid_control=self.only_mid_control,
+        )
         return eps
 
     @torch.no_grad()
     def get_unconditional_conditioning(self, N):
-        return self.get_learned_conditioning([""] * N)
+        try:
+            return super().get_unconditional_conditioning(N)
+        except Exception:
+            return self.get_learned_conditioning([""] * N)
 
     @torch.no_grad()
-    def log_images(self, batch, N=4, n_row=2, sample=False, ddim_steps=50, ddim_eta=0.0, return_keys=None,
-                   quantize_denoised=True, inpaint=True, plot_denoise_rows=False, plot_progressive_rows=True,
-                   plot_diffusion_rows=False, unconditional_guidance_scale=9.0, unconditional_guidance_label=None,
-                   use_ema_scope=True,
-                   **kwargs):
-        use_ddim = ddim_steps is not None
-
-        log = dict()
-        z, c = self.get_input(batch, self.first_stage_key, bs=N)
-        c_cat, c = c["c_concat"][0][:N], c["c_crossattn"][0][:N]
-        N = min(z.shape[0], N)
-        n_row = min(z.shape[0], n_row)
-        log["reconstruction"] = self.decode_first_stage(z)
-        log["control"] = c_cat * 2.0 - 1.0
-        log["conditioning"] = log_txt_as_img((512, 512), batch[self.cond_stage_key], size=16)
-
-        if plot_diffusion_rows:
-            # get diffusion row
-            diffusion_row = list()
-            z_start = z[:n_row]
-            for t in range(self.num_timesteps):
-                if t % self.log_every_t == 0 or t == self.num_timesteps - 1:
-                    t = repeat(torch.tensor([t]), '1 -> b', b=n_row)
-                    t = t.to(self.device).long()
-                    noise = torch.randn_like(z_start)
-                    z_noisy = self.q_sample(x_start=z_start, t=t, noise=noise)
-                    diffusion_row.append(self.decode_first_stage(z_noisy))
-
-            diffusion_row = torch.stack(diffusion_row)  # n_log_step, n_row, C, H, W
-            diffusion_grid = rearrange(diffusion_row, 'n b c h w -> b n c h w')
-            diffusion_grid = rearrange(diffusion_grid, 'b n c h w -> (b n) c h w')
-            diffusion_grid = make_grid(diffusion_grid, nrow=diffusion_row.shape[0])
-            log["diffusion_row"] = diffusion_grid
-
-        if sample:
-            # get denoise row
-            samples, z_denoise_row = self.sample_log(cond={"c_concat": [c_cat], "c_crossattn": [c]},
-                                                     batch_size=N, ddim=use_ddim,
-                                                     ddim_steps=ddim_steps, eta=ddim_eta)
-            x_samples = self.decode_first_stage(samples)
-            log["samples"] = x_samples
-            if plot_denoise_rows:
-                denoise_grid = self._get_denoise_row_from_list(z_denoise_row)
-                log["denoise_row"] = denoise_grid
-
-        if unconditional_guidance_scale > 1.0:
-            uc_cross = self.get_unconditional_conditioning(N)
-            uc_cat = c_cat  # torch.zeros_like(c_cat)
-            uc_full = {"c_concat": [uc_cat], "c_crossattn": [uc_cross]}
-            samples_cfg, _ = self.sample_log(cond={"c_concat": [c_cat], "c_crossattn": [c]},
-                                             batch_size=N, ddim=use_ddim,
-                                             ddim_steps=ddim_steps, eta=ddim_eta,
-                                             unconditional_guidance_scale=unconditional_guidance_scale,
-                                             unconditional_conditioning=uc_full,
-                                             )
-            x_samples_cfg = self.decode_first_stage(samples_cfg)
-            log[f"samples_cfg_scale_{unconditional_guidance_scale:.2f}"] = x_samples_cfg
-
-        return log
-
-    @torch.no_grad()
-    def sample_log(self, cond, batch_size, ddim, ddim_steps, **kwargs):
+    def sample_log(self, cond, batch_size, ddim=True, ddim_steps=50, eta=0.0, **kwargs):
+        """
+        TODO: check this implementation
+        """
         ddim_sampler = DDIMSampler(self)
-        b, c, h, w = cond["c_concat"][0].shape
-        shape = (self.channels, h // 8, w // 8)
-        samples, intermediates = ddim_sampler.sample(ddim_steps, batch_size, shape, cond, verbose=False, **kwargs)
+        control_hint = cond.get("control_hint", None)
+        if control_hint is None:
+            raise ValueError("sample_log requires 'control_hint' to infer shape (T,F).")
+        _, _, t_size, f_size = control_hint.shape
+        factor = getattr(self, "downsampling_factor", 8)
+        shape = (self.channels, t_size // factor, f_size // factor)
+        samples, intermediates = ddim_sampler.sample(
+            ddim_steps,
+            batch_size,
+            shape,
+            cond,
+            verbose=False,
+            eta=eta,
+            ddim=ddim,
+            **kwargs,
+        )
         return samples, intermediates
 
     def configure_optimizers(self):
         lr = self.learning_rate
         params = list(self.control_model.parameters())
-        if not self.sd_locked:
+        if not getattr(self, "sd_locked", True):
             params += list(self.model.diffusion_model.output_blocks.parameters())
             params += list(self.model.diffusion_model.out.parameters())
         opt = torch.optim.AdamW(params, lr=lr)
         return opt
-
-    def low_vram_shift(self, is_diffusing):
-        if is_diffusing:
-            self.model = self.model.cuda()
-            self.control_model = self.control_model.cuda()
-            self.first_stage_model = self.first_stage_model.cpu()
-            self.cond_stage_model = self.cond_stage_model.cpu()
-        else:
-            self.model = self.model.cpu()
-            self.control_model = self.control_model.cpu()
-            self.first_stage_model = self.first_stage_model.cuda()
-            self.cond_stage_model = self.cond_stage_model.cuda()
-
