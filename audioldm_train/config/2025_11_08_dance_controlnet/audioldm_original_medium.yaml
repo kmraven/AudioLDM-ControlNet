@@ -13,13 +13,11 @@ variables:
   optimize_ddpm_parameter: &optimize_ddpm_parameter true
   optimize_gpt: &optimize_gpt true
   warmup_steps: &warmup_steps 2000
-  hint_embed_dim: &hint_embed_dim 8 # TODO check
 
 data: 
   train: ["aist"]
   val: "aist"
   test: "aist"
-  class_label_indices: "audioset_eval_subset"
   dataloader_add_ons: [] 
 
 step:
@@ -150,7 +148,6 @@ model:
         # context_dim: 
         # - 768
         in_channels: *unet_in_channels # The input channel of the UNet model
-        hint_channels: *hint_embbed_dim # TODO might need to change
         model_channels: 192 # TODO might need to change
         attention_resolutions:
         - 8

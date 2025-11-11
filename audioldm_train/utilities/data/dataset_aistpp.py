@@ -15,14 +15,12 @@ class AISTDataset(AudioDataset):
 
     def __getitem__(self, index):
         data = super().__getitem__(index)
-
         datum = self.data[index]
         kpt_path = datum.get("motion", None)
-        k2d = self.motion_preprocessor.extract(kpt_path)
-
-        tgt_T = self.target_length
-        k2d = self._time_resample_sequence(k2d, tgt_T)  # (tgt_T, J, 2) or (tgt_T, 2*J)
-
+        k2d = self.motion_preprocessor._load_keypoints(kpt_path)  # shape: (T, 17, 3)
+        k2d = self.motion_preprocessor._interpolate_nan_in_keypoints(k2d)[:, :, :2]  # shape: (T, 17, 2)
+        # k2d = self.motion_preprocessor.extract(kpt_path)  # shape: (T, 138)
+        k2d = self._time_resample_sequence(k2d, self.target_length)
         data.update({"motion": k2d})
         return data
 
@@ -62,14 +60,8 @@ class AISTDataset(AudioDataset):
         )
 
     def _time_resample_sequence(self, seq, target_T):
-        """
-        seq: (T, J, 2) または (T, 2J)
-        target_T: int
-        return: (target_T, J, 2) または (target_T, 2J)
-        """
         seq = np.asarray(seq)
         if seq.ndim == 2:
-            # (T, 2J) のときは (T, D) とみなす
             T, D = seq.shape
             if T == target_T:
                 return seq
@@ -81,7 +73,6 @@ class AISTDataset(AudioDataset):
                 out[:, d] = np.interp(x_new, x_old, seq[:, d])
             return out
         elif seq.ndim == 3:
-            # (T, J, 2)
             T, J, C = seq.shape
             assert C == 2, f"Expected last dim=2, got {C}"
             if T == target_T:
@@ -109,6 +100,13 @@ class MotionPreprocessor:
 
     def __init__(self):
         pass
+
+    def _load_keypoints(self, keypoints_path):
+        with open(keypoints_path, 'rb') as f:
+            keypoints = pickle.load(f)
+        assert isinstance(keypoints, np.ndarray), "keypoints should be a list of numpy arrays"
+        assert keypoints.shape[1] == 17 and keypoints.shape[2] == 3, "keypoints should be a list of numpy arrays with shape [T, 17, 3]"
+        return keypoints
 
     def _interpolate_nan_in_keypoints(keypoints):
         T, J, C = keypoints.shape
@@ -148,10 +146,7 @@ class MotionPreprocessor:
                 joint angular velocity (each bone)
             ]
         """
-        with open(keypoints_path, 'rb') as f:
-            keypoints = pickle.load(f)
-        assert isinstance(keypoints, np.ndarray), "keypoints should be a list of numpy arrays"
-        assert keypoints.shape[1] == 17 and keypoints.shape[2] == 3, "keypoints should be a list of numpy arrays with shape [T, 17, 3]"
+        keypoints = self._load_keypoints(keypoints_path)  # shape: (T, 17, 3)
         pose_feature = torch.tensor(self._interpolate_nan_in_keypoints(keypoints)[:, :, :2])  # reshape to (T, 17, 2)
         pose_feature = torch.nan_to_num(pose_feature, nan=0.0)
         T, J, _ = pose_feature.shape # (T,J,2)

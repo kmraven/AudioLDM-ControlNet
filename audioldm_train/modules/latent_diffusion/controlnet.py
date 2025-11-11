@@ -2,7 +2,6 @@
 adopted from
 https://github.com/lllyasviel/ControlNet/blob/ed85cd1e25a5ed592f7d8178495b4483de0331bf/cldm/cldm.py
 """
-
 import torch
 import torch as th
 import torch.nn as nn
@@ -79,30 +78,197 @@ class ControlledUnetModel(UNetModel):
             return self.out(h)
 
 
-# TODO: check and modify the shape of zero_module conv layers if necessary
-class MotionEncoder(nn.Module):
-    def __init__(self, in_channels, out_channels, dims):
+class PoseEncoder(nn.Module):
+    """
+    Simple Pose Encoder for 2D COCO keypoints to match a target latent dimension.
+    - Input: keypoints of shape (N, T, J, 2) or (N, T, J, 3) where the 3rd channel can be visibility/confidence (v).
+    - Output: (N, T, out_dim) by default. You can set out_layout='NCT' to get (N, out_dim, T),
+              or return_2d_hint=True to get (N, out_dim, T, 1) for 2D-conv backbones.
+
+    Design (lightweight, MotionBERT downstream-friendly):
+      1) Root-centering using pelvis (midpoint of left/right hip).
+      2) Scale normalization using torso length (distance between mid-shoulders and mid-hips).
+      3) Optional per-joint learnable embeddings (joint id embedding).
+      4) Per-frame MLP to project (J * feat_per_joint) -> hidden -> out_dim.
+      5) Optional shallow temporal depthwise conv for smoothing (residual).
+      6) Confidence/visibility masking: if provided, downweight or drop unreliable joints.
+
+    Note:
+      - Time dimension T is preserved as-is (already aligned with music latent).
+      - Keep it simple so that you can later replace this with MotionBERT features.
+    """
+
+    # COCO 17-joint order (common variant):
+    # 0:nose,1:left_eye,2:right_eye,3:left_ear,4:right_ear,
+    # 5:left_shoulder,6:right_shoulder,7:left_elbow,8:right_elbow,9:left_wrist,10:right_wrist,
+    # 11:left_hip,12:right_hip,13:left_knee,14:right_knee,15:left_ankle,16:right_ankle
+    COCO_LEFT_SHOULDER = 5
+    COCO_RIGHT_SHOULDER = 6
+    COCO_LEFT_HIP = 11
+    COCO_RIGHT_HIP = 12
+
+    def __init__(
+        self,
+        num_joints: int = 17,
+        in_channels: int = 2,          # 2 (x,y) or 3 (x,y,v)
+        out_dim: int = 256,            # target latent dim to match music latent
+        hidden_dim: int = 512,         # MLP hidden
+        use_joint_embed: bool = True,  # learnable joint id embeddings
+        joint_embed_dim: int = 8,      # small embedding for joint identity
+        use_temporal_smoothing: bool = True,
+        temporal_kernel: int = 3,      # temporal depthwise kernel
+        out_layout: str = "NTC",       # "NTC" -> (N,T,C), "NCT" -> (N,C,T)
+        return_2d_hint: bool = False,  # if True, returns (N, C, T, 1) for 2D conv consumers
+        epsilon: float = 1e-6,
+    ):
         super().__init__()
-        self.model = TimestepEmbedSequential(
-            conv_nd(dims, in_channels, 16, 3, padding=1),
-            nn.SiLU(),
-            conv_nd(dims, 16, 16, 3, padding=1),
-            nn.SiLU(),
-            conv_nd(dims, 16, 32, 3, padding=1, stride=2),
-            nn.SiLU(),
-            conv_nd(dims, 32, 32, 3, padding=1),
-            nn.SiLU(),
-            conv_nd(dims, 32, 96, 3, padding=1, stride=2),
-            nn.SiLU(),
-            conv_nd(dims, 96, 96, 3, padding=1),
-            nn.SiLU(),
-            conv_nd(dims, 96, 256, 3, padding=1, stride=2),
-            nn.SiLU(),
-            zero_module(conv_nd(dims, 256, out_channels, 3, padding=1)),
+        self.J = num_joints
+        self.in_channels = in_channels
+        self.out_dim = out_dim
+        self.hidden_dim = hidden_dim
+        self.eps = epsilon
+        self.use_joint_embed = use_joint_embed
+        self.joint_embed_dim = joint_embed_dim if use_joint_embed else 0
+        self.use_temporal_smoothing = use_temporal_smoothing
+        self.temporal_kernel = temporal_kernel
+        self.out_layout = out_layout
+        self.return_2d_hint = return_2d_hint
+
+        feat_per_joint = 2  # we only encode (x,y) after pre-processing; confidence handled as weights
+        in_per_frame = self.J * (feat_per_joint + self.joint_embed_dim)
+
+        # per-joint id embedding (optional)
+        if self.use_joint_embed:
+            self.joint_embed = nn.Embedding(self.J, self.joint_embed_dim)
+            nn.init.normal_(self.joint_embed.weight, std=0.02)
+
+        # simple per-frame MLP
+        self.proj = nn.Sequential(
+            nn.Linear(in_per_frame, hidden_dim),
+            nn.ReLU(inplace=True),
+            nn.Linear(hidden_dim, out_dim)
         )
 
-    def forward(self, x):
-        return self.model(x)
+        # shallow temporal smoothing with depthwise separable conv (residual)
+        if self.use_temporal_smoothing:
+            # conv expects (N, C, T). We'll permute around it.
+            self.dw_conv = nn.Conv1d(out_dim, out_dim, kernel_size=self.temporal_kernel,
+                                     padding=self.temporal_kernel // 2, groups=out_dim, bias=True)
+            self.pw_conv = nn.Conv1d(out_dim, out_dim, kernel_size=1, bias=True)
+            nn.init.zeros_(self.dw_conv.bias)
+            nn.init.zeros_(self.pw_conv.bias)
+
+    @staticmethod
+    def _midpoint(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
+        # a, b: (..., 2)
+        return 0.5 * (a + b)
+
+    def _root_and_scale(self, kpt_xy: torch.Tensor, vis: torch.Tensor = None):
+        """
+        Root-center (pelvis) and scale-normalize by torso length.
+        kpt_xy: (N, T, J, 2)
+        vis: (N, T, J, 1) or None (0/1 mask or soft weights). If None, use ones.
+        Returns:
+          norm_xy: (N, T, J, 2), scale-invariant, root-centered
+          weights: (N, T, J, 1) in [0,1]
+        """
+        N, T, J, _ = kpt_xy.shape
+        device = kpt_xy.device
+
+        if vis is None:
+            weights = torch.ones((N, T, J, 1), device=device, dtype=kpt_xy.dtype)
+        else:
+            # clamp to [0,1]
+            weights = torch.clamp(vis, 0.0, 1.0)
+
+        # compute pelvis = midpoint of left/right hip
+        lhip = kpt_xy[..., self.COCO_LEFT_HIP, :]   # (N,T,2)
+        rhip = kpt_xy[..., self.COCO_RIGHT_HIP, :]  # (N,T,2)
+        pelvis = self._midpoint(lhip, rhip)         # (N,T,2)
+
+        # root-center
+        centered = kpt_xy - pelvis.unsqueeze(-2)    # (N,T,J,2)
+
+        # torso length = distance between mid-shoulders and mid-hips
+        lsho = kpt_xy[..., self.COCO_LEFT_SHOULDER, :]
+        rsho = kpt_xy[..., self.COCO_RIGHT_SHOULDER, :]
+        mid_sho = self._midpoint(lsho, rsho)        # (N,T,2)
+        mid_hip = self._midpoint(lhip, rhip)        # (N,T,2)
+        torso = torch.linalg.norm(mid_sho - mid_hip, dim=-1, keepdim=True)  # (N,T,1)
+        torso = torch.clamp(torso, min=self.eps)
+
+        norm_xy = centered / torso.unsqueeze(-2)    # (N,T,J,2)
+
+        # if some frames are fully invalid, keep them small (already handled by weights in aggregation)
+        return norm_xy, weights
+
+    def forward(self, keypoints: torch.Tensor):
+        """
+        keypoints: (N, T, J, 2) or (N, T, J, 3) with (x,y[,v])
+        Returns:
+          (N, T, out_dim) by default, or (N, out_dim, T) if out_layout='NCT',
+          or (N, out_dim, T, 1) if return_2d_hint=True.
+        """
+        assert keypoints.dim() == 4, "keypoints must be (N, T, J, C)"
+        N, T, J, C = keypoints.shape
+        assert J == self.J, f"num_joints mismatch: expected {self.J}, got {J}"
+        assert C in (2, 3), "last channel must be 2:(x,y) or 3:(x,y,v)"
+
+        if C == 3:
+            xy = keypoints[..., :2]
+            v = keypoints[..., 2:].unsqueeze(-1) if keypoints.size(-1) == 3 else None  # (N,T,J,1)
+            # if keypoints[...,2] is already (N,T,J,1) you can adapt above line
+            v = keypoints[..., 2].unsqueeze(-1)  # ensure (N,T,J,1)
+        else:
+            xy = keypoints
+            v = None
+
+        # 1) root-centering & scale-normalization
+        xy, w = self._root_and_scale(xy, v)  # xy: (N,T,J,2), w: (N,T,J,1)
+
+        # 2) (optional) joint id embeddings
+        if self.use_joint_embed:
+            # joint ids: 0..J-1
+            joint_ids = torch.arange(self.J, device=xy.device).long()  # (J,)
+            je = self.joint_embed(joint_ids)  # (J, E)
+            je = je.view(1, 1, self.J, self.joint_embed_dim).expand(N, T, self.J, self.joint_embed_dim)
+            feat = torch.cat([xy, je], dim=-1)  # (N,T,J,2+E)
+        else:
+            feat = xy  # (N,T,J,2)
+
+        # 3) apply visibility/confidence weights (elementwise, pass-through)
+        if w is not None:
+            # multiply only the coordinate part; for joint embeddings we can keep them unchanged
+            if self.use_joint_embed:
+                coords = feat[..., :2]
+                rest = feat[..., 2:]
+                coords = coords * w
+                feat = torch.cat([coords, rest], dim=-1)
+            else:
+                feat = feat * w
+
+        # 4) per-frame MLP projection
+        feat = feat.reshape(N, T, -1)        # (N,T,J*(2+E))
+        proj = self.proj(feat)               # (N,T,out_dim)
+
+        # 5) optional shallow temporal smoothing (depthwise separable conv)
+        if self.use_temporal_smoothing:
+            # to (N,C,T)
+            x = proj.transpose(1, 2)         # (N,out_dim,T)
+            res = self.pw_conv(self.dw_conv(x))
+            x = x + res                      # residual
+            proj = x.transpose(1, 2)         # (N,T,out_dim)
+
+        # 6) layout / hint shape
+        if self.return_2d_hint:
+            # (N, out_dim, T, 1) for 2D-conv consumers (e.g., ControlNet hint path)
+            out = proj.transpose(1, 2).unsqueeze(-1)
+            return out  # (N, C, T, 1)
+
+        if self.out_layout == "NCT":
+            return proj.transpose(1, 2)      # (N,out_dim,T)
+        # default: "NTC"
+        return proj                          # (N,T,out_dim)
 
 
 class ControlNet(nn.Module):
@@ -190,7 +356,7 @@ class ControlNet(nn.Module):
         elif context_dim is None:
             context_dim = [None]  # At least use one spatial transformer
 
-        self.input_hint_block = MotionEncoder(hint_channels, model_channels, dims)
+        self.input_hint_block = PoseEncoder(out_dim=model_channels)
 
         self.input_blocks = nn.ModuleList(
             [
