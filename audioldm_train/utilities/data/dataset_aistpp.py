@@ -1,4 +1,5 @@
 import pickle
+import math
 
 import numpy as np
 import torch
@@ -8,12 +9,16 @@ from audioldm_train.utilities.data.dataset import AudioDataset
 
 
 class AISTDataset(AudioDataset):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.motion_preprocessor = MotionPreprocessor()
+
     def __getitem__(self, index):
         data = super().__getitem__(index)
 
         datum = self.data[index]
         kpt_path = datum.get("motion", None)
-        k2d = self._load_keypoints_2d(kpt_path)
+        k2d = self.motion_preprocessor.extract(kpt_path)
 
         tgt_T = self.target_length
         k2d = self._time_resample_sequence(k2d, tgt_T)  # (tgt_T, J, 2) or (tgt_T, 2*J)
@@ -56,18 +61,6 @@ class AISTDataset(AudioDataset):
             random_start,
         )
 
-    def _load_keypoints_2d(self, path):
-        with open(path, "rb") as f:
-            keypoints = pickle.load(f)
-        keypoints = self._interpolate_nan_in_keypoints(keypoints)
-        return torch.tensor(keypoints)
-
-    def _interpolate_nan_in_keypoints(keypoints):
-        T, J, C = keypoints.shape
-        keypoints_flatten = keypoints.reshape(T, -1)
-        keypoints_interpolated = pd.DataFrame(keypoints_flatten).interpolate(method='linear', limit_direction='both', axis=0)
-        return keypoints_interpolated.values.reshape(T, J, C)
-
     def _time_resample_sequence(self, seq, target_T):
         """
         seq: (T, J, 2) または (T, 2J)
@@ -102,3 +95,82 @@ class AISTDataset(AudioDataset):
             return out
         else:
             raise ValueError(f"Unsupported keypoints shape: {seq.shape}")
+
+
+class MotionPreprocessor:
+
+    COCO_BONES = [
+        (0, 1), (0, 2), (1, 3), (2, 4),   # face
+        (0, 5),  (5, 7), (7, 9), (5, 11),     # left upper body
+        (0, 6), (6, 8), (8, 10), (6, 12),     # right upper body
+        (11, 13),  (13, 15),                  # Left lowerbody
+        (12, 14), (14, 16),                   # Right lowerbody
+    ]
+
+    def __init__(self):
+        pass
+
+    def _interpolate_nan_in_keypoints(keypoints):
+        T, J, C = keypoints.shape
+        keypoints_flatten = keypoints.reshape(T, -1)
+        keypoints_interpolated = pd.DataFrame(keypoints_flatten).interpolate(method='linear', limit_direction='both', axis=0)
+        return keypoints_interpolated.values.reshape(T, J, C)
+
+    def __angle_difference(self, a1, a2):
+        """Compute wrapped angle difference within [-pi, pi]"""
+        delta = a1 - a2
+        delta = (delta + math.pi) % (2 * math.pi) - math.pi
+        return delta
+
+    def __compute_bone_angles(self, positions, bones):
+        """
+        Compute 2D joint orientation angles for each bone. (in radian on the image)
+        positions: (T, J, 2)
+        Returns: (T, num_bones)
+        """
+        T, J, _ = positions.shape
+        angles = []
+        for p1_idx, p2_idx in bones:
+            vec = positions[:, p2_idx, :] - positions[:, p1_idx, :]  # (T, 2)
+            bone_angle = torch.atan2(vec[:, 1], vec[:, 0])     # (T,)
+            angles.append(bone_angle)
+        return torch.stack(angles, dim=1)  # (T, num_bones)
+
+    def extract(self, keypoints_path):
+        """
+        Input: 2d keypoints in COCO format (T, 17, 2)
+        Output: [root position, 
+                root velocity, 
+                joint position (rel to root),
+                joint velocity (rel to root),
+                joint acceleration (rel to root),
+                joint angles (each bone)
+                joint angular velocity (each bone)
+            ]
+        """
+        with open(keypoints_path, 'rb') as f:
+            keypoints = pickle.load(f)
+        assert isinstance(keypoints, np.ndarray), "keypoints should be a list of numpy arrays"
+        assert keypoints.shape[1] == 17 and keypoints.shape[2] == 3, "keypoints should be a list of numpy arrays with shape [T, 17, 3]"
+        pose_feature = torch.tensor(self._interpolate_nan_in_keypoints(keypoints)[:, :, :2])  # reshape to (T, 17, 2)
+        pose_feature = torch.nan_to_num(pose_feature, nan=0.0)
+        T, J, _ = pose_feature.shape # (T,J,2)
+        # using coco format, extract joint position, velocity, acceleration in root space
+        root = (pose_feature[:, 11, :] + pose_feature[:, 12, :]) / 2 # (T, 2) midpoint between left and right hip
+        root_vel = torch.cat((torch.zeros(1, 2), root[1:] - root[:-1]), 0) #(T, 2)
+        joint_pos = pose_feature - root.unsqueeze(1) #(T, J, 2) joint position in root space
+        joint_vel = torch.cat((torch.zeros(1, J, 2), joint_pos[1:] - joint_pos[:-1]), 0) #(T, J, 2) joint linear velocity in root space
+        joint_acc = torch.cat((torch.zeros(1, J, 2), joint_vel[1:] - joint_vel[:-1]), 0) #(T, J, 2) joint linear acceleration in root space
+        # 2d joint orientations, from each parent joint
+        # Bone angles on the 2D image
+        joint_angles = self.__compute_bone_angles(joint_pos, self.COCO_BONES)  # (T, num_bones)
+        # Bone angular velocity (wrapped between -pi and pi) and pad zeros
+        joint_angle_vel = torch.cat((torch.zeros(1, len(self.COCO_BONES)), self.__angle_difference(joint_angles[1:], joint_angles[:-1])), 0)  # (T, num_bones)
+        all_feat = torch.cat((root, # (T, 4+6J+2(J-1)) = (T, 138)
+                                root_vel,  
+                                joint_pos.flatten(start_dim=1), 
+                                joint_vel.flatten(start_dim=1), 
+                                joint_acc.flatten(start_dim=1), 
+                                joint_angles, 
+                                joint_angle_vel), 1)
+        return all_feat  # shape: (T, 138)
