@@ -1,8 +1,8 @@
-import json
-import os
+import pickle
 
 import numpy as np
 import torch
+import pandas as pd
 
 from audioldm_train.utilities.data.dataset import AudioDataset
 
@@ -13,22 +13,17 @@ class AISTDataset(AudioDataset):
 
         datum = self.data[index]
         kpt_path = datum.get("motion", None)
-        k2d = self._load_keypoints_2d(kpt_path)  # (T_raw, J, 2) or (T_raw, 2*J)
+        k2d = self._load_keypoints_2d(kpt_path)
 
         tgt_T = self.target_length
         k2d = self._time_resample_sequence(k2d, tgt_T)  # (tgt_T, J, 2) or (tgt_T, 2*J)
-
-        if isinstance(k2d, np.ndarray):
-            k2d = torch.from_numpy(k2d).float()
-        else:
-            k2d = k2d.float()
 
         data.update({"motion": k2d})
         return data
 
     def feature_extraction(self, index):
         """
-        Omits below parts from parent class' feature_extraction:
+        Omits below parts from original 'feature_extraction' methos:
          - skipping index when it's out of range
         """
         label_indices = np.zeros(self.label_num, dtype=np.float32)
@@ -62,37 +57,16 @@ class AISTDataset(AudioDataset):
         )
 
     def _load_keypoints_2d(self, path):
-        """
-        期待する形式:
-          - .npy: (T, J, 2) または (T, 2J)
-          - .json: {"keypoints": [[x1,y1, x2,y2, ...], ...]} 等に緩く対応
-        """
-        if path is None or (not os.path.exists(path)):
-            # 無い場合はゼロ配列を返す（tgt_T で後から埋め、shape は推論）
-            # ただし shape が決まらないため、後段のモデル都合に合わせて J を固定したい場合は config で指定してください
-            return np.zeros((1, 34, 2), dtype=np.float32)  # 仮の(1, J=34, 2)
+        with open(path, "rb") as f:
+            keypoints = pickle.load(f)
+        keypoints = self._interpolate_nan_in_keypoints(keypoints)
+        return torch.tensor(keypoints)
 
-        ext = os.path.splitext(path)[-1].lower()
-        if ext == ".npy":
-            arr = np.load(path)
-            # (T, 2J) → (T, J, 2) に直しておくと扱いやすい
-            if arr.ndim == 2 and arr.shape[1] % 2 == 0:
-                J = arr.shape[1] // 2
-                arr = arr.reshape(arr.shape[0], J, 2)
-            return arr.astype(np.float32)
-        elif ext == ".json":
-            with open(path, "r") as f:
-                obj = json.load(f)
-            # よくある構造: {"keypoints": [[x1,y1,x2,y2,...], ...]}
-            if "keypoints" in obj:
-                kp = np.array(obj["keypoints"], dtype=np.float32)
-                if kp.ndim == 2 and kp.shape[1] % 2 == 0:
-                    J = kp.shape[1] // 2
-                    kp = kp.reshape(kp.shape[0], J, 2)
-                return kp
-            raise ValueError(f"Unsupported json structure in {path}")
-        else:
-            raise ValueError(f"Unsupported keypoint file: {path}")
+    def _interpolate_nan_in_keypoints(keypoints):
+        T, J, C = keypoints.shape
+        keypoints_flatten = keypoints.reshape(T, -1)
+        keypoints_interpolated = pd.DataFrame(keypoints_flatten).interpolate(method='linear', limit_direction='both', axis=0)
+        return keypoints_interpolated.values.reshape(T, J, C)
 
     def _time_resample_sequence(self, seq, target_T):
         """

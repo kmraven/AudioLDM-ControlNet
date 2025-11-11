@@ -79,6 +79,32 @@ class ControlledUnetModel(UNetModel):
             return self.out(h)
 
 
+# TODO: check and modify the shape of zero_module conv layers if necessary
+class MotionEncoder(nn.Module):
+    def __init__(self, in_channels, out_channels, dims):
+        super().__init__()
+        self.model = TimestepEmbedSequential(
+            conv_nd(dims, in_channels, 16, 3, padding=1),
+            nn.SiLU(),
+            conv_nd(dims, 16, 16, 3, padding=1),
+            nn.SiLU(),
+            conv_nd(dims, 16, 32, 3, padding=1, stride=2),
+            nn.SiLU(),
+            conv_nd(dims, 32, 32, 3, padding=1),
+            nn.SiLU(),
+            conv_nd(dims, 32, 96, 3, padding=1, stride=2),
+            nn.SiLU(),
+            conv_nd(dims, 96, 96, 3, padding=1),
+            nn.SiLU(),
+            conv_nd(dims, 96, 256, 3, padding=1, stride=2),
+            nn.SiLU(),
+            zero_module(conv_nd(dims, 256, out_channels, 3, padding=1)),
+        )
+
+    def forward(self, x):
+        return self.model(x)
+
+
 class ControlNet(nn.Module):
     """
     modified based on differences between
@@ -164,24 +190,7 @@ class ControlNet(nn.Module):
         elif context_dim is None:
             context_dim = [None]  # At least use one spatial transformer
 
-        # TODO: check and modify the dims of zero_module conv layers if necessary
-        self.input_hint_block = TimestepEmbedSequential(
-            conv_nd(dims, hint_channels, 16, 3, padding=1),
-            nn.SiLU(),
-            conv_nd(dims, 16, 16, 3, padding=1),
-            nn.SiLU(),
-            conv_nd(dims, 16, 32, 3, padding=1, stride=2),
-            nn.SiLU(),
-            conv_nd(dims, 32, 32, 3, padding=1),
-            nn.SiLU(),
-            conv_nd(dims, 32, 96, 3, padding=1, stride=2),
-            nn.SiLU(),
-            conv_nd(dims, 96, 96, 3, padding=1),
-            nn.SiLU(),
-            conv_nd(dims, 96, 256, 3, padding=1, stride=2),
-            nn.SiLU(),
-            zero_module(conv_nd(dims, 256, model_channels, 3, padding=1)),
-        )
+        self.input_hint_block = MotionEncoder(hint_channels, model_channels, dims)
 
         self.input_blocks = nn.ModuleList(
             [

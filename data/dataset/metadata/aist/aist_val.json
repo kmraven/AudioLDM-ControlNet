@@ -1,0 +1,184 @@
+{
+  "data": [
+    {
+      "wav": "audio_clips/val/mBR0/gBR_sBM_c01_d04_mBR0_ch01_1.wav",
+      "motion": "keypoints_clips/val/mBR0/gBR_sBM_c01_d04_mBR0_ch01_1.pkl",
+      "caption": "A film instrumentalpop track featuring drummachine, acousticguitar and piano."
+    },
+    {
+      "wav": "audio_clips/val/mBR0/gBR_sBM_c01_d04_mBR0_ch01_2.wav",
+      "motion": "keypoints_clips/val/mBR0/gBR_sBM_c01_d04_mBR0_ch01_2.pkl",
+      "caption": "A film newage track featuring synthesizer, drums and piano."
+    },
+    {
+      "wav": "audio_clips/val/mBR0/gBR_sBM_c01_d05_mBR0_ch01_1.wav",
+      "motion": "keypoints_clips/val/mBR0/gBR_sBM_c01_d05_mBR0_ch01_1.pkl",
+      "caption": "A film instrumentalpop track featuring drummachine, acousticguitar and piano."
+    },
+    {
+      "wav": "audio_clips/val/mBR0/gBR_sBM_c01_d05_mBR0_ch01_2.wav",
+      "motion": "keypoints_clips/val/mBR0/gBR_sBM_c01_d05_mBR0_ch01_2.pkl",
+      "caption": "A film newage track featuring synthesizer, drums and piano."
+    },
+    {
+      "wav": "audio_clips/val/mHO5/gHO_sBM_c01_d20_mHO5_ch01_1.wav",
+      "motion": "keypoints_clips/val/mHO5/gHO_sBM_c01_d20_mHO5_ch01_1.pkl",
+      "caption": "A energetic techno track featuring drummachine, synthesizer and drums."
+    },
+    {
+      "wav": "audio_clips/val/mHO5/gHO_sBM_c01_d21_mHO5_ch01_1.wav",
+      "motion": "keypoints_clips/val/mHO5/gHO_sBM_c01_d21_mHO5_ch01_1.pkl",
+      "caption": "A energetic techno track featuring drummachine, synthesizer and drums."
+    },
+    {
+      "wav": "audio_clips/val/mJB5/gJB_sBM_c01_d08_mJB5_ch01_1.wav",
+      "motion": "keypoints_clips/val/mJB5/gJB_sBM_c01_d08_mJB5_ch01_1.pkl",
+      "caption": "A emotional instrumentalpop track featuring piano, strings and bass."
+    },
+    {
+      "wav": "audio_clips/val/mJB5/gJB_sBM_c01_d09_mJB5_ch01_1.wav",
+      "motion": "keypoints_clips/val/mJB5/gJB_sBM_c01_d09_mJB5_ch01_1.pkl",
+      "caption": "A emotional instrumentalpop track featuring piano, strings and bass."
+    },
+    {
+      "wav": "audio_clips/val/mJS3/gJS_sBM_c01_d01_mJS3_ch01_1.wav",
+      "motion": "keypoints_clips/val/mJS3/gJS_sBM_c01_d01_mJS3_ch01_1.pkl",
+      "caption": "A energetic techno track featuring bass, piano and drummachine."
+    },
+    {
+      "wav": "audio_clips/val/mJS3/gJS_sBM_c01_d01_mJS3_ch01_2.wav",
+      "motion": "keypoints_clips/val/mJS3/gJS_sBM_c01_d01_mJS3_ch01_2.pkl",
+      "caption": "A energetic newage track featuring synthesizer, drums and bass."
+    },
+    {
+      "wav": "audio_clips/val/mJS3/gJS_sBM_c01_d03_mJS3_ch01_1.wav",
+      "motion": "keypoints_clips/val/mJS3/gJS_sBM_c01_d03_mJS3_ch01_1.pkl",
+      "caption": "A energetic techno track featuring bass, piano and drummachine."
+    },
+    {
+      "wav": "audio_clips/val/mJS3/gJS_sBM_c01_d03_mJS3_ch01_2.wav",
+      "motion": "keypoints_clips/val/mJS3/gJS_sBM_c01_d03_mJS3_ch01_2.pkl",
+      "caption": "A energetic newage track featuring synthesizer, drums and bass."
+    },
+    {
+      "wav": "audio_clips/val/mKR2/gKR_sBM_c01_d28_mKR2_ch01_1.wav",
+      "motion": "keypoints_clips/val/mKR2/gKR_sBM_c01_d28_mKR2_ch01_1.pkl",
+      "caption": "A energetic instrumentalpop track featuring piano, drummachine and guitar."
+    },
+    {
+      "wav": "audio_clips/val/mKR2/gKR_sBM_c01_d28_mKR2_ch01_2.wav",
+      "motion": "keypoints_clips/val/mKR2/gKR_sBM_c01_d28_mKR2_ch01_2.pkl",
+      "caption": "A energetic newage track featuring synthesizer, drums and piano."
+    },
+    {
+      "wav": "audio_clips/val/mKR2/gKR_sBM_c01_d30_mKR2_ch01_1.wav",
+      "motion": "keypoints_clips/val/mKR2/gKR_sBM_c01_d30_mKR2_ch01_1.pkl",
+      "caption": "A energetic instrumentalpop track featuring piano, drummachine and guitar."
+    },
+    {
+      "wav": "audio_clips/val/mKR2/gKR_sBM_c01_d30_mKR2_ch01_2.wav",
+      "motion": "keypoints_clips/val/mKR2/gKR_sBM_c01_d30_mKR2_ch01_2.pkl",
+      "caption": "A energetic newage track featuring synthesizer, drums and piano."
+    },
+    {
+      "wav": "audio_clips/val/mLH4/gLH_sBM_c01_d17_mLH4_ch01_1.wav",
+      "motion": "keypoints_clips/val/mLH4/gLH_sBM_c01_d17_mLH4_ch01_1.pkl",
+      "caption": "A energetic reggae track featuring piano, drummachine and electricpiano."
+    },
+    {
+      "wav": "audio_clips/val/mLH4/gLH_sBM_c01_d17_mLH4_ch01_2.wav",
+      "motion": "keypoints_clips/val/mLH4/gLH_sBM_c01_d17_mLH4_ch01_2.pkl",
+      "caption": "A energetic reggae track featuring synthesizer, drums and computer."
+    },
+    {
+      "wav": "audio_clips/val/mLH4/gLH_sBM_c01_d18_mLH4_ch01_1.wav",
+      "motion": "keypoints_clips/val/mLH4/gLH_sBM_c01_d18_mLH4_ch01_1.pkl",
+      "caption": "A energetic reggae track featuring piano, drummachine and electricpiano."
+    },
+    {
+      "wav": "audio_clips/val/mLH4/gLH_sBM_c01_d18_mLH4_ch01_2.wav",
+      "motion": "keypoints_clips/val/mLH4/gLH_sBM_c01_d18_mLH4_ch01_2.pkl",
+      "caption": "A energetic reggae track featuring synthesizer, drums and computer."
+    },
+    {
+      "wav": "audio_clips/val/mLO2/gLO_sBM_c01_d13_mLO2_ch01_1.wav",
+      "motion": "keypoints_clips/val/mLO2/gLO_sBM_c01_d13_mLO2_ch01_1.pkl",
+      "caption": "A energetic jazz track featuring piano, electricpiano and guitar."
+    },
+    {
+      "wav": "audio_clips/val/mLO2/gLO_sBM_c01_d13_mLO2_ch01_2.wav",
+      "motion": "keypoints_clips/val/mLO2/gLO_sBM_c01_d13_mLO2_ch01_2.pkl",
+      "caption": "A film newage track featuring synthesizer, piano and electricpiano."
+    },
+    {
+      "wav": "audio_clips/val/mLO2/gLO_sBM_c01_d15_mLO2_ch01_1.wav",
+      "motion": "keypoints_clips/val/mLO2/gLO_sBM_c01_d15_mLO2_ch01_1.pkl",
+      "caption": "A energetic jazz track featuring piano, electricpiano and guitar."
+    },
+    {
+      "wav": "audio_clips/val/mLO2/gLO_sBM_c01_d15_mLO2_ch01_2.wav",
+      "motion": "keypoints_clips/val/mLO2/gLO_sBM_c01_d15_mLO2_ch01_2.pkl",
+      "caption": "A film newage track featuring synthesizer, piano and electricpiano."
+    },
+    {
+      "wav": "audio_clips/val/mMH3/gMH_sBM_c01_d22_mMH3_ch01_1.wav",
+      "motion": "keypoints_clips/val/mMH3/gMH_sBM_c01_d22_mMH3_ch01_1.pkl",
+      "caption": "A film instrumentalpop track featuring piano, drummachine and electricpiano."
+    },
+    {
+      "wav": "audio_clips/val/mMH3/gMH_sBM_c01_d22_mMH3_ch01_2.wav",
+      "motion": "keypoints_clips/val/mMH3/gMH_sBM_c01_d22_mMH3_ch01_2.pkl",
+      "caption": "A film newage track featuring drummachine, synthesizer and piano."
+    },
+    {
+      "wav": "audio_clips/val/mMH3/gMH_sBM_c01_d24_mMH3_ch01_1.wav",
+      "motion": "keypoints_clips/val/mMH3/gMH_sBM_c01_d24_mMH3_ch01_1.pkl",
+      "caption": "A film instrumentalpop track featuring piano, drummachine and electricpiano."
+    },
+    {
+      "wav": "audio_clips/val/mMH3/gMH_sBM_c01_d24_mMH3_ch01_2.wav",
+      "motion": "keypoints_clips/val/mMH3/gMH_sBM_c01_d24_mMH3_ch01_2.pkl",
+      "caption": "A film newage track featuring drummachine, synthesizer and piano."
+    },
+    {
+      "wav": "audio_clips/val/mPO1/gPO_sBM_c01_d10_mPO1_ch01_1.wav",
+      "motion": "keypoints_clips/val/mPO1/gPO_sBM_c01_d10_mPO1_ch01_1.pkl",
+      "caption": "A energetic rock track featuring drummachine, bass and piano."
+    },
+    {
+      "wav": "audio_clips/val/mPO1/gPO_sBM_c01_d10_mPO1_ch01_2.wav",
+      "motion": "keypoints_clips/val/mPO1/gPO_sBM_c01_d10_mPO1_ch01_2.pkl",
+      "caption": "A energetic indie track featuring bass, synthesizer and drummachine."
+    },
+    {
+      "wav": "audio_clips/val/mPO1/gPO_sBM_c01_d11_mPO1_ch01_1.wav",
+      "motion": "keypoints_clips/val/mPO1/gPO_sBM_c01_d11_mPO1_ch01_1.pkl",
+      "caption": "A energetic rock track featuring drummachine, bass and piano."
+    },
+    {
+      "wav": "audio_clips/val/mPO1/gPO_sBM_c01_d11_mPO1_ch01_2.wav",
+      "motion": "keypoints_clips/val/mPO1/gPO_sBM_c01_d11_mPO1_ch01_2.pkl",
+      "caption": "A energetic indie track featuring bass, synthesizer and drummachine."
+    },
+    {
+      "wav": "audio_clips/val/mWA0/gWA_sBM_c01_d25_mWA0_ch01_1.wav",
+      "motion": "keypoints_clips/val/mWA0/gWA_sBM_c01_d25_mWA0_ch01_1.pkl",
+      "caption": "A energetic rock track featuring piano, bass and guitar."
+    },
+    {
+      "wav": "audio_clips/val/mWA0/gWA_sBM_c01_d25_mWA0_ch01_2.wav",
+      "motion": "keypoints_clips/val/mWA0/gWA_sBM_c01_d25_mWA0_ch01_2.pkl",
+      "caption": "A energetic poprock track featuring synthesizer, drums and bass."
+    },
+    {
+      "wav": "audio_clips/val/mWA0/gWA_sBM_c01_d26_mWA0_ch01_1.wav",
+      "motion": "keypoints_clips/val/mWA0/gWA_sBM_c01_d26_mWA0_ch01_1.pkl",
+      "caption": "A energetic rock track featuring piano, bass and guitar."
+    },
+    {
+      "wav": "audio_clips/val/mWA0/gWA_sBM_c01_d26_mWA0_ch01_2.wav",
+      "motion": "keypoints_clips/val/mWA0/gWA_sBM_c01_d26_mWA0_ch01_2.pkl",
+      "caption": "A energetic poprock track featuring synthesizer, drums and bass."
+    }
+  ]
+}
