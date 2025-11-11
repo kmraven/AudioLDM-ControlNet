@@ -16,7 +16,9 @@ from audioldm_train.modules.diffusionmodules.openaimodel import (
     UNetModel,
 )
 from audioldm_train.modules.latent_diffusion.ddim import DDIMSampler
-from audioldm_train.modules.latent_diffusion.ddpm import LatentDiffusion
+from audioldm_train.modules.latent_diffusion.ddpm import (
+    LatentDiffusion,
+)
 from audioldm_train.utilities.diffusion_util import (
     conv_nd,
     linear,
@@ -162,9 +164,7 @@ class ControlNet(nn.Module):
         elif context_dim is None:
             context_dim = [None]  # At least use one spatial transformer
 
-        # TODO: check and modify for used hint data
-        # === 入力の最初にヒント（ガイド特徴）を処理する小さなネット ===
-        # 画像版 ControlNet の input_hint_block を踏襲（2D Conv）。音声も 2D（T×F）表現前提。
+        # TODO: check and modify the dims of zero_module conv layers if necessary
         self.input_hint_block = TimestepEmbedSequential(
             conv_nd(dims, hint_channels, 16, 3, padding=1),
             nn.SiLU(),
@@ -401,7 +401,7 @@ class ControlLDM(LatentDiffusion):
     def __init__(
         self,
         control_stage_config,
-        control_key,  # バッチ中のヒント取得キー（例：'hint' / 'control' 等）
+        control_key,
         only_mid_control=False,
         *args,
         **kwargs,
@@ -430,53 +430,72 @@ class ControlLDM(LatentDiffusion):
     def _flatten_sorted(self, keys, prefix):
         return sorted([k for k in keys if k.startswith(prefix)])
 
-    def _extract_unet_inputs_from_cond_dict(self, cond_dict):
+    def _get_unet_input(self, x, t, cond_dict):
         """
-        TODO: check this implementation
-        AudioLDM の DiffusionWrapper が内部でしていることを最小限で再現：
-        cond_dict から y（FiLM）、context_list、context_attn_mask_list を作る。
-        （正確なキーはプロジェクト実装に合わせてください）
+        This is just a partial copy of 'DiffusionWrapper.forward' method
         """
-        keys = list(cond_dict.keys())
+        x = x.contiguous()
+        t = t.contiguous()
 
-        # FiLM ベクトルの結合
-        film_keys = self._flatten_sorted(keys, "film")
+        # x with condition (or maybe not)
+        xc = x
+
         y = None
-        if len(film_keys) > 0:
-            film_list = [cond_dict[k] for k in film_keys]
-            # すべて (B, D) 前提
-            y = torch.cat(film_list, dim=-1)
+        context_list, attn_mask_list = [], []
 
-        # Cross-Attn の context と mask
-        ctx_keys = [
-            k
-            for k in keys
-            if k.startswith("crossattn") and (not k.endswith("_attn_mask"))
-        ]
-        ctx_keys = sorted(ctx_keys)
-        context_list = [cond_dict[k] for k in ctx_keys]
+        conditional_keys = cond_dict.keys()
 
-        mask_keys = [k for k in keys if k.endswith("_attn_mask")]
-        mask_keys = sorted(mask_keys)
-        context_attn_mask_list = (
-            [cond_dict[k] for k in mask_keys] if len(mask_keys) > 0 else None
-        )
+        for key in conditional_keys:
+            if "concat" in key:
+                xc = torch.cat([x, cond_dict[key].unsqueeze(1)], dim=1)
+            elif "film" in key:
+                if y is None:
+                    y = cond_dict[key].squeeze(1)
+                else:
+                    y = torch.cat([y, cond_dict[key].squeeze(1)], dim=-1)
+            elif "crossattn" in key:
+                # assert context is None, "You can only have one context matrix, got %s" % (cond_dict.keys())
+                if isinstance(cond_dict[key], dict):
+                    for k in cond_dict[key].keys():
+                        if "crossattn" in k:
+                            context, attn_mask = cond_dict[key][
+                                k
+                            ]  # crossattn_audiomae_pooled: torch.Size([12, 128, 768])
+                else:
+                    assert len(cond_dict[key]) == 2, (
+                        "The context condition for %s you returned should have two element, one context one mask"
+                        % (key)
+                    )
+                    context, attn_mask = cond_dict[key]
 
-        # Concat 系（入力チャネルへ結合）を使う場合は、音声実装側の DiffusionWrapper で処理する想定
-        # ここでは U-Net に渡す 3 つだけ返せばよい
-        return y, context_list, context_attn_mask_list
+                # The input to the UNet model is a list of context matrix
+                context_list.append(context)
+                attn_mask_list.append(attn_mask)
+
+            elif (
+                "noncond" in key
+            ):  # If you use loss function in the conditional module, include the keyword "noncond" in the return dictionary
+                continue
+            else:
+                raise NotImplementedError()
+        return xc, t, y, context_list, attn_mask_list
 
     def apply_model(self, x_noisy, t, cond, *args, **kwargs):
+        """
+        The 'control' argument in the 'ControlledUnetModel.forward' method is added based on the 'UNetModel.forward' method.
+        The 'DiffusionWrapper' class also needs to be modified to pass additional arguments.
+        However, from a maintainability standpoint, it is undesirable to modify the original 'DiffusionWrapper' directly.
+        Since the 'LatentDiffusion' class already inherits from the original 'DiffusionWrapper', creating and using a new 'DiffusionWrapper' would be cumbersome.
+        Because the role of 'DiffusionWrapper' is limited, the modification will be handled here instead.
+        """
         assert isinstance(cond, dict) and "cond_dict" in cond, (
             "cond must be {'cond_dict':..., 'control_hint':...}"
         )
         cond_dict = cond["cond_dict"]
         control_hint = cond.get("control_hint", None)
 
-        diffusion_model = self.model.diffusion_model
-
-        y, context_list, context_attn_mask_list = (
-            self._extract_unet_inputs_from_cond_dict(cond_dict)
+        xc, t, y, context_list, context_attn_mask_list = self._get_unet_input(
+            x_noisy, t, cond_dict
         )
 
         if control_hint is None:
@@ -492,8 +511,10 @@ class ControlLDM(LatentDiffusion):
             )
             control = [c * scale for c, scale in zip(control, self.control_scales)]
 
-        eps = diffusion_model(
-            x_noisy,
+        # call the unet model directly, without through DiffusionWrapper
+        diffusion_model = self.model.diffusion_model
+        out = diffusion_model(
+            xc,
             timesteps=t,
             y=y,
             context_list=context_list,
@@ -501,7 +522,7 @@ class ControlLDM(LatentDiffusion):
             control=control,
             only_mid_control=self.only_mid_control,
         )
-        return eps
+        return out
 
     @torch.no_grad()
     def get_unconditional_conditioning(self, N):
