@@ -5,6 +5,7 @@ https://github.com/lllyasviel/ControlNet/blob/ed85cd1e25a5ed592f7d8178495b4483de
 import torch
 import torch as th
 import torch.nn as nn
+import torch.nn.functional as F
 
 from audioldm_train.modules.diffusionmodules.attention import SpatialTransformer
 from audioldm_train.modules.diffusionmodules.openaimodel import (
@@ -40,7 +41,7 @@ class ControlledUnetModel(UNetModel):
         y=None,
         context_list=None,
         context_attn_mask_list=None,
-        control=None,
+        controlnet_hint_list=None,
         only_mid_control=False,
         **kwargs,
     ):
@@ -60,15 +61,17 @@ class ControlledUnetModel(UNetModel):
                 hs.append(h)
             h = self.middle_block(h, emb, context_list, context_attn_mask_list)
 
-        if control is not None:
-            h = h + control.pop()
+        if len(controlnet_hint_list) > 0:
+            for controlnet_hint in controlnet_hint_list:
+                h = h + controlnet_hint.pop()
 
         for module in self.output_blocks:
             skip = hs.pop()
-            if only_mid_control or control is None:
+            if only_mid_control or len(controlnet_hint_list) == 0:
                 h = th.cat([h, skip], dim=1)
             else:
-                h = th.cat([h, skip + control.pop()], dim=1)
+                for controlnet_hint in controlnet_hint_list:
+                    h = th.cat([h, skip + controlnet_hint.pop()], dim=1)
             h = module(h, emb, context_list, context_attn_mask_list)
 
         h = h.type(x.dtype)
@@ -271,6 +274,77 @@ class PoseEncoder(nn.Module):
         return proj                          # (N,T,out_dim)
 
 
+class InputHintBlockKeypoints1D(nn.Module):
+    """
+    2D keypoints(COCO) を時間Conv1dで処理 → 学習された周波数ゲートで (N,C,T,F) へ拡張 →
+    最後に zero-init 1x1 Conv で model_channels へ射影する block。
+    - hint は (N, T, C_kp) または (N, C_kp, T) を受け付ける
+    - 出力は (N, model_channels, T_out, F_target)
+    """
+    def __init__(
+        self,
+        hint_channels: int,      # 例: 138 (= 17 keypoints * (x,y,conf) * ？フレーム毎整形数)
+        model_channels: int,
+        F_target: int,           # UNet latent の周波数サイズに合わせる
+        mid_channels: int = 64,
+        T_target: int | None = None,   # UNet latent の時間サイズに事前に合わせたい場合(任意)
+    ):
+        super().__init__()
+        self.hint_channels = hint_channels
+        self.F_target = F_target
+        self.T_target = T_target
+
+        # 1) 時間方向のConv1dスタック（keypointsの「列」を時系列特徴へ）
+        self.time_stack = nn.Sequential(
+            nn.Conv1d(hint_channels, mid_channels, kernel_size=3, padding=1),
+            nn.SiLU(),
+            nn.Conv1d(mid_channels, mid_channels, kernel_size=3, padding=1),
+            nn.SiLU(),
+        )
+
+        # 2) 周波数ゲート（学習パラメータ）。rank-1 の外積で (N, mid, T, F) を生成
+        #    初期ゼロに近い値で制御が徐々に効くようにする（ControlNet的ふるまい）
+        self.freq_gate = nn.Parameter(torch.zeros(1, 1, 1, F_target))
+
+        # 3) 最後に zero-init 1x1 Conv（周波数方向は広がった後、チャネルだけ合わせる）
+        self.proj_out = zero_module(nn.Conv2d(mid_channels, model_channels, kernel_size=1))
+
+    def forward(self, hint, emb=None, context_list=None, context_attn_mask_list=None):
+        """
+        hint: (N, T, Ck) or (N, Ck, T)
+        return: (N, model_channels, T_out, F_target)
+        """
+        # Conv1d 入力の (N, C, T) に合わせる
+        if hint.dim() != 3:
+            raise ValueError("hint must be 3D (N,T,Ck) or (N,Ck,T)")
+        if hint.size(1) == self.hint_channels:
+            # (N, Ck, T)
+            h1d = hint
+        elif hint.size(2) == self.hint_channels:
+            # (N, T, Ck) -> (N, Ck, T)
+            h1d = hint.permute(0, 2, 1).contiguous()
+        else:
+            raise ValueError(f"hint last dim must be {self.hint_channels}, "
+                             f"got shape {tuple(hint.shape)}")
+
+        # 1) 時間Conv1d
+        feat = self.time_stack(h1d)  # (N, mid, T')
+
+        # 任意: UNet の時間長に事前整合（未指定なら later で足し込み前に合わせてもOK）
+        if (self.T_target is not None) and (feat.size(-1) != self.T_target):
+            # 2D化して両軸同時に補間（幅1→F_targetへも同時に行うので後段不要）
+            feat2d = feat.unsqueeze(-1)                                 # (N, mid, T', 1)
+            feat2d = F.interpolate(feat2d, size=(self.T_target, self.F_target),
+                                   mode="bilinear", align_corners=False)  # (N, mid, T_target, F_target)
+        else:
+            # 2) 周波数ゲートで 2D 展開（(N, mid, T', 1) × (1,1,1,F) → (N, mid, T', F)）
+            feat2d = feat.unsqueeze(-1) * self.freq_gate                # (N, mid, T', F_target)
+
+        # 3) zero-init 1x1 Conv で model_channels に整形
+        out = self.proj_out(feat2d)                                     # (N, model_channels, T_out, F_target)
+        return out
+
+
 class ControlNet(nn.Module):
     """
     modified based on differences between
@@ -283,7 +357,6 @@ class ControlNet(nn.Module):
         image_size,
         in_channels,
         model_channels,
-        hint_channels,
         num_res_blocks,
         attention_resolutions,
         dropout=0,
@@ -306,6 +379,8 @@ class ControlNet(nn.Module):
         context_dim=None,  # custom transformer support
         n_embed=None,  # custom support for prediction of discrete ids into codebook of first stage vq model
         legacy=True,
+        latent_t_size=256,
+        latent_f_size=16,
     ):
         super().__init__()
 
@@ -356,7 +431,13 @@ class ControlNet(nn.Module):
         elif context_dim is None:
             context_dim = [None]  # At least use one spatial transformer
 
-        self.input_hint_block = PoseEncoder(out_dim=model_channels)
+        self.input_hint_block = InputHintBlockKeypoints1D(
+            hint_channels=138,
+            model_channels=model_channels,
+            F_target=latent_f_size,
+            mid_channels=64,
+            T_target=latent_t_size,
+        )
 
         self.input_blocks = nn.ModuleList(
             [
@@ -575,32 +656,59 @@ class ControlLDM(LatentDiffusion):
 
     def __init__(
         self,
-        control_stage_config,
-        control_key,
-        only_mid_control=False,
+        controlnet_stage_config,
         *args,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
-        self.control_model = instantiate_from_config(control_stage_config)
-        self.control_key = control_key
-        self.only_mid_control = only_mid_control
-        self.control_scales = [1.0] * 13
+        self.controlnet_stage_models = nn.ModuleList([])
+        self.instantiate_controlnet_stage(controlnet_stage_config)
+        self.controlnet_scales = [1.0] * 13
+
+    def instantiate_controlnet_stage(self, config):
+        self.controlnet_stage_model_metadata = {}
+        for i, controlnet_model_key in enumerate(config.keys()):
+            model = instantiate_from_config(config[controlnet_model_key])
+            self.controlnet_stage_models.append(model)
+            self.controlnet_stage_model_metadata[controlnet_model_key] = {
+                "model_idx": i,
+                "controlnet_stage_key": config[controlnet_model_key]["controlnet_stage_key"],
+            }
 
     @torch.no_grad()
     def get_input(self, batch, k, *args, **kwargs):
         z, cond_dict = super().get_input(batch, k, *args, **kwargs)
-        assert self.control_key in batch, f"'{self.control_key}' not found in batch."
-        control = batch[self.control_key].to(self.device)
-        # TODO: check a shape of control hint
-        if control.dim() == 3:
-            control = control.unsqueeze(1)
-        else:
-            raise ValueError(f"Unexpected control hint shape: {control.shape}")
+        for controlnet_model_key in self.controlnet_stage_model_metadata.keys():
+            controlnet_stage_key = self.controlnet_stage_model_metadata[
+                controlnet_model_key
+            ]["controlnet_stage_key"]
+            assert controlnet_stage_key in batch, f"'{controlnet_stage_key}' not found in batch."
+            control = batch[controlnet_stage_key].to(self.device)
+            control = control.to(memory_format=torch.contiguous_format).float()
+            cond_dict[controlnet_model_key] = control
+        return z, cond_dict
 
-        control = control.to(memory_format=torch.contiguous_format).float()
-        cond = dict(cond_dict=cond_dict, control_hint=control)
-        return z, cond
+    def filter_useful_cond_dict(self, cond_dict):
+        new_cond_dict = {}
+        for model_key in cond_dict.keys():
+            if model_key in self.cond_stage_model_metadata.keys():
+                new_cond_dict[model_key] = cond_dict[model_key]
+            elif model_key in self.controlnet_stage_model_metadata.keys():
+                new_cond_dict[model_key] = cond_dict[model_key]
+
+        # All the conditional model_key in the metadata should be used
+        for model_key in self.cond_stage_model_metadata.keys():
+            assert model_key in new_cond_dict.keys(), "%s, %s" % (
+                model_key,
+                str(new_cond_dict.keys()),
+            )
+        for model_key in self.controlnet_stage_model_metadata.keys():
+            assert model_key in new_cond_dict.keys(), "%s, %s" % (
+                model_key,
+                str(new_cond_dict.keys()),
+            )
+
+        return new_cond_dict
 
     def _flatten_sorted(self, keys, prefix):
         return sorted([k for k in keys if k.startswith(prefix)])
@@ -616,7 +724,7 @@ class ControlLDM(LatentDiffusion):
         xc = x
 
         y = None
-        context_list, attn_mask_list = [], []
+        context_list, attn_mask_list, controlnet_dict = [], [], {}
 
         conditional_keys = cond_dict.keys()
 
@@ -646,14 +754,15 @@ class ControlLDM(LatentDiffusion):
                 # The input to the UNet model is a list of context matrix
                 context_list.append(context)
                 attn_mask_list.append(attn_mask)
-
+            elif "controlnet" in key:
+                controlnet_dict[key] = cond_dict[key]
             elif (
                 "noncond" in key
             ):  # If you use loss function in the conditional module, include the keyword "noncond" in the return dictionary
                 continue
             else:
                 raise NotImplementedError()
-        return xc, t, y, context_list, attn_mask_list
+        return xc, t, y, context_list, attn_mask_list, controlnet_dict
 
     def apply_model(self, x_noisy, t, cond, *args, **kwargs):
         """
@@ -663,28 +772,25 @@ class ControlLDM(LatentDiffusion):
         Since the 'LatentDiffusion' class already inherits from the original 'DiffusionWrapper', creating and using a new 'DiffusionWrapper' would be cumbersome.
         Because the role of 'DiffusionWrapper' is limited, the modification will be handled here instead.
         """
-        assert isinstance(cond, dict) and "cond_dict" in cond, (
-            "cond must be {'cond_dict':..., 'control_hint':...}"
-        )
-        cond_dict = cond["cond_dict"]
-        control_hint = cond.get("control_hint", None)
-
-        xc, t, y, context_list, context_attn_mask_list = self._get_unet_input(
-            x_noisy, t, cond_dict
+        xc, t, y, context_list, context_attn_mask_list, controlnet_dict = self._get_unet_input(
+            x_noisy, t, cond
         )
 
-        if control_hint is None:
-            control = None
-        else:
-            control = self.control_model(
+        controlnet_hint_list = []
+        for controlnet_model_key, controlnet_hint in controlnet_dict.items():
+            controlnet_model_idx = self.controlnet_stage_model_metadata[
+                controlnet_model_key
+            ]["model_idx"]
+            controlnet_hint = self.controlnet_stage_models[controlnet_model_idx](
                 x=x_noisy,
-                hint=control_hint,
+                hint=controlnet_hint,
                 timesteps=t,
                 y=y,
                 context_list=context_list,
                 context_attn_mask_list=context_attn_mask_list,
             )
-            control = [c * scale for c, scale in zip(control, self.control_scales)]
+            controlnet_hint = [c * scale for c, scale in zip(controlnet_hint, self.controlnet_scales)]
+            controlnet_hint_list.append(controlnet_hint)
 
         # call the unet model directly, without through DiffusionWrapper
         diffusion_model = self.model.diffusion_model
@@ -694,8 +800,7 @@ class ControlLDM(LatentDiffusion):
             y=y,
             context_list=context_list,
             context_attn_mask_list=context_attn_mask_list,
-            control=control,
-            only_mid_control=self.only_mid_control,
+            controlnet_hint_list=controlnet_hint_list,
         )
         return out
 
@@ -706,35 +811,59 @@ class ControlLDM(LatentDiffusion):
         except Exception:
             return self.get_learned_conditioning([""] * N)
 
-    @torch.no_grad()
-    def sample_log(self, cond, batch_size, ddim=True, ddim_steps=50, eta=0.0, **kwargs):
-        """
-        TODO: check this implementation
-        """
-        ddim_sampler = DDIMSampler(self)
-        control_hint = cond.get("control_hint", None)
-        if control_hint is None:
-            raise ValueError("sample_log requires 'control_hint' to infer shape (T,F).")
-        _, _, t_size, f_size = control_hint.shape
-        factor = getattr(self, "downsampling_factor", 8)
-        shape = (self.channels, t_size // factor, f_size // factor)
-        samples, intermediates = ddim_sampler.sample(
-            ddim_steps,
-            batch_size,
-            shape,
-            cond,
-            verbose=False,
-            eta=eta,
-            ddim=ddim,
-            **kwargs,
-        )
-        return samples, intermediates
+    # @torch.no_grad()
+    # def sample_log(self, cond, batch_size, ddim=True, ddim_steps=50, eta=0.0, **kwargs):
+    #     """
+    #     TODO: check this implementation
+    #     """
+    #     ddim_sampler = DDIMSampler(self)
+    #     controlnet_hint = cond.get("controlnet_hint", None)
+    #     if controlnet_hint is None:
+    #         raise ValueError("sample_log requires 'controlnet_hint' to infer shape (T,F).")
+    #     _, _, t_size, f_size = controlnet_hint.shape
+    #     factor = getattr(self, "downsampling_factor", 8)
+    #     shape = (self.channels, t_size // factor, f_size // factor)
+    #     samples, intermediates = ddim_sampler.sample(
+    #         ddim_steps,
+    #         batch_size,
+    #         shape,
+    #         cond,
+    #         verbose=False,
+    #         eta=eta,
+    #         ddim=ddim,
+    #         **kwargs,
+    #     )
+    #     return samples, intermediates
 
     def configure_optimizers(self):
         lr = self.learning_rate
-        params = list(self.control_model.parameters())
-        if not getattr(self, "sd_locked", True):
-            params += list(self.model.diffusion_model.output_blocks.parameters())
-            params += list(self.model.diffusion_model.out.parameters())
+        params = list(self.model.parameters())
+
+        for each in self.cond_stage_models:
+            params = params + list(
+                each.parameters()
+            )  # Add the parameter from the conditional stage
+        
+        for each in self.controlnet_stage_models:
+            params = params + list(
+                each.parameters()
+            )  # Add the parameter from the controlnet stage
+
+        if self.learn_logvar:
+            print("Diffusion model optimizing logvar")
+            params.append(self.logvar)
         opt = torch.optim.AdamW(params, lr=lr)
+        # if self.use_scheduler:
+        #     assert "target" in self.scheduler_config
+        #     scheduler = instantiate_from_config(self.scheduler_config)
+
+        #     print("Setting up LambdaLR scheduler...")
+        #     scheduler = [
+        #         {
+        #             "scheduler": LambdaLR(opt, lr_lambda=scheduler.schedule),
+        #             "interval": "step",
+        #             "frequency": 1,
+        #         }
+        #     ]
+        #     return [opt], scheduler
         return opt

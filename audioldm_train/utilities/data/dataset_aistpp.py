@@ -1,5 +1,6 @@
 import pickle
 import math
+import os
 
 import numpy as np
 import torch
@@ -17,9 +18,9 @@ class AISTDataset(AudioDataset):
         data = super().__getitem__(index)
         datum = self.data[index]
         kpt_path = datum.get("motion", None)
-        k2d = self.motion_preprocessor._load_keypoints(kpt_path)  # shape: (T, 17, 3)
-        k2d = self.motion_preprocessor._interpolate_nan_in_keypoints(k2d)[:, :, :2]  # shape: (T, 17, 2)
-        # k2d = self.motion_preprocessor.extract(kpt_path)  # shape: (T, 138)
+        # k2d = self.motion_preprocessor._load_keypoints(kpt_path)  # shape: (T, 17, 3)
+        # k2d = self.motion_preprocessor._interpolate_nan_in_keypoints(k2d)[:, :, :2]  # shape: (T, 17, 2)
+        k2d = self.motion_preprocessor.extract(kpt_path)  # shape: (T, 138)
         k2d = self._time_resample_sequence(k2d, self.target_length)
         data.update({"motion": k2d})
         return data
@@ -87,6 +88,17 @@ class AISTDataset(AudioDataset):
         else:
             raise ValueError(f"Unsupported keypoints shape: {seq.shape}")
 
+    def _relative_path_to_absolute_path(self, metadata, dataset_name):
+        root_path = self.get_dataset_root_path(dataset_name)
+        for i in range(len(metadata["data"])):
+            metadata["data"][i]["wav"] = os.path.join(
+                root_path, metadata["data"][i]["wav"]
+            )
+            metadata["data"][i]["motion"] = os.path.join(
+                root_path, metadata["data"][i]["motion"]
+            )
+        return metadata
+
 
 class MotionPreprocessor:
 
@@ -108,7 +120,7 @@ class MotionPreprocessor:
         assert keypoints.shape[1] == 17 and keypoints.shape[2] == 3, "keypoints should be a list of numpy arrays with shape [T, 17, 3]"
         return keypoints
 
-    def _interpolate_nan_in_keypoints(keypoints):
+    def _interpolate_nan_in_keypoints(self, keypoints):
         T, J, C = keypoints.shape
         keypoints_flatten = keypoints.reshape(T, -1)
         keypoints_interpolated = pd.DataFrame(keypoints_flatten).interpolate(method='linear', limit_direction='both', axis=0)
