@@ -2,7 +2,6 @@ import os
 import sys
 import warnings
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
 sys.path.append("src")
 warnings.simplefilter(action="ignore", category=FutureWarning)

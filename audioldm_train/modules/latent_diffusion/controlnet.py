@@ -638,6 +638,8 @@ class ControlNet(nn.Module):
         for module, zero_conv in zip(self.input_blocks, self.zero_convs):
             h = module(h, emb, context_list, context_attn_mask_list)
             if guided_hint is not None:
+                if guided_hint.shape[-2:] != h.shape[-2:]:
+                    guided_hint = F.interpolate(guided_hint, size=h.shape[-2:], mode="bilinear", align_corners=False)
                 h = h + guided_hint
                 guided_hint = None
             outs.append(zero_conv(h, emb, context_list, context_attn_mask_list))
@@ -836,34 +838,15 @@ class ControlLDM(LatentDiffusion):
     #     return samples, intermediates
 
     def configure_optimizers(self):
+        """
+        make only ControlNet parameters to be trainable
+        """
         lr = self.learning_rate
-        params = list(self.model.parameters())
-
-        for each in self.cond_stage_models:
-            params = params + list(
-                each.parameters()
-            )  # Add the parameter from the conditional stage
-        
+        params = None
         for each in self.controlnet_stage_models:
-            params = params + list(
-                each.parameters()
-            )  # Add the parameter from the controlnet stage
-
-        if self.learn_logvar:
-            print("Diffusion model optimizing logvar")
-            params.append(self.logvar)
+            if params is None:
+                params = list(each.parameters())
+            else:
+                params = params + list(each.parameters())
         opt = torch.optim.AdamW(params, lr=lr)
-        # if self.use_scheduler:
-        #     assert "target" in self.scheduler_config
-        #     scheduler = instantiate_from_config(self.scheduler_config)
-
-        #     print("Setting up LambdaLR scheduler...")
-        #     scheduler = [
-        #         {
-        #             "scheduler": LambdaLR(opt, lr_lambda=scheduler.schedule),
-        #             "interval": "step",
-        #             "frequency": 1,
-        #         }
-        #     ]
-        #     return [opt], scheduler
         return opt
