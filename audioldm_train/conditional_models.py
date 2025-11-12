@@ -1298,7 +1298,8 @@ class CLAPAudioEmbeddingClassifierFreev2(nn.Module):
                 audio_dict = get_audio_features(
                     audio_data,
                     mel,
-                    480000,
+                    # 480000,  hardcoded for 10s audio
+                    int(48000 * 5.12) - 1,
                     data_truncating="fusion",
                     data_filling="repeatpad",
                     audio_cfg=self.model_cfg["audio_cfg"],
