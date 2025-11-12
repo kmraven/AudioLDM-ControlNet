@@ -13,6 +13,7 @@ import torch
 
 from tqdm import tqdm
 from pytorch_lightning.strategies.ddp import DDPStrategy
+from huggingface_hub import hf_hub_download
 from audioldm_train.utilities.data.dataset_aistpp import AISTDataset
 
 from torch.utils.data import DataLoader
@@ -27,6 +28,40 @@ from audioldm_train.utilities.model_util import instantiate_from_config
 import logging
 
 logging.basicConfig(level=logging.WARNING)
+
+
+def download_checkpoint(checkpoint_name="audioldm2-full"):
+    """
+    https://github.com/haoheliu/AudioLDM2/blob/b5786c5dc0ae8f766337fdc1b67ab6046586d14d/audioldm2/utils.py#L209
+    """
+    if("audioldm2-speech" in checkpoint_name):
+        model_id = "haoheliu/audioldm2-speech"
+    else:
+        model_id = "haoheliu/%s" % checkpoint_name
+
+    checkpoint_path = hf_hub_download(
+        repo_id=model_id,
+        filename=checkpoint_name+".pth"
+    )
+    return checkpoint_path
+
+
+def modify_state_dict(state_dict, modify_dict):
+    '''
+    modify_dict[target_key] = {
+        "new_key": str,
+        "duplicate": bool
+    }
+    '''
+    for target_key in modify_dict.keys():
+        new_key = modify_dict[target_key]["new_key"]
+        duplicate = modify_dict[target_key]["duplicate"]
+
+        if target_key in state_dict.keys():
+            state_dict[new_key] = state_dict[target_key]
+            if not duplicate:
+                del state_dict[target_key]
+    return state_dict
 
 
 def print_on_rank0(msg):
@@ -163,7 +198,32 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
 
     if is_external_checkpoints:
         if resume_from_checkpoint is not None:
-            ckpt = torch.load(resume_from_checkpoint)["state_dict"]
+            try:
+                ckpt = torch.load(resume_from_checkpoint)["state_dict"]
+            except FileNotFoundError:
+                ckpt_path = download_checkpoint(resume_from_checkpoint)
+                ckpt = torch.load(ckpt_path)["state_dict"]
+
+            # # save ckpt.keys() and state_dict.keys() to txt file for comparison
+            # with open("ckpt_keys.txt", "w") as f:
+            #     for key in ckpt.keys():
+            #         f.write(f"{key}\n")
+            # with open("model_state_dict_keys.txt", "w") as f:
+            #     for key in latent_diffusion.state_dict().keys():
+            #         f.write(f"{key}\n")
+            # sys.exit(0)
+
+            modify_dict = {
+                "cond_stage_model": {
+                    "new_key": "cond_stage_models.0",
+                    "duplicate": False,
+                },
+                "model.diffusion_model": {
+                    "new_key": "controlnet_stage_models.0",
+                    "duplicate": True,
+                }
+            }
+            ckpt = modify_state_dict(ckpt, modify_dict)
 
             key_not_in_model_state_dict = []
             size_mismatch_keys = []

@@ -1,2 +1,2 @@
 export CUDA_VISIBLE_DEVICES=1
-python3 audioldm_train/train/latent_diffusion_controlnet.py -c audioldm_train/config/2025_11_08_dance_controlnet/audioldm_original_medium.yaml
+python3 audioldm_train/train/latent_diffusion_controlnet.py -c audioldm_train/config/2025_11_08_dance_controlnet/audioldm_original_medium.yaml --reload_from_ckpt data/checkpoints/audioldm-m-full.ckpt
