@@ -670,6 +670,7 @@ class ControlLDM(LatentDiffusion):
             "val/frechet_audio_distance": 32.0,
             "val/beat_coverage_score": 0.0,
             "val/beat_hit_score": 0.0,
+            "val/f1_score": 0.0,
             "val/tempo_difference": 100.0,
             "val/clap_score": 0.0,
         }

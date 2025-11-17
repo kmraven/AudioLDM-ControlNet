@@ -148,7 +148,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
             every_n_train_steps=save_checkpoint_every_n_steps,
             save_top_k=save_top_k,
             auto_insert_metric_name=False,
-            save_last=False,
+            save_last=True,
         ),
         ModelCheckpoint(
             dirpath=checkpoint_path,
@@ -171,6 +171,14 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
             monitor="val/tempo_difference",
             mode="min",
             filename="checkpoint-tempo_difference-{val/tempo_difference:.2f}-global_step={global_step:.0f}",
+            auto_insert_metric_name=False,
+            save_last=False,
+        ),
+        ModelCheckpoint(
+            dirpath=checkpoint_path,
+            monitor="val/clap_score",
+            mode="min",
+            filename="checkpoint-clap_score-{val/clap_score:.2f}-global_step={global_step:.0f}",
             auto_insert_metric_name=False,
             save_last=False,
         ),

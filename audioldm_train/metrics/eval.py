@@ -107,8 +107,6 @@ class ControlNetEvaluationHelper(EvaluationHelper):
 
         print("Evaluation Result:")
         print("\n".join((f"{k}: {v:.7f}" for k, v in out.items())))
-        json_path = os.path.join(os.path.dirname(generate_files_path), self.get_current_time()+"_"+os.path.basename(generate_files_path) + ".json")
-        write_json(out, json_path)
         return out
     
     def __calculate_beat_clap_score(self, dataloader):

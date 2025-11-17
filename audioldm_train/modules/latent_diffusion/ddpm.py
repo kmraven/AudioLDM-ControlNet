@@ -1869,7 +1869,7 @@ class LatentDiffusion(DDPM):
             name = self.get_validation_folder_name()
 
         waveform_save_path = os.path.join(self.get_log_dir(), name)
-        waveform_save_path = waveform_save_path.replace("val_0", "infer")
+        # waveform_save_path = waveform_save_path.replace("val_0", "infer")
 
         os.makedirs(waveform_save_path, exist_ok=True)
         print("Waveform inference save path: ", waveform_save_path)

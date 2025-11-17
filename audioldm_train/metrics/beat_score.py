@@ -6,10 +6,11 @@ from LORIS: https://github.com/OpenGVLab/LORIS/blob/443e4b992a1dc32ab594373012e9
 
 import librosa
 import numpy as np
+import torch
 
 
 class BeatScoreCalculator:
-    def __beat_detect(self, x, sr=22050):
+    def __beat_detect(self, x, sr):
         if x.ndim > 1:
             x = librosa.to_mono(x)
         onsets = librosa.onset.onset_detect(
@@ -48,7 +49,7 @@ class BeatScoreCalculator:
             return 0
         return 2 * (cover_rate * hit_rate) / (cover_rate + hit_rate)
 
-    def __estimate_bpm(self, x, sr=22050, aggregate=np.mean):
+    def __estimate_bpm(self, x, sr, aggregate=np.mean):
         if x.ndim > 1:
             x = librosa.to_mono(x)
         onset_env = librosa.onset.onset_strength(y=x, sr=sr)
@@ -65,12 +66,16 @@ class BeatScoreCalculator:
             return 0.0
         return bpm
 
-    def __tempo_difference(self, gt_audio, syn_audio, sr=22050):
+    def __tempo_difference(self, gt_audio, syn_audio, sr):
         bpm_gt = self.__estimate_bpm(gt_audio, sr=sr)
         bpm_syn = self.__estimate_bpm(syn_audio, sr=sr)
         return abs(bpm_syn - bpm_gt)
 
-    def calculate(self, gt_audio, syn_audio, sr=22050):
+    def calculate(self, gt_audio, syn_audio, sr):
+        if isinstance(gt_audio, torch.Tensor) == True:
+            gt_audio = gt_audio.cpu().numpy()
+        if isinstance(syn_audio, torch.Tensor) == True:
+            syn_audio = syn_audio.cpu().numpy()
         gt_beats = self.__beat_detect(gt_audio, sr)
         syn_beats = self.__beat_detect(syn_audio, sr)
         cover_rate, hit_rate = self.__beat_scores(gt_beats, syn_beats)
