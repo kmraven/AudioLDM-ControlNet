@@ -104,7 +104,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
         % (len(dataset), len(loader), batch_size)
     )
 
-    val_dataset = AISTDataset(configs, split="test", add_ons=dataloader_add_ons)
+    val_dataset = AISTDataset(configs, split="val", add_ons=dataloader_add_ons)
 
     val_loader = DataLoader(
         val_dataset,
@@ -139,16 +139,42 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
 
     wandb_path = os.path.join(log_path, exp_group_name, exp_name)
 
-    checkpoint_callback = ModelCheckpoint(
-        dirpath=checkpoint_path,
-        monitor="global_step",
-        mode="max",
-        filename="checkpoint-fad-{val/frechet_inception_distance:.2f}-global_step={global_step:.0f}",
-        every_n_train_steps=save_checkpoint_every_n_steps,
-        save_top_k=save_top_k,
-        auto_insert_metric_name=False,
-        save_last=False,
-    )
+    checkpoint_callbacks = [
+        ModelCheckpoint(
+            dirpath=checkpoint_path,
+            monitor="global_step",
+            mode="max",
+            filename="checkpoint-global_step={global_step:.0f}",
+            every_n_train_steps=save_checkpoint_every_n_steps,
+            save_top_k=save_top_k,
+            auto_insert_metric_name=False,
+            save_last=False,
+        ),
+        ModelCheckpoint(
+            dirpath=checkpoint_path,
+            monitor="val/frechet_audio_distance",
+            mode="min",
+            filename="checkpoint-fad-{val/frechet_audio_distance:.2f}-global_step={global_step:.0f}",
+            auto_insert_metric_name=False,
+            save_last=False,
+        ),
+        ModelCheckpoint(
+            dirpath=checkpoint_path,
+            monitor="val/f1_score",
+            mode="max",
+            filename="checkpoint-f1_score-{val/f1_score:.2f}-global_step={global_step:.0f}",
+            auto_insert_metric_name=False,
+            save_last=False,
+        ),
+        ModelCheckpoint(
+            dirpath=checkpoint_path,
+            monitor="val/tempo_difference",
+            mode="min",
+            filename="checkpoint-tempo_difference-{val/tempo_difference:.2f}-global_step={global_step:.0f}",
+            auto_insert_metric_name=False,
+            save_last=False,
+        ),
+    ]
 
     os.makedirs(checkpoint_path, exist_ok=True)
     shutil.copy(config_yaml_path, wandb_path)
@@ -193,7 +219,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
         limit_val_batches=limit_val_batches,
         check_val_every_n_epoch=validation_every_n_epochs,
         strategy=DDPStrategy(find_unused_parameters=True),
-        callbacks=[checkpoint_callback],
+        callbacks=checkpoint_callbacks,
     )
 
     if is_external_checkpoints:
@@ -203,16 +229,6 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
             except FileNotFoundError:
                 ckpt_path = download_checkpoint(resume_from_checkpoint)
                 ckpt = torch.load(ckpt_path)["state_dict"]
-
-            # # save ckpt.keys() and state_dict.keys() to txt file for comparison
-            # with open("ckpt_keys.txt", "w") as f:
-            #     for key in ckpt.keys():
-            #         f.write(f"{key}\n")
-            # with open("model_state_dict_keys.txt", "w") as f:
-            #     for key in latent_diffusion.state_dict().keys():
-            #         f.write(f"{key}\n")
-            # sys.exit(0)
-
             modify_dict = {
                 "cond_stage_model": {
                     "new_key": "cond_stage_models.0",

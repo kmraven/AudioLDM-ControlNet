@@ -2,6 +2,7 @@
 adopted from
 https://github.com/lllyasviel/ControlNet/blob/ed85cd1e25a5ed592f7d8178495b4483de0331bf/cldm/cldm.py
 """
+import os
 import torch
 import torch as th
 import torch.nn as nn
@@ -659,6 +660,7 @@ class ControlLDM(LatentDiffusion):
     def __init__(
         self,
         controlnet_stage_config,
+        evaluator_config,
         *args,
         **kwargs,
     ):
@@ -666,6 +668,18 @@ class ControlLDM(LatentDiffusion):
         self.controlnet_stage_models = nn.ModuleList([])
         self.instantiate_controlnet_stage(controlnet_stage_config)
         self.controlnet_scales = [1.0] * 13
+        self.metrics_buffer = {
+            "val/frechet_audio_distance": 32.0,
+            "val/beat_coverage_score": 0.0,
+            "val/beat_hit_score": 0.0,
+            "val/tempo_difference": 100.0,
+            "val/clap_score": 0.0,
+        }
+        if self.global_rank == 0:
+            self.evaluator = instantiate_from_config(evaluator_config)
+            print("ControlLDM: evaluator instantiated.")
+        else:
+            self.evaluator = None
 
     def instantiate_controlnet_stage(self, config):
         self.controlnet_stage_model_metadata = {}
@@ -812,30 +826,6 @@ class ControlLDM(LatentDiffusion):
             return super().get_unconditional_conditioning(N)
         except Exception:
             return self.get_learned_conditioning([""] * N)
-
-    # @torch.no_grad()
-    # def sample_log(self, cond, batch_size, ddim=True, ddim_steps=50, eta=0.0, **kwargs):
-    #     """
-    #     TODO: check this implementation
-    #     """
-    #     ddim_sampler = DDIMSampler(self)
-    #     controlnet_hint = cond.get("controlnet_hint", None)
-    #     if controlnet_hint is None:
-    #         raise ValueError("sample_log requires 'controlnet_hint' to infer shape (T,F).")
-    #     _, _, t_size, f_size = controlnet_hint.shape
-    #     factor = getattr(self, "downsampling_factor", 8)
-    #     shape = (self.channels, t_size // factor, f_size // factor)
-    #     samples, intermediates = ddim_sampler.sample(
-    #         ddim_steps,
-    #         batch_size,
-    #         shape,
-    #         cond,
-    #         verbose=False,
-    #         eta=eta,
-    #         ddim=ddim,
-    #         **kwargs,
-    #     )
-    #     return samples, intermediates
 
     def configure_optimizers(self):
         """

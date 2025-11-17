@@ -1,5 +1,5 @@
 metadata_root: "./data/dataset/metadata/dataset_root.json"
-log_directory: "./log/latent_diffusion_controlnet"
+log_directory: "./log/latent_diffusion_controlnet_re"
 project: "audioldm_controlnet"
 precision: "high"
 
@@ -7,7 +7,7 @@ variables:
   sampling_rate: &sampling_rate 16000 
   mel_bins: &mel_bins 64
   latent_embed_dim: &latent_embed_dim 8
-  latent_t_size: &latent_t_size 256 # TODO might need to change
+  latent_t_size: &latent_t_size 128 # TODO might need to change
   latent_f_size: &latent_f_size 16
   in_channels: &unet_in_channels 8
   optimize_ddpm_parameter: &optimize_ddpm_parameter true
@@ -172,3 +172,8 @@ model:
       unconditional_guidance_scale: 3.5
       ddim_sampling_steps: 200
       n_candidates_per_samples: 3
+    
+    evaluator_config:
+      target: audioldm_train.metrics.eval.ControlNetEvaluationHelper
+      params:
+        sampling_rate: *sampling_rate
