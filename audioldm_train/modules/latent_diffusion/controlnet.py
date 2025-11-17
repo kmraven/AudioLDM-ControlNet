@@ -639,8 +639,6 @@ class ControlNet(nn.Module):
         for module, zero_conv in zip(self.input_blocks, self.zero_convs):
             h = module(h, emb, context_list, context_attn_mask_list)
             if guided_hint is not None:
-                if guided_hint.shape[-2:] != h.shape[-2:]:
-                    guided_hint = F.interpolate(guided_hint, size=h.shape[-2:], mode="bilinear", align_corners=False)
                 h = h + guided_hint
                 guided_hint = None
             outs.append(zero_conv(h, emb, context_list, context_attn_mask_list))
