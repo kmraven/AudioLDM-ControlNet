@@ -1,5 +1,5 @@
 metadata_root: "./data/dataset/metadata/dataset_root.json"
-log_directory: "./log/latent_diffusion_controlnet"
+log_directory: "./log/latent_diffusion_controlnet_strech"
 project: "audioldm_controlnet"
 precision: "high"
 

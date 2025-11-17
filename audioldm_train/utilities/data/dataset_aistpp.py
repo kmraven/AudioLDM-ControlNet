@@ -5,8 +5,10 @@ import os
 import numpy as np
 import torch
 import pandas as pd
+import torchaudio.transforms as T
 
-from audioldm_train.utilities.data.dataset import AudioDataset
+from audioldm_train.utilities.data.dataset import AudioDataset, spectral_normalize_torch
+from librosa.filters import mel as librosa_mel_fn
 
 
 class AISTDataset(AudioDataset):
@@ -98,6 +100,72 @@ class AISTDataset(AudioDataset):
                 root_path, metadata["data"][i]["motion"]
             )
         return metadata
+
+    def mel_spectrogram_train(
+            self,
+            y,
+            max_expand_rate=0.1,
+            stretch_prob=0.5,
+    ):
+        if torch.min(y) < -1.0:
+            print("train min value is ", torch.min(y))
+        if torch.max(y) > 1.0:
+            print("train max value is ", torch.max(y))
+
+        if self.mel_fmax not in self.mel_basis:
+            mel = librosa_mel_fn(
+                self.sampling_rate,
+                self.filter_length,
+                self.n_mel,
+                self.mel_fmin,
+                self.mel_fmax,
+            )
+            self.mel_basis[str(self.mel_fmax) + "_" + str(y.device)] = (
+                torch.from_numpy(mel).float().to(y.device)
+            )
+            self.hann_window[str(y.device)] = torch.hann_window(self.win_length).to(
+                y.device
+            )
+
+        y = torch.nn.functional.pad(
+            y.unsqueeze(1),
+            (
+                int((self.filter_length - self.hop_length) / 2),
+                int((self.filter_length - self.hop_length) / 2),
+            ),
+            mode="reflect",
+        )
+
+        y = y.squeeze(1)
+
+        stft_spec = torch.stft(
+            y,
+            self.filter_length,
+            hop_length=self.hop_length,
+            win_length=self.win_length,
+            window=self.hann_window[str(y.device)],
+            center=False,
+            pad_mode="reflect",
+            normalized=False,
+            onesided=True,
+            return_complex=True,
+        )  # shape: [channels, freq_bins, time_frames], complex dtype
+        
+        if self.split == "train" and torch.rand(1).item() < stretch_prob:
+            original_length = stft_spec.size(2)
+            rate = float(torch.empty(1).uniform_(1.0, 1.0 + max_expand_rate))
+            ts = T.TimeStretch(hop_length=self.hop_length, n_freq=stft_spec.size(1), fixed_rate=rate).to(y.device)
+            stft_spec = ts(stft_spec)
+            stft_spec = stft_spec[:, :, :original_length]
+
+        stft_spec = torch.abs(stft_spec)
+        mel = spectral_normalize_torch(
+            torch.matmul(
+                self.mel_basis[str(self.mel_fmax) + "_" + str(y.device)], stft_spec
+            )
+        )
+
+        return mel[0], stft_spec[0]
 
 
 class MotionPreprocessor:
