@@ -114,7 +114,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     # Copy test data
     test_data_subset_folder = os.path.join(
         os.path.dirname(configs["log_directory"]),
-        "testset_data",
+        "valset_data",
         val_dataset.dataset_name,
     )
     os.makedirs(test_data_subset_folder, exist_ok=True)
@@ -177,7 +177,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
         ModelCheckpoint(
             dirpath=checkpoint_path,
             monitor="val/clap_score",
-            mode="min",
+            mode="max",
             filename="checkpoint-clap_score-{val/clap_score:.2f}-global_step={global_step:.0f}",
             auto_insert_metric_name=False,
             save_last=False,

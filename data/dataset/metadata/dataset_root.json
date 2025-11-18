@@ -14,7 +14,7 @@
             },
             "aist":{
                 "train": "./data/dataset/metadata/aist/aist_train.json",
-                "test": "./data/dataset/metadata/aist/aist_val.json",
+                "test": "./data/dataset/metadata/aist/aist_test.json",
                 "val": "./data/dataset/metadata/aist/aist_val.json"
             }
         }

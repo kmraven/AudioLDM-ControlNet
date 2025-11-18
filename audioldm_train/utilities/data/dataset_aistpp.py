@@ -15,6 +15,7 @@ class AISTDataset(AudioDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.motion_preprocessor = MotionPreprocessor()
+        self.strech_rate = None
 
     def __getitem__(self, index):
         data = super().__getitem__(index)
@@ -23,7 +24,12 @@ class AISTDataset(AudioDataset):
         # k2d = self.motion_preprocessor._load_keypoints(kpt_path)  # shape: (T, 17, 3)
         # k2d = self.motion_preprocessor._interpolate_nan_in_keypoints(k2d)[:, :, :2]  # shape: (T, 17, 2)
         k2d = self.motion_preprocessor.extract(kpt_path)  # shape: (T, 138)
-        k2d = self._time_resample_sequence(k2d, self.target_length)
+        if self.strech_rate is not None:
+            k2d = self._time_resample_sequence(k2d, int(self.target_length / self.strech_rate))
+            k2d = k2d[:self.target_length]
+            self.strech_rate = None
+        else:
+            k2d = self._time_resample_sequence(k2d, self.target_length)
         data.update({"motion": k2d})
         return data
 
@@ -68,7 +74,6 @@ class AISTDataset(AudioDataset):
             T, D = seq.shape
             if T == target_T:
                 return seq
-            # 線形補間
             x_old = np.linspace(0, 1, T, dtype=np.float32)
             x_new = np.linspace(0, 1, target_T, dtype=np.float32)
             out = np.empty((target_T, D), dtype=np.float32)
@@ -104,8 +109,8 @@ class AISTDataset(AudioDataset):
     def mel_spectrogram_train(
             self,
             y,
-            max_expand_rate=0.1,
-            stretch_prob=0.5,
+            additional_strech_rate=0.3,
+            stretch_prob=0.8,
     ):
         if torch.min(y) < -1.0:
             print("train min value is ", torch.min(y))
@@ -153,8 +158,8 @@ class AISTDataset(AudioDataset):
         
         if self.split == "train" and torch.rand(1).item() < stretch_prob:
             original_length = stft_spec.size(2)
-            rate = float(torch.empty(1).uniform_(1.0, 1.0 + max_expand_rate))
-            ts = T.TimeStretch(hop_length=self.hop_length, n_freq=stft_spec.size(1), fixed_rate=rate).to(y.device)
+            self.strech_rate = float(torch.empty(1).uniform_(1.0 - additional_strech_rate, 1.0))
+            ts = T.TimeStretch(n_freq=stft_spec.size(1), fixed_rate=self.strech_rate).to(y.device)
             stft_spec = ts(stft_spec)
             stft_spec = stft_spec[:, :, :original_length]
 
