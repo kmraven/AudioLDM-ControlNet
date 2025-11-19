@@ -609,18 +609,18 @@ class DDPM(pl.LightningModule):
         #         > 1e-7
         #     ), "Optimizer is not working"
 
-        if len(self.metrics_buffer.keys()) > 0:
-            for k in self.metrics_buffer.keys():
-                self.log(
-                    k,
-                    self.metrics_buffer[k],
-                    prog_bar=False,
-                    logger=True,
-                    on_step=True,
-                    on_epoch=False,
-                )
-                # print(k, self.metrics_buffer[k])
-            self.metrics_buffer = {}
+        # if len(self.metrics_buffer.keys()) > 0:
+        #     for k in self.metrics_buffer.keys():
+        #         self.log(
+        #             k,
+        #             self.metrics_buffer[k],
+        #             prog_bar=False,
+        #             logger=True,
+        #             on_step=True,
+        #             on_epoch=False,
+        #         )
+        #         # print(k, self.metrics_buffer[k])
+        #     self.metrics_buffer = {}
 
         loss, loss_dict = self.shared_step(batch)
 
@@ -772,6 +772,17 @@ class DDPM(pl.LightningModule):
                     self.metrics_buffer = {
                         ("val/" + k): float(v) for k, v in metrics.items()
                     }
+                    if len(self.metrics_buffer.keys()) > 0:
+                        for k in self.metrics_buffer.keys():
+                            self.log(
+                                k,
+                                self.metrics_buffer[k],
+                                prog_bar=False,
+                                logger=True,
+                                on_step=True,
+                                on_epoch=False,
+                            )
+                        self.metrics_buffer = {}
                 else:
                     print(
                         "The target folder for evaluation does not exist: %s"

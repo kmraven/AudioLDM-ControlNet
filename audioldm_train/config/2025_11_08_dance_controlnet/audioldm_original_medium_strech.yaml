@@ -6,13 +6,36 @@ precision: "high"
 variables:
   sampling_rate: &sampling_rate 16000 
   mel_bins: &mel_bins 64
-  latent_embed_dim: &latent_embed_dim 8
+  latent_embed_dim: &latent_embed_dim 8 # TODO might need to change
   latent_t_size: &latent_t_size 128 # TODO might need to change
   latent_f_size: &latent_f_size 16
-  in_channels: &unet_in_channels 8
+  in_channels: &unet_in_channels 8 # The input channel of the UNet model
+  model_channels: &unet_model_channels 192
   optimize_ddpm_parameter: &optimize_ddpm_parameter true
   optimize_gpt: &optimize_gpt true
   warmup_steps: &warmup_steps 2000
+  default_unet_params: &default_unet_params
+    image_size: 64 
+    extra_film_condition_dim: 512 # If you use film as extra condition, set this parameter. For example if you have two conditioning vectors each have dimension 512, then this number would be 1024
+    # context_dim: 
+    # - 768
+    in_channels: *unet_in_channels
+    out_channels: *latent_embed_dim
+    model_channels: *unet_model_channels
+    attention_resolutions:
+    - 8
+    - 4
+    - 2
+    num_res_blocks: 2
+    channel_mult: 
+    - 1
+    - 2
+    - 3
+    - 5
+    num_head_channels: 32
+    use_spatial_transformer: true
+    transformer_depth: 1
+    extra_sa_layer: False
 
 data: 
   train: ["aist"]
@@ -84,7 +107,6 @@ model:
           num_res_blocks: 2
           attn_resolutions: []
           dropout: 0.0
-    
     # Other parameters
     base_learning_rate: 1.0e-4
     warmup_steps: *warmup_steps
@@ -107,28 +129,7 @@ model:
     unet_config:
       target: audioldm_train.modules.latent_diffusion.controlnet.ControlledUnetModel
       params:
-        image_size: 64 
-        extra_film_condition_dim: 512 # If you use film as extra condition, set this parameter. For example if you have two conditioning vectors each have dimension 512, then this number would be 1024
-        # context_dim: 
-        # - 768
-        in_channels: *unet_in_channels # The input channel of the UNet model
-        out_channels: *latent_embed_dim # TODO might need to change
-        model_channels: 192 # TODO might need to change
-        attention_resolutions:
-        - 8
-        - 4
-        - 2
-        num_res_blocks: 2
-        channel_mult: 
-        - 1
-        - 2
-        - 3
-        - 5
-        num_head_channels: 32
-        use_spatial_transformer: true
-        transformer_depth: 1
-        extra_sa_layer: False
-    
+        <<: *default_unet_params
     cond_stage_config:
       film_clap_cond1:
         cond_stage_key: text
@@ -139,40 +140,27 @@ model:
           sampling_rate: 16000
           embed_mode: text # or text
           amodel: HTSAT-base
-    
     controlnet_stage_config:
       dance_controlnet:
         controlnet_stage_key: motion
-        target: audioldm_train.modules.latent_diffusion.controlnet.ControlNet
+        target: audioldm_train.modules.latent_diffusion.dance_controlnet.DanceControlNetWrapper
         params:
-          latent_t_size: *latent_t_size # TODO might need to change
-          latent_f_size: *latent_f_size
-          image_size: 64 
-          extra_film_condition_dim: 512 # If you use film as extra condition, set this parameter. For example if you have two conditioning vectors each have dimension 512, then this number would be 1024
-          # context_dim: 
-          # - 768
-          in_channels: *unet_in_channels # The input channel of the UNet model
-          model_channels: 192 # TODO might need to change
-          attention_resolutions:
-          - 8
-          - 4
-          - 2
-          num_res_blocks: 2
-          channel_mult: 
-          - 1
-          - 2
-          - 3
-          - 5
-          num_head_channels: 32
-          use_spatial_transformer: true
-          transformer_depth: 1
-          extra_sa_layer: False
-
+          feature_encoder_config:
+            target: audioldm_train.modules.motion_encoder.encoder.InputHintBlockKeypoints1D
+            params:
+              hint_channels: 138
+              model_channels: *unet_model_channels
+              F_target: *latent_f_size
+              mid_channels: 64
+              T_target: *latent_t_size
+          controlnet_model_config:
+            target: audioldm_train.modules.latent_diffusion.controlnet.ControlNet
+            params:
+              <<: *default_unet_params
     evaluation_params:
       unconditional_guidance_scale: 3.5
       ddim_sampling_steps: 200
       n_candidates_per_samples: 3
-    
     evaluator_config:
       target: audioldm_train.metrics.eval.ControlNetEvaluationHelper
       params:
