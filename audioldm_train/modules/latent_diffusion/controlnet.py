@@ -163,6 +163,10 @@ class ControlNet(nn.Module):
         elif context_dim is None:
             context_dim = [None]  # At least use one spatial transformer
 
+        self.input_hint_zero_conv = zero_module(
+            conv_nd(dims, model_channels, model_channels, 1, padding=0)
+        )
+
         self.input_blocks = nn.ModuleList(
             [
                 TimestepEmbedSequential(
@@ -358,7 +362,7 @@ class ControlNet(nn.Module):
         for module, zero_conv in zip(self.input_blocks, self.zero_convs):
             h = module(h, emb, context_list, context_attn_mask_list)
             if hint is not None:
-                h = h + hint
+                h = h + self.input_hint_zero_conv(hint)
                 hint = None
             outs.append(zero_conv(h, emb, context_list, context_attn_mask_list))
 

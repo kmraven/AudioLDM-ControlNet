@@ -136,12 +136,12 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     save_top_k = configs["step"]["save_top_k"]
 
     checkpoint_path = os.path.join(log_path, exp_group_name, exp_name, "checkpoints")
-
+    checkpoint_save_path = os.path.join(configs.get("ckpt_save_path", log_path), exp_group_name, exp_name, "checkpoints")
     wandb_path = os.path.join(log_path, exp_group_name, exp_name)
 
     checkpoint_callbacks = [
         ModelCheckpoint(
-            dirpath=checkpoint_path,
+            dirpath=checkpoint_save_path,
             monitor="global_step",
             mode="max",
             filename="checkpoint-global_step={global_step:.0f}",
@@ -151,7 +151,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
             save_last=True,
         ),
         ModelCheckpoint(
-            dirpath=checkpoint_path,
+            dirpath=checkpoint_save_path,
             monitor="val/frechet_audio_distance",
             mode="min",
             filename="checkpoint-fad-{val/frechet_audio_distance:.2f}-global_step={global_step:.0f}",
@@ -159,7 +159,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
             save_last=False,
         ),
         ModelCheckpoint(
-            dirpath=checkpoint_path,
+            dirpath=checkpoint_save_path,
             monitor="val/f1_score",
             mode="max",
             filename="checkpoint-f1_score-{val/f1_score:.2f}-global_step={global_step:.0f}",
@@ -167,7 +167,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
             save_last=False,
         ),
         ModelCheckpoint(
-            dirpath=checkpoint_path,
+            dirpath=checkpoint_save_path,
             monitor="val/tempo_difference",
             mode="min",
             filename="checkpoint-tempo_difference-{val/tempo_difference:.2f}-global_step={global_step:.0f}",
@@ -175,7 +175,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
             save_last=False,
         ),
         ModelCheckpoint(
-            dirpath=checkpoint_path,
+            dirpath=checkpoint_save_path,
             monitor="val/clap_score",
             mode="max",
             filename="checkpoint-clap_score-{val/clap_score:.2f}-global_step={global_step:.0f}",
@@ -183,8 +183,8 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
             save_last=False,
         ),
     ]
-
     os.makedirs(checkpoint_path, exist_ok=True)
+    os.makedirs(checkpoint_save_path, exist_ok=True)
     shutil.copy(config_yaml_path, wandb_path)
 
     is_external_checkpoints = False
@@ -303,6 +303,14 @@ if __name__ == "__main__":
         help="path to pretrained checkpoint",
     )
 
+    parser.add_argument(
+        "--ckpt_save_path",
+        type=str,
+        required=False,
+        default=None,
+        help="path to checkpoint save directory",
+    )
+
     parser.add_argument("--val", action="store_true")
 
     args = parser.parse_args()
@@ -321,6 +329,9 @@ if __name__ == "__main__":
 
     if args.reload_from_ckpt is not None:
         config_yaml["reload_from_ckpt"] = args.reload_from_ckpt
+
+    if args.ckpt_save_path is not None:
+            config_yaml["ckpt_save_path"] = args.ckpt_save_path
 
     if perform_validation:
         config_yaml["model"]["params"]["cond_stage_config"][
