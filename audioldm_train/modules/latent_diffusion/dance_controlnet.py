@@ -1,8 +1,6 @@
 from typing import Any
 import torch.nn as nn
 from audioldm_train.utilities.model_util import instantiate_from_config
-from audioldm_train.modules.motion_encoder.encoder import InputHintBlockKeypoints1D
-from audioldm_train.modules.latent_diffusion.controlnet import ControlNet
 
 
 class DanceControlNetWrapper(nn.Module):

@@ -1,5 +1,5 @@
 metadata_root: "./data/dataset/metadata/dataset_root.json"
-log_directory: "./log/latent_diffusion_controlnet"
+log_directory: "./log/latent_diffusion_controlnet_motionbert"
 project: "audioldm_controlnet"
 precision: "high"
 
@@ -64,6 +64,16 @@ preprocessing:
     n_mel_channels: *mel_bins
     mel_fmin: 0
     mel_fmax: 8000 
+  # added for dance-controlnet
+  strech_augmentation:
+    additional_strech_rate: 0.3
+    stretch_prob: 0.8
+  motion:
+    target_length: *latent_t_size
+    camera_height: 1080
+    camera_width: 1920
+    scale_range_train: [1, 3]
+    scale_range_test: [2, 2]
 
 augmentation:
   mixup: 0.0
@@ -140,19 +150,37 @@ model:
           sampling_rate: 16000
           embed_mode: text # or text
           amodel: HTSAT-base
+    # added for ControlNet
     controlnet_stage_config:
       dance_controlnet:
         controlnet_stage_key: motion
         target: audioldm_train.modules.latent_diffusion.dance_controlnet.DanceControlNetWrapper
         params:
           feature_encoder_config:
-            target: audioldm_train.modules.motion_encoder.encoder.InputHintBlockKeypoints1D
+            target: audioldm_train.modules.motion_encoder.encoder.MotionEncoderWrapper
             params:
-              hint_channels: 138
-              model_channels: *unet_model_channels
-              F_target: *latent_f_size
-              mid_channels: 64
-              T_target: *latent_t_size
+              motion_bert_config:
+                target: audioldm_train.modules.motion_encoder.MotionBERT.DSTformer.DSTformerWrapper
+                params:
+                  dim_in: 3
+                  dim_out: 3
+                  dim_feat: 512 # default value: intermediate representation
+                  dim_rep: &dim_rep 512 # default value
+                  depth: 5 # default value
+                  num_heads: 8 # default value
+                  mlp_ratio: 2 # default value
+                  maxlen: 243 # default value
+                  num_joints: &num_joints 17
+              motion_bert_pretrained_weights_path: data/checkpoints/latest_epoch.bin
+              feature_mapper_config:
+                target: audioldm_train.modules.motion_encoder.encoder.MotionBERT2AudioLDMEncoder
+                params:
+                  kpt_num_joints: *num_joints
+                  kpt_feat_dim: *dim_rep
+                  audio_channels: *unet_model_channels
+                  audio_freq: *latent_f_size
+                  d_model: 512
+                  num_temporal_blocks: 3
           controlnet_model_config:
             target: audioldm_train.modules.latent_diffusion.controlnet.ControlNet
             params:

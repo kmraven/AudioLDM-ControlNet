@@ -1,37 +1,64 @@
-import pickle
-import math
 import os
 
 import numpy as np
 import torch
-import pandas as pd
 import torchaudio.transforms as T
 
 from audioldm_train.utilities.data.dataset import AudioDataset, spectral_normalize_torch
 from librosa.filters import mel as librosa_mel_fn
+from audioldm_train.utilities.data.keypoints import (
+    load_keypoints,
+    interp_nan_keypoints,
+    resample_keypoints_2d,
+    coco2h36m,
+    make_cam,
+    crop_scale,
+)
 
 
 class AISTDataset(AudioDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.motion_preprocessor = MotionPreprocessor()
         self.strech_rate = None
+
+    def build_setting_parameters(self):
+        super().build_setting_parameters()
+        self.additional_strech_rate = self.config["preprocessing"].get("strech_augmentation", {}).get("additional_strech_rate", 0.)  # type: ignore
+        self.stretch_prob = self.config["preprocessing"].get("strech_augmentation", {}).get("stretch_prob", 0.)  # type: ignore
+        self.camera_shape = (
+            self.config["preprocessing"]["motion"]["camera_height"],  # type: ignore
+            self.config["preprocessing"]["motion"]["camera_width"],   # type: ignore
+        )
+        self.motion_target_length = self.config["preprocessing"]["motion"]["target_length"]  # type: ignore
+        if "train" in self.split:
+            self.scale_range = self.config["preprocessing"]["motion"].get("scale_range_train", [1, 1])  # type: ignore
+        else:
+            self.scale_range = self.config["preprocessing"]["motion"].get("scale_range_test", [1, 1])  # type: ignore
 
     def __getitem__(self, index):
         data = super().__getitem__(index)
         datum = self.data[index]
         kpt_path = datum.get("motion", None)
-        # k2d = self.motion_preprocessor._load_keypoints(kpt_path)  # shape: (T, 17, 3)
-        # k2d = self.motion_preprocessor._interpolate_nan_in_keypoints(k2d)[:, :, :2]  # shape: (T, 17, 2)
-        k2d = self.motion_preprocessor.extract(kpt_path)  # shape: (T, 138)
-        if self.strech_rate is not None:
-            k2d = self._time_resample_sequence(k2d, int(self.target_length / self.strech_rate))
-            k2d = k2d[:self.target_length]
-            self.strech_rate = None
-        else:
-            k2d = self._time_resample_sequence(k2d, self.target_length)
+        k2d = self.process_keypoints(kpt_path)
         data.update({"motion": k2d})
         return data
+    
+    def process_keypoints(self, kpt_path):
+        k2d = load_keypoints(kpt_path)  # shape: (T, 17, 3)
+        k2d = interp_nan_keypoints(k2d)  # shape: (T, 17, 3)
+        if self.strech_rate is not None:
+            k2d = resample_keypoints_2d(k2d, int(self.motion_target_length / self.strech_rate))
+            k2d = k2d[:self.motion_target_length]
+            self.strech_rate = None
+        else:
+            k2d = resample_keypoints_2d(k2d, self.motion_target_length)
+        k2d_score = k2d[:, :, 2]  # shape: (T, 17)
+        k2d = k2d[:, :, :2]  # shape: (T, 17, 2)
+        k2d = make_cam(k2d[np.newaxis, ...], self.camera_shape)[0]  # shape: (T, 17, 2)
+        k2d = np.concatenate([k2d, k2d_score[:, :, np.newaxis]], axis=2)  # shape: (T, 17, 3)
+        k2d = coco2h36m(k2d[np.newaxis, ...])[0]  # shape: (T, 17, 3)
+        k2d = crop_scale(k2d, self.scale_range)  # shape: (T, 17, 3)
+        return k2d
 
     def feature_extraction(self, index):
         """
@@ -68,33 +95,6 @@ class AISTDataset(AudioDataset):
             random_start,
         )
 
-    def _time_resample_sequence(self, seq, target_T):
-        seq = np.asarray(seq)
-        if seq.ndim == 2:
-            T, D = seq.shape
-            if T == target_T:
-                return seq
-            x_old = np.linspace(0, 1, T, dtype=np.float32)
-            x_new = np.linspace(0, 1, target_T, dtype=np.float32)
-            out = np.empty((target_T, D), dtype=np.float32)
-            for d in range(D):
-                out[:, d] = np.interp(x_new, x_old, seq[:, d])
-            return out
-        elif seq.ndim == 3:
-            T, J, C = seq.shape
-            assert C == 2, f"Expected last dim=2, got {C}"
-            if T == target_T:
-                return seq
-            x_old = np.linspace(0, 1, T, dtype=np.float32)
-            x_new = np.linspace(0, 1, target_T, dtype=np.float32)
-            out = np.empty((target_T, J, C), dtype=np.float32)
-            for j in range(J):
-                out[:, j, 0] = np.interp(x_new, x_old, seq[:, j, 0])
-                out[:, j, 1] = np.interp(x_new, x_old, seq[:, j, 1])
-            return out
-        else:
-            raise ValueError(f"Unsupported keypoints shape: {seq.shape}")
-
     def _relative_path_to_absolute_path(self, metadata, dataset_name):
         root_path = self.get_dataset_root_path(dataset_name)
         for i in range(len(metadata["data"])):
@@ -106,12 +106,7 @@ class AISTDataset(AudioDataset):
             )
         return metadata
 
-    def mel_spectrogram_train(
-            self,
-            y,
-            additional_strech_rate=0.3,
-            stretch_prob=0.8,
-    ):
+    def mel_spectrogram_train(self, y):
         if torch.min(y) < -1.0:
             print("train min value is ", torch.min(y))
         if torch.max(y) > 1.0:
@@ -156,9 +151,9 @@ class AISTDataset(AudioDataset):
             return_complex=True,
         )  # shape: [channels, freq_bins, time_frames], complex dtype
         
-        if self.split == "train" and torch.rand(1).item() < stretch_prob:
+        if self.split == "train" and torch.rand(1).item() < self.stretch_prob:
             original_length = stft_spec.size(2)
-            self.strech_rate = float(torch.empty(1).uniform_(1.0 - additional_strech_rate, 1.0))
+            self.strech_rate = float(torch.empty(1).uniform_(1.0 - self.additional_strech_rate, 1.0))
             ts = T.TimeStretch(n_freq=stft_spec.size(1), fixed_rate=self.strech_rate).to(y.device)
             stft_spec = ts(stft_spec)
             stft_spec = stft_spec[:, :, :original_length]
@@ -171,86 +166,3 @@ class AISTDataset(AudioDataset):
         )
 
         return mel[0], stft_spec[0]
-
-
-class MotionPreprocessor:
-
-    COCO_BONES = [
-        (0, 1), (0, 2), (1, 3), (2, 4),   # face
-        (0, 5),  (5, 7), (7, 9), (5, 11),     # left upper body
-        (0, 6), (6, 8), (8, 10), (6, 12),     # right upper body
-        (11, 13),  (13, 15),                  # Left lowerbody
-        (12, 14), (14, 16),                   # Right lowerbody
-    ]
-
-    def __init__(self):
-        pass
-
-    def _load_keypoints(self, keypoints_path):
-        with open(keypoints_path, 'rb') as f:
-            keypoints = pickle.load(f)
-        assert isinstance(keypoints, np.ndarray), "keypoints should be a list of numpy arrays"
-        assert keypoints.shape[1] == 17 and keypoints.shape[2] == 3, "keypoints should be a list of numpy arrays with shape [T, 17, 3]"
-        return keypoints
-
-    def _interpolate_nan_in_keypoints(self, keypoints):
-        T, J, C = keypoints.shape
-        keypoints_flatten = keypoints.reshape(T, -1)
-        keypoints_interpolated = pd.DataFrame(keypoints_flatten).interpolate(method='linear', limit_direction='both', axis=0)
-        return keypoints_interpolated.values.reshape(T, J, C)
-
-    def __angle_difference(self, a1, a2):
-        """Compute wrapped angle difference within [-pi, pi]"""
-        delta = a1 - a2
-        delta = (delta + math.pi) % (2 * math.pi) - math.pi
-        return delta
-
-    def __compute_bone_angles(self, positions, bones):
-        """
-        Compute 2D joint orientation angles for each bone. (in radian on the image)
-        positions: (T, J, 2)
-        Returns: (T, num_bones)
-        """
-        T, J, _ = positions.shape
-        angles = []
-        for p1_idx, p2_idx in bones:
-            vec = positions[:, p2_idx, :] - positions[:, p1_idx, :]  # (T, 2)
-            bone_angle = torch.atan2(vec[:, 1], vec[:, 0])     # (T,)
-            angles.append(bone_angle)
-        return torch.stack(angles, dim=1)  # (T, num_bones)
-
-    def extract(self, keypoints_path):
-        """
-        Input: 2d keypoints in COCO format (T, 17, 2)
-        Output: [root position, 
-                root velocity, 
-                joint position (rel to root),
-                joint velocity (rel to root),
-                joint acceleration (rel to root),
-                joint angles (each bone)
-                joint angular velocity (each bone)
-            ]
-        """
-        keypoints = self._load_keypoints(keypoints_path)  # shape: (T, 17, 3)
-        pose_feature = torch.tensor(self._interpolate_nan_in_keypoints(keypoints)[:, :, :2])  # reshape to (T, 17, 2)
-        pose_feature = torch.nan_to_num(pose_feature, nan=0.0)
-        T, J, _ = pose_feature.shape # (T,J,2)
-        # using coco format, extract joint position, velocity, acceleration in root space
-        root = (pose_feature[:, 11, :] + pose_feature[:, 12, :]) / 2 # (T, 2) midpoint between left and right hip
-        root_vel = torch.cat((torch.zeros(1, 2), root[1:] - root[:-1]), 0) #(T, 2)
-        joint_pos = pose_feature - root.unsqueeze(1) #(T, J, 2) joint position in root space
-        joint_vel = torch.cat((torch.zeros(1, J, 2), joint_pos[1:] - joint_pos[:-1]), 0) #(T, J, 2) joint linear velocity in root space
-        joint_acc = torch.cat((torch.zeros(1, J, 2), joint_vel[1:] - joint_vel[:-1]), 0) #(T, J, 2) joint linear acceleration in root space
-        # 2d joint orientations, from each parent joint
-        # Bone angles on the 2D image
-        joint_angles = self.__compute_bone_angles(joint_pos, self.COCO_BONES)  # (T, num_bones)
-        # Bone angular velocity (wrapped between -pi and pi) and pad zeros
-        joint_angle_vel = torch.cat((torch.zeros(1, len(self.COCO_BONES)), self.__angle_difference(joint_angles[1:], joint_angles[:-1])), 0)  # (T, num_bones)
-        all_feat = torch.cat((root, # (T, 4+6J+2(J-1)) = (T, 138)
-                                root_vel,  
-                                joint_pos.flatten(start_dim=1), 
-                                joint_vel.flatten(start_dim=1), 
-                                joint_acc.flatten(start_dim=1), 
-                                joint_angles, 
-                                joint_angle_vel), 1)
-        return all_feat  # shape: (T, 138)

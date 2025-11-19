@@ -1,3 +1,8 @@
+"""
+adopted from MotionBERT:
+https://github.com/Walter0807/MotionBERT/blob/dccfe7b14a7f09aae2e27a16d951cb4c6f6e62f6/lib/model/drop.py
+"""
+
 """ DropBlock, DropPath
 PyTorch implementations of DropBlock and DropPath (Stochastic Depth) regularization layers.
 Papers:

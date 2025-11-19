@@ -1,3 +1,7 @@
+"""
+adopted from MotionBERT:
+https://github.com/Walter0807/MotionBERT/blob/dccfe7b14a7f09aae2e27a16d951cb4c6f6e62f6/lib/model/DSTformer.py
+"""
 import torch
 import torch.nn as nn
 import math
@@ -360,4 +364,24 @@ class DSTformer(nn.Module):
 
     def get_representation(self, x):
         return self.forward(x, return_rep=True)
-    
+
+
+class DSTformerWrapper(DSTformer):
+    """
+    just edited a default argument value of norm_layer
+    """
+    def __init__(
+        self, dim_in=3, dim_out=3, dim_feat=256, dim_rep=512,
+        depth=5, num_heads=8, mlp_ratio=4, 
+        num_joints=17, maxlen=243, 
+        qkv_bias=True, qk_scale=None, drop_rate=0., attn_drop_rate=0., drop_path_rate=0.,
+        norm_layer=partial(nn.LayerNorm, eps=1e-6), att_fuse=True,
+    ):
+        super().__init__(
+            dim_in=dim_in, dim_out=dim_out, dim_feat=dim_feat, dim_rep=dim_rep,
+            depth=depth, num_heads=num_heads, mlp_ratio=mlp_ratio, 
+            num_joints=num_joints, maxlen=maxlen, 
+            qkv_bias=qkv_bias, qk_scale=qk_scale, drop_rate=drop_rate,
+            attn_drop_rate=attn_drop_rate, drop_path_rate=drop_path_rate,
+            norm_layer=norm_layer, att_fuse=att_fuse # type: ignore
+        )
