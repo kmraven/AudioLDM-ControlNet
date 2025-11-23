@@ -4,23 +4,39 @@ import torch.nn as nn
 import torch.nn.functional as F
 from audioldm_train.utilities.model_util import instantiate_from_config
 
-class TemporalConvBlock(nn.Module):
-    def __init__(self, dim, kernel_size=3):
+class ZeroConv1dProject(nn.Module):
+    def __init__(self, d_model: int, C: int, Freq: int, kernel_size: int = 1, padding: int = 0):
         super().__init__()
-        padding = kernel_size // 2
-        self.conv1 = nn.Conv1d(dim, dim, kernel_size, padding=padding)
-        self.conv2 = nn.Conv1d(dim, dim, kernel_size, padding=padding)
-        self.norm = nn.LayerNorm(dim)
+        out_channels = C * Freq
+        self.conv = nn.Conv1d(
+            in_channels=d_model,
+            out_channels=out_channels,
+            kernel_size=kernel_size,
+            padding=padding
+        )
+        nn.init.zeros_(self.conv.weight)
+        if self.conv.bias is not None:
+            nn.init.zeros_(self.conv.bias)
+        self.C = C
+        self.Freq = Freq
 
-    def forward(self, x):  # x: [B, T, D]
-        residual = x
-        x = x.transpose(1, 2)  # [B, D, T]
-        x = self.conv1(x)
-        x = F.gelu(x)
-        x = self.conv2(x)
-        x = x.transpose(1, 2)  # [B, T, D]
-        x = self.norm(x + residual)
-        return x
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        x: [B, T, D_model]
+        return: [B, C, T, Freq]
+        """
+        B, T, D = x.shape
+        assert D == self.conv.in_channels
+
+        x = x.transpose(1, 2)             # [B, D_model, T]
+        y = self.conv(x)                  # [B, C*Freq, T]
+
+        B, CF, T_out = y.shape
+        assert CF == self.C * self.Freq
+        y = y.view(B, self.C, self.Freq, T_out)  # [B, C, Freq, T]
+        y = y.permute(0, 1, 3, 2)         # [B, C, T, Freq]
+
+        return y
 
 
 class MotionBERT2AudioLDMEncoder(nn.Module):
@@ -31,23 +47,14 @@ class MotionBERT2AudioLDMEncoder(nn.Module):
         audio_channels: int,
         audio_freq: int,
         d_model: int = 512,
-        num_temporal_blocks: int = 3,
     ):
         super().__init__()
         self.kpt_num_joints = kpt_num_joints
         self.kpt_feat_dim = kpt_feat_dim
-        self.audio_channels = audio_channels
-        self.audio_freq = audio_freq
 
         d_in = kpt_num_joints * kpt_feat_dim
         self.input_proj = nn.Linear(d_in, d_model)
-        self.input_norm = nn.LayerNorm(d_model)
-
-        self.temporal_blocks = nn.ModuleList(
-            [TemporalConvBlock(d_model) for _ in range(num_temporal_blocks)]
-        )
-
-        self.output_proj = nn.Linear(d_model, audio_channels * audio_freq)
+        self.output_proj = ZeroConv1dProject(d_model, audio_channels, audio_freq)
 
     def forward(self, x):
         """
@@ -56,19 +63,9 @@ class MotionBERT2AudioLDMEncoder(nn.Module):
         """
         B, T, J, F = x.shape
         assert J == self.kpt_num_joints and F == self.kpt_feat_dim
-
         x = x.view(B, T, J * F)  # [B, T, D_in]
-
         h = self.input_proj(x)          # [B, T, D_model]
-        h = self.input_norm(h)
-
-        for block in self.temporal_blocks:
-            h = block(h)                # [B, T, D_model]
-
-        h = self.output_proj(h)         # [B, T, C*Freq]
-        h = h.view(B, T, self.audio_channels, self.audio_freq)
-        h = h.permute(0, 2, 1, 3)       # [B, C, T, Freq]
-
+        h = self.output_proj(h)         # [B, C, T, Freq]
         return h
 
 

@@ -180,7 +180,6 @@ model:
                   audio_channels: *unet_model_channels
                   audio_freq: *latent_f_size
                   d_model: 512
-                  num_temporal_blocks: 3
           controlnet_model_config:
             target: audioldm_train.modules.latent_diffusion.controlnet.ControlNet
             params:
