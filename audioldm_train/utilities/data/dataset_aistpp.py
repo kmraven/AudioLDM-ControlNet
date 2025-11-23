@@ -13,6 +13,7 @@ from audioldm_train.utilities.data.keypoints import (
     coco2h36m,
     make_cam,
     crop_scale,
+    extract_motion_beat,
 )
 
 
@@ -168,3 +169,44 @@ class AISTDataset(AudioDataset):
         )
 
         return mel[0], stft_spec[0]
+
+
+class AISTBeatDanceDataset(AISTDataset):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def build_setting_parameters(self):
+        super().build_setting_parameters()
+        self.fps_keypoints = self.config["preprocessing"]["motion"]["fps_keypoints"]  # type: ignore
+        self.beat_dim = self.config["preprocessing"]["motion"]["beat_dim"]  # type: ignore
+
+    def __getitem__(self, index):
+        data = super(AISTDataset).__getitem__(index)
+        datum = self.data[index]
+        kpt_path = datum.get("motion", None)
+        beat_feature = self.process_beat_feature(kpt_path)  # call first not to lose strech_rate
+        k2d = self.process_keypoints(kpt_path)
+        data.update({"motion": {
+            'motion_feature': k2d,
+            'motion_beat_feature': beat_feature
+        }})
+        if self.split=="train" and "text" in data and np.random.rand() < 0.5:
+            data["text"] = ""
+        return data
+    
+    # TODO pre-calculate and save beat feature to speed up data loading
+    def process_beat_feature(self, kpt_path):
+        k2d = load_keypoints(kpt_path)  # shape: (T, 17, 3)
+        k2d = interp_nan_keypoints(k2d)  # shape: (T, 17, 3)
+        if self.strech_rate is not None:
+            original_length = len(k2d)
+            k2d = resample_keypoints_2d(k2d, int(original_length / self.strech_rate))
+            k2d = k2d[:original_length]
+        beat_feature = extract_motion_beat(
+            k2d,
+            beat_dim=self.beat_dim,
+            target_length=self.motion_target_length,
+            fps_keypoints=self.fps_keypoints,
+            duration=self.duration,
+        )  # shape: (beat_dim, target_length)
+        return beat_feature

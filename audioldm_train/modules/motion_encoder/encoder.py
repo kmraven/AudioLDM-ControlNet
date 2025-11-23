@@ -69,6 +69,38 @@ class MotionBERT2AudioLDMEncoder(nn.Module):
         return h
 
 
+class MotionBERT2BeatDance2AudioLDMEncoder(nn.Module):
+    def __init__(
+        self,
+        kpt_num_joints: int,
+        kpt_feat_dim: int,
+        audio_channels: int,
+        audio_freq: int,
+        beatdance_output_dim: int,
+        beatdance_config: Any,
+    ):
+        super().__init__()
+        self.kpt_num_joints = kpt_num_joints
+        self.kpt_feat_dim = kpt_feat_dim
+
+        self.beatdance: Any = instantiate_from_config(beatdance_config)
+        self.output_proj = ZeroConv1dProject(beatdance_output_dim, audio_channels, audio_freq)
+
+    def forward(self, x):
+        """
+        motion_feature: [B, T, J, F]  (MotionBERT get_representation() output)
+        motion_beat_feature: [B, T, beat_dim]  (extracted motion beat feature)
+        return: [B, C, T, Freq]  (AudioLDM/ControlNet input)
+        """
+        motion_feature = x['motion_feature']
+        motion_beat_feature = x['motion_beat_feature']
+        B, T, J, F = motion_feature.shape
+        assert J == self.kpt_num_joints and F == self.kpt_feat_dim
+        h = self.beatdance(motion_feature, motion_beat_feature)  # [B, T, beatdance_output_dim]
+        h = self.output_proj(h)         # [B, C, T, Freq]
+        return h
+
+
 class MotionEncoderWrapper(nn.Module):
     def __init__(self, motion_bert_config, motion_bert_pretrained_weights_path, feature_mapper_config):
         super().__init__()

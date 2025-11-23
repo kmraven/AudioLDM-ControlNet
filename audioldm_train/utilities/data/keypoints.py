@@ -1,6 +1,9 @@
 import pickle
 import copy
 import numpy as np
+import torch
+from scipy.signal import argrelextrema
+from scipy.ndimage import gaussian_filter as G
 
 
 def load_keypoints(keypoints_path):
@@ -55,6 +58,32 @@ def resample_keypoints_2d(kps, T_target):
             out[:, j, c] = resample_keypoints_1d(kps[:, j, c], T_target)
 
     return out
+
+
+def extract_motion_beat(keypoints, beat_dim, target_length, fps_keypoints, duration):
+    assert isinstance(keypoints, np.ndarray), "keypoints should be a list of numpy arrays"
+    assert keypoints.shape[1] == 17 and keypoints.shape[2] == 3, "keypoints should be a list of numpy arrays with shape [T, 17, 3]"
+    velocity = np.mean(np.sqrt(np.sum((keypoints[1:] - keypoints[:-1]) ** 2, axis=2)), axis=1)
+    kinetic_vel = np.zeros(keypoints.shape[0])
+    valid_len = min(len(velocity), len(kinetic_vel) - 1)
+    kinetic_vel[1:valid_len + 1] = np.nan_to_num(velocity[:valid_len], nan=0.0)
+    max_val = np.max(kinetic_vel)
+    if max_val > 0:
+        kinetic_vel /= max_val
+    kinetic_vel = np.nan_to_num(G(kinetic_vel, sigma=2))
+    motion_beats = argrelextrema(kinetic_vel, np.less)[0][argrelextrema(kinetic_vel, np.less)[0] < keypoints.shape[0]]
+
+    flatten_target_length = target_length * beat_dim
+    beats_time = motion_beats / fps_keypoints
+    fps = flatten_target_length / duration
+    beats_idx = np.round(beats_time * fps).astype(int)
+    beats_idx = np.unique(beats_idx)
+    beats_idx = beats_idx[beats_idx < flatten_target_length]
+    beats_vector = np.zeros(flatten_target_length, dtype=int)
+    beats_vector[beats_idx] = 1
+    beats_feature = torch.tensor(beats_vector).view(beat_dim, target_length)
+    return beats_feature
+
 
 
 """
