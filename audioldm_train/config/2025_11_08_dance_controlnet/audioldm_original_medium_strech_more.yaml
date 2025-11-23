@@ -1,5 +1,5 @@
 metadata_root: "./data/dataset/metadata/dataset_root.json"
-log_directory: "./log/latent_diffusion_controlnet_motionbert_more"
+log_directory: "./log/latent_diffusion_controlnet_motionbert"
 project: "audioldm_controlnet"
 precision: "high"
 
@@ -45,10 +45,10 @@ data:
   dataloader_add_ons: [] 
 
 step:
-  validation_every_n_epochs: 5
-  save_checkpoint_every_n_steps: 5000
+  validation_every_n_epochs: 10
+  save_checkpoint_every_n_steps: 10000
   # limit_val_batches: 2
-  max_steps: 800000
+  max_steps: 1000000
   save_top_k: 1
 
 preprocessing:
@@ -88,7 +88,7 @@ model:
       params: 
         reload_from_ckpt: "data/checkpoints/vae_mel_16k_64bins.ckpt"
         sampling_rate: *sampling_rate
-        batchsize: 4
+        batchsize: 8
         monitor: val/rec_loss
         image_key: fbank
         subband: 1
@@ -122,7 +122,7 @@ model:
     warmup_steps: *warmup_steps
     optimize_ddpm_parameter: *optimize_ddpm_parameter
     sampling_rate: *sampling_rate
-    batchsize: 2
+    batchsize: 8
     linear_start: 0.0015
     linear_end: 0.0195
     num_timesteps_cond: 1

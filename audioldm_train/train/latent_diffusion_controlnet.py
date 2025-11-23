@@ -133,7 +133,6 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     validation_every_n_epochs = configs["step"]["validation_every_n_epochs"]
     save_checkpoint_every_n_steps = configs["step"]["save_checkpoint_every_n_steps"]
     max_steps = configs["step"]["max_steps"]
-    save_top_k = configs["step"]["save_top_k"]
 
     checkpoint_path = os.path.join(log_path, exp_group_name, exp_name, "checkpoints")
     checkpoint_save_path = os.path.join(configs.get("ckpt_save_path", log_path), exp_group_name, exp_name, "checkpoints")
@@ -141,45 +140,52 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
 
     checkpoint_callbacks = [
         ModelCheckpoint(
-            dirpath=checkpoint_save_path,
+            dirpath=checkpoint_path,
             monitor="global_step",
             mode="max",
             filename="checkpoint-global_step={global_step:.0f}",
-            every_n_train_steps=save_checkpoint_every_n_steps,
-            save_top_k=save_top_k,
+            every_n_epochs=validation_every_n_epochs,
             auto_insert_metric_name=False,
             save_last=True,
         ),
         ModelCheckpoint(
-            dirpath=checkpoint_save_path,
+            # dirpath=checkpoint_save_path,
+            dirpath=checkpoint_path,
             monitor="val/frechet_audio_distance",
             mode="min",
             filename="checkpoint-fad-{val/frechet_audio_distance:.2f}-global_step={global_step:.0f}",
             auto_insert_metric_name=False,
+            save_weights_only=True,
             save_last=False,
         ),
         ModelCheckpoint(
-            dirpath=checkpoint_save_path,
+            # dirpath=checkpoint_save_path,
+            dirpath=checkpoint_path,
             monitor="val/f1_score",
             mode="max",
             filename="checkpoint-f1_score-{val/f1_score:.2f}-global_step={global_step:.0f}",
             auto_insert_metric_name=False,
+            save_weights_only=True,
             save_last=False,
         ),
         ModelCheckpoint(
-            dirpath=checkpoint_save_path,
+            # dirpath=checkpoint_save_path,
+            dirpath=checkpoint_path,
             monitor="val/tempo_difference",
             mode="min",
             filename="checkpoint-tempo_difference-{val/tempo_difference:.2f}-global_step={global_step:.0f}",
             auto_insert_metric_name=False,
+            save_weights_only=True,
             save_last=False,
         ),
         ModelCheckpoint(
-            dirpath=checkpoint_save_path,
+            # dirpath=checkpoint_save_path,
+            dirpath=checkpoint_path,
             monitor="val/clap_score",
             mode="max",
             filename="checkpoint-clap_score-{val/clap_score:.2f}-global_step={global_step:.0f}",
             auto_insert_metric_name=False,
+            save_weights_only=True,
             save_last=False,
         ),
     ]

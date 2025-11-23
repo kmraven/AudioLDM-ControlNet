@@ -41,6 +41,8 @@ class AISTDataset(AudioDataset):
         kpt_path = datum.get("motion", None)
         k2d = self.process_keypoints(kpt_path)
         data.update({"motion": k2d})
+        if self.split=="train" and "text" in data and np.random.rand() < 0.5:
+            data["text"] = ""
         return data
     
     def process_keypoints(self, kpt_path):

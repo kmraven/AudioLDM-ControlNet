@@ -751,12 +751,11 @@ class DDPM(pl.LightningModule):
         )
 
     def on_validation_epoch_end(self) -> None:
-        if self.global_rank == 0 and self.evaluator is not None:
+        if self.evaluator is not None:
             assert (
                 self.test_data_subset_path is not None
             ), "Please set test_data_subset_path before validation so that model have a target folder"
             try:
-
                 name = self.validation_folder_name
                 waveform_save_path = os.path.join(self.get_log_dir(), name)
                 if (
@@ -773,14 +772,13 @@ class DDPM(pl.LightningModule):
                         ("val/" + k): float(v) for k, v in metrics.items()
                     }
                     if len(self.metrics_buffer.keys()) > 0:
-                        for k in self.metrics_buffer.keys():
+                        for k, v in self.metrics_buffer.items():
                             self.log(
                                 k,
-                                self.metrics_buffer[k],
-                                prog_bar=False,
-                                logger=True,
-                                on_step=True,
-                                on_epoch=False,
+                                v,
+                                on_step=False,
+                                on_epoch=True,
+                                sync_dist=True,
                             )
                         self.metrics_buffer = {}
                 else:
