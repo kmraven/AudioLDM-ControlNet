@@ -81,7 +81,7 @@ def extract_motion_beat(keypoints, beat_dim, target_length, fps_keypoints, durat
     beats_idx = beats_idx[beats_idx < flatten_target_length]
     beats_vector = np.zeros(flatten_target_length, dtype=int)
     beats_vector[beats_idx] = 1
-    beats_feature = torch.tensor(beats_vector).view(beat_dim, target_length)
+    beats_feature = torch.tensor(beats_vector).view(target_length, beat_dim)
     return beats_feature
 
 

@@ -418,8 +418,7 @@ class ControlLDM(LatentDiffusion):
                 controlnet_model_key
             ]["controlnet_stage_key"]
             assert controlnet_stage_key in batch, f"'{controlnet_stage_key}' not found in batch."
-            control = batch[controlnet_stage_key].to(self.device)
-            control = control.to(memory_format=torch.contiguous_format).float()
+            control = batch[controlnet_stage_key]
             cond_dict[controlnet_model_key] = control
         return z, cond_dict
 

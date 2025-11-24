@@ -6,26 +6,26 @@ os.environ["TOKENIZERS_PARALLELISM"] = "true"
 sys.path.append("src")
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
-import shutil
 import argparse
-import yaml
+import logging
+import shutil
+
 import torch
-
-from tqdm import tqdm
-from pytorch_lightning.strategies.ddp import DDPStrategy
+import yaml
 from huggingface_hub import hf_hub_download
-from audioldm_train.utilities.data.dataset_aistpp import AISTBeatDanceDataset
-
-from torch.utils.data import DataLoader
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
-from audioldm_train.utilities.tools import (
-    get_restore_step,
-    copy_test_subset_data,
-)
+from pytorch_lightning.strategies.ddp import DDPStrategy
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+
+from audioldm_train.utilities.data.dataset_aistpp import AISTBeatDanceDataset
 from audioldm_train.utilities.model_util import instantiate_from_config
-import logging
+from audioldm_train.utilities.tools import (
+    copy_test_subset_data,
+    get_restore_step,
+)
 
 logging.basicConfig(level=logging.WARNING)
 
@@ -34,25 +34,24 @@ def download_checkpoint(checkpoint_name="audioldm2-full"):
     """
     https://github.com/haoheliu/AudioLDM2/blob/b5786c5dc0ae8f766337fdc1b67ab6046586d14d/audioldm2/utils.py#L209
     """
-    if("audioldm2-speech" in checkpoint_name):
+    if "audioldm2-speech" in checkpoint_name:
         model_id = "haoheliu/audioldm2-speech"
     else:
         model_id = "haoheliu/%s" % checkpoint_name
 
     checkpoint_path = hf_hub_download(
-        repo_id=model_id,
-        filename=checkpoint_name+".pth"
+        repo_id=model_id, filename=checkpoint_name + ".pth"
     )
     return checkpoint_path
 
 
 def modify_state_dict(state_dict, modify_dict):
-    '''
+    """
     modify_dict[target_key] = {
         "new_key": str,
         "duplicate": bool
     }
-    '''
+    """
     for target_key in modify_dict.keys():
         new_key = modify_dict[target_key]["new_key"]
         duplicate = modify_dict[target_key]["duplicate"]
@@ -135,7 +134,9 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     max_steps = configs["step"]["max_steps"]
 
     checkpoint_path = os.path.join(log_path, exp_group_name, exp_name, "checkpoints")
-    checkpoint_save_path = os.path.join(configs.get("ckpt_save_path", log_path), exp_group_name, exp_name, "checkpoints")
+    # checkpoint_save_path = os.path.join(
+    #     configs.get("ckpt_save_path", log_path), exp_group_name, exp_name, "checkpoints"
+    # )
     wandb_path = os.path.join(log_path, exp_group_name, exp_name)
 
     checkpoint_callbacks = [
@@ -147,50 +148,51 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
             every_n_epochs=validation_every_n_epochs,
             auto_insert_metric_name=False,
             save_last=True,
+            save_top_k=3,
         ),
-        ModelCheckpoint(
-            # dirpath=checkpoint_save_path,
-            dirpath=checkpoint_path,
-            monitor="val/frechet_audio_distance",
-            mode="min",
-            filename="checkpoint-fad-{val/frechet_audio_distance:.2f}-global_step={global_step:.0f}",
-            auto_insert_metric_name=False,
-            save_weights_only=True,
-            save_last=False,
-        ),
-        ModelCheckpoint(
-            # dirpath=checkpoint_save_path,
-            dirpath=checkpoint_path,
-            monitor="val/f1_score",
-            mode="max",
-            filename="checkpoint-f1_score-{val/f1_score:.2f}-global_step={global_step:.0f}",
-            auto_insert_metric_name=False,
-            save_weights_only=True,
-            save_last=False,
-        ),
-        ModelCheckpoint(
-            # dirpath=checkpoint_save_path,
-            dirpath=checkpoint_path,
-            monitor="val/tempo_difference",
-            mode="min",
-            filename="checkpoint-tempo_difference-{val/tempo_difference:.2f}-global_step={global_step:.0f}",
-            auto_insert_metric_name=False,
-            save_weights_only=True,
-            save_last=False,
-        ),
-        ModelCheckpoint(
-            # dirpath=checkpoint_save_path,
-            dirpath=checkpoint_path,
-            monitor="val/clap_score",
-            mode="max",
-            filename="checkpoint-clap_score-{val/clap_score:.2f}-global_step={global_step:.0f}",
-            auto_insert_metric_name=False,
-            save_weights_only=True,
-            save_last=False,
-        ),
+        # ModelCheckpoint(
+        #     # dirpath=checkpoint_save_path,
+        #     dirpath=checkpoint_path,
+        #     monitor="val/frechet_audio_distance",
+        #     mode="min",
+        #     filename="checkpoint-fad-{val/frechet_audio_distance:.2f}-global_step={global_step:.0f}",
+        #     auto_insert_metric_name=False,
+        #     save_weights_only=True,
+        #     save_last=False,
+        # ),
+        # ModelCheckpoint(
+        #     # dirpath=checkpoint_save_path,
+        #     dirpath=checkpoint_path,
+        #     monitor="val/f1_score",
+        #     mode="max",
+        #     filename="checkpoint-f1_score-{val/f1_score:.2f}-global_step={global_step:.0f}",
+        #     auto_insert_metric_name=False,
+        #     save_weights_only=True,
+        #     save_last=False,
+        # ),
+        # ModelCheckpoint(
+        #     # dirpath=checkpoint_save_path,
+        #     dirpath=checkpoint_path,
+        #     monitor="val/tempo_difference",
+        #     mode="min",
+        #     filename="checkpoint-tempo_difference-{val/tempo_difference:.2f}-global_step={global_step:.0f}",
+        #     auto_insert_metric_name=False,
+        #     save_weights_only=True,
+        #     save_last=False,
+        # ),
+        # ModelCheckpoint(
+        #     # dirpath=checkpoint_save_path,
+        #     dirpath=checkpoint_path,
+        #     monitor="val/clap_score",
+        #     mode="max",
+        #     filename="checkpoint-clap_score-{val/clap_score:.2f}-global_step={global_step:.0f}",
+        #     auto_insert_metric_name=False,
+        #     save_weights_only=True,
+        #     save_last=False,
+        # ),
     ]
     os.makedirs(checkpoint_path, exist_ok=True)
-    os.makedirs(checkpoint_save_path, exist_ok=True)
+    # os.makedirs(checkpoint_save_path, exist_ok=True)
     shutil.copy(config_yaml_path, wandb_path)
 
     is_external_checkpoints = False
@@ -251,7 +253,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
                 "model.diffusion_model": {
                     "new_key": "controlnet_stage_models.0",
                     "duplicate": True,
-                }
+                },
             }
             ckpt = modify_state_dict(ckpt, modify_dict)
 
@@ -337,7 +339,7 @@ if __name__ == "__main__":
         config_yaml["reload_from_ckpt"] = args.reload_from_ckpt
 
     if args.ckpt_save_path is not None:
-            config_yaml["ckpt_save_path"] = args.ckpt_save_path
+        config_yaml["ckpt_save_path"] = args.ckpt_save_path
 
     if perform_validation:
         config_yaml["model"]["params"]["cond_stage_config"][

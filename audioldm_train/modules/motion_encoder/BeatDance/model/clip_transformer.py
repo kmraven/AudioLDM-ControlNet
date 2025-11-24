@@ -98,10 +98,12 @@ class DanceOnlyBeatDanceWrapper(CLIPTransformer):
             kpt_num_joints: int,
             kpt_feat_dim: int,
             beat_dim: int,
-            beatdance_output_dim: int
+            beatdance_output_dim: int,
+            num_frames: int,
         ):
         config = CusConfig(beatdance_config_path, exp_name="")
         config.embed_dim = beatdance_output_dim
+        config.num_frames = num_frames
         super(DanceOnlyBeatDanceWrapper, self).__init__(config)
         del self.dropout2
         del self.music_transformer
@@ -120,9 +122,9 @@ class DanceOnlyBeatDanceWrapper(CLIPTransformer):
         motion_beat_feature: [B, T, beat_dim]  (extracted motion beat feature)
         return: [B, C, T, Freq]  (AudioLDM/ControlNet input)
         """
+        B, T, J, F = motion_feature.shape
+        motion_feature = motion_feature.reshape(B, T, J * F)
         motion_feature = self.video_linear(motion_feature)
         motion_beat_feature = self.video_beat_linear(motion_beat_feature)
         video_features_trans = self.video_multimodel_fuse(motion_feature, motion_beat_feature)
-        video_features_trans = video_features_trans['video_fuse'].reshape(-1, int(self.config.embed_dim) * (self.config.num_frames))
-        
-        return video_features_trans
+        return video_features_trans['video_fuse']

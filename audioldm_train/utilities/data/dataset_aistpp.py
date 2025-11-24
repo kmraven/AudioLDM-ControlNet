@@ -181,7 +181,7 @@ class AISTBeatDanceDataset(AISTDataset):
         self.beat_dim = self.config["preprocessing"]["motion"]["beat_dim"]  # type: ignore
 
     def __getitem__(self, index):
-        data = super(AISTDataset).__getitem__(index)
+        data = AudioDataset.__getitem__(self, index)
         datum = self.data[index]
         kpt_path = datum.get("motion", None)
         beat_feature = self.process_beat_feature(kpt_path)  # call first not to lose strech_rate
@@ -195,6 +195,7 @@ class AISTBeatDanceDataset(AISTDataset):
         return data
     
     # TODO pre-calculate and save beat feature to speed up data loading
+    # pre-calculate the beat_time and convert to target_length
     def process_beat_feature(self, kpt_path):
         k2d = load_keypoints(kpt_path)  # shape: (T, 17, 3)
         k2d = interp_nan_keypoints(k2d)  # shape: (T, 17, 3)
@@ -208,5 +209,5 @@ class AISTBeatDanceDataset(AISTDataset):
             target_length=self.motion_target_length,
             fps_keypoints=self.fps_keypoints,
             duration=self.duration,
-        )  # shape: (beat_dim, target_length)
+        )  # shape: (target_length, beat_dim)
         return beat_feature

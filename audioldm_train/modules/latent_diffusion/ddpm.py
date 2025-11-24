@@ -1,14 +1,10 @@
 from multiprocessing.sharedctypes import Value
-import statistics
-import sys
 import os
-from tkinter import E
 
 import torch
 import torch.nn as nn
 import numpy as np
 import pytorch_lightning as pl
-from torch.optim.lr_scheduler import LambdaLR
 from einops import rearrange, repeat
 from contextlib import contextmanager
 from functools import partial
@@ -21,7 +17,6 @@ import datetime
 from audioldm_train.utilities.model_util import (
     exists,
     default,
-    mean_flat,
     count_params,
     instantiate_from_config,
 )
@@ -34,7 +29,6 @@ from audioldm_train.utilities.diffusion_util import (
 
 from audioldm_train.modules.diffusionmodules.ema import LitEma
 from audioldm_train.modules.diffusionmodules.distributions import (
-    normal_kl,
     DiagonalGaussianDistribution,
 )
 
@@ -42,7 +36,6 @@ from audioldm_train.modules.diffusionmodules.distributions import (
 from audioldm_train.modules.latent_diffusion.ddim import DDIMSampler
 from audioldm_train.modules.latent_diffusion.plms import PLMSSampler
 import soundfile as sf
-import os
 
 __conditioning_keys__ = {"concat": "c_concat", "crossattn": "c_crossattn", "adm": "y"}
 
@@ -725,10 +718,13 @@ class DDPM(pl.LightningModule):
                 self.cond_stage_models[model_idx].use_gt_mae_output = False
                 self.cond_stage_models[model_idx].use_gt_mae_prob = 0.0
         self.validation_folder_name = self.get_validation_folder_name()
+        self.val_losses = []
         return super().on_validation_epoch_start()
 
     @torch.no_grad()
     def validation_step(self, batch, batch_idx):
+        loss, _ = self.shared_step(batch)
+        self.val_losses.append(loss.item())
         self.generate_sample(
             [batch],
             name=self.validation_folder_name,
@@ -751,6 +747,13 @@ class DDPM(pl.LightningModule):
         )
 
     def on_validation_epoch_end(self) -> None:
+        avg_val_loss = sum(self.val_losses) / len(self.val_losses)
+        self.log(
+            "val/loss",
+            avg_val_loss,
+            on_step=False,
+            on_epoch=True,
+        )
         if self.evaluator is not None:
             assert (
                 self.test_data_subset_path is not None

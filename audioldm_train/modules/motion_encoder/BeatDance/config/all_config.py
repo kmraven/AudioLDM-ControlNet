@@ -1,7 +1,7 @@
 import os
 import argparse
-from config.base_config import Config
-from modules.basic_utils import mkdirp, deletedir
+from .base_config import Config
+# from modules.basic_utils import mkdirp, deletedir
 import json
 from types import SimpleNamespace
 
@@ -81,9 +81,9 @@ class AllConfig(Config):
         args.model_path = os.path.join(args.output_dir, args.exp_name)
         args.tb_log_dir = os.path.join(args.tb_log_dir, args.exp_name)
 
-        mkdirp(args.model_path)
-        deletedir(args.tb_log_dir)
-        mkdirp(args.tb_log_dir)
+        # mkdirp(args.model_path)
+        # deletedir(args.tb_log_dir)
+        # mkdirp(args.tb_log_dir)
 
         return args
 
@@ -107,7 +107,7 @@ class CusConfig(Config):
         args.model_path = os.path.join(args.output_dir, args.exp_name)
         args.tb_log_dir = os.path.join(args.tb_log_dir, args.exp_name)
 
-        mkdirp(args.model_path)
+        # mkdirp(args.model_path)
         #deletedir(args.tb_log_dir)
         os.makedirs(args.tb_log_dir, exist_ok=True)
 
