@@ -1,27 +1,27 @@
 {
     "prune_after_training": 0,
     "use_fused_concept_weights": 0,
-    "num_concepts": 0,
+    "num_concepts": 64,
     "infer_qb_norm": 0,
     "enable_probing": 0,
     "save_inference": 0,
 
     "dataset_name": "aist",
-    "videos_dir": "./data/dataset/aist/beatdance_features",
+    "videos_dir": "/home/sangheon/Desktop/SonyCSL/dance2music/AIST/beatdance_features",
     "ann_dir": "",
     "msrvtt_train_file": "9k",
     "num_frames": 10,
     "video_sample_type": "uniform",
     "input_res": 224,
+
   
-    "exp_name": "seglen10_L10_batchsize32_framewise_v2",
-    "output_dir": "./log/beatdance",
+    "output_dir": "/data/rkimura/beatdance",
     "save_every": 50,
     "log_step": 20,
     "evals_per_epoch": 1,
     "load_epoch": null,
     "eval_window_size": 5,
-    "metric": "t2v",
+    "metric": "v2t",
   
     "huggingface": true,
     "arch": "clip_transformer",
@@ -34,7 +34,7 @@
     "mode": "none",
     "loss": "clip",
     "threshold": 0.1,
-    "beta": 1.0,
+    "beta": 0.4,
     "clip_lr": 1e-6,
     "noclip_lr": 1e-5,
     "batch_size": 32,
@@ -53,6 +53,6 @@
     "num_workers": 4,
     "seed": 24,
     "no_tensorboard": false,
-    "tb_log_dir": "./log/beatdance/logs"
+    "tb_log_dir": "/data/rkimura/beatdance/logs"
   }
   

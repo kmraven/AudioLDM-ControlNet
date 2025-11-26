@@ -15,4 +15,13 @@ dataset
 checkpoints
 *.tar
 condor*
-wandb
+wandbBeatDance/outputs/MotionBERT_pos/*.pth
+*.pth
+*.ckpt
+BeatDance/outputs/MotionBERT_pos/*.pth
+*.pth
+*.ckpt
+BeatDance/outputs/MotionBERT_pos/*.pth
+*.pth
+*.ckpt
+BeatDance/outputs/

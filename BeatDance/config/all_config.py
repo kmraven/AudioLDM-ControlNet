@@ -1,7 +1,7 @@
 import os
 import argparse
-from .base_config import Config
-# from modules.basic_utils import mkdirp, deletedir
+from config.base_config import Config
+from modules.basic_utils import mkdirp, deletedir
 import json
 from types import SimpleNamespace
 
@@ -10,7 +10,7 @@ class AllConfig(Config):
         super().__init__()
 
     def parse_args(self):
-        description = 'Text-to-Video Retrieval' 
+        description = 'Text-to-Video Retrieval'
         parser = argparse.ArgumentParser(description=description)
 
         # lsc parameters
@@ -23,10 +23,10 @@ class AllConfig(Config):
 
         # data parameters
         parser.add_argument('--dataset_name', type=str, default='pdl', help="Dataset name")
-        parser.add_argument('--videos_dir', type=str, default='/home/sangheon/Desktop/AudioLDM-ControlNet/data/dataset/AIST/beatdance_features', help="Location of videos")
+        parser.add_argument('--videos_dir', type=str, default='/home/sangheon/Desktop/SonyCSL/dance2music/AIST/beatdance_features', help="Location of videos")
         parser.add_argument('--ann_dir', type=str, default='/data/han_data/dance_data/pdl_chopped_2.csv', help='Location of annotation file')
         parser.add_argument('--msrvtt_train_file', type=str, default='9k')
-        parser.add_argument('--num_frames', type=int, default=30) # this is the L intervals
+        parser.add_argument('--num_frames', type=int, default=110) # this is the L intervals
         parser.add_argument('--video_sample_type', default='uniform', help="'rand'/'uniform'")
         parser.add_argument('--input_res', type=int, default=224)
 
@@ -81,9 +81,9 @@ class AllConfig(Config):
         args.model_path = os.path.join(args.output_dir, args.exp_name)
         args.tb_log_dir = os.path.join(args.tb_log_dir, args.exp_name)
 
-        # mkdirp(args.model_path)
-        # deletedir(args.tb_log_dir)
-        # mkdirp(args.tb_log_dir)
+        mkdirp(args.model_path)
+        deletedir(args.tb_log_dir)
+        mkdirp(args.tb_log_dir)
 
         return args
 
@@ -98,7 +98,7 @@ class CusConfig(Config):
     def parse_args(self):
         with open(self.config_path, 'r') as f:
             config_dict = json.load(f)
-        
+
         # Convert to an object so attributes can be accessed with dot notation
         args = SimpleNamespace(**config_dict)
 
@@ -107,7 +107,7 @@ class CusConfig(Config):
         args.model_path = os.path.join(args.output_dir, args.exp_name)
         args.tb_log_dir = os.path.join(args.tb_log_dir, args.exp_name)
 
-        # mkdirp(args.model_path)
+        mkdirp(args.model_path)
         #deletedir(args.tb_log_dir)
         os.makedirs(args.tb_log_dir, exist_ok=True)
 

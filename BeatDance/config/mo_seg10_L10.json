@@ -6,17 +6,17 @@
     "enable_probing": 0,
     "save_inference": 0,
 
-    "dataset_name": "aist",
-    "videos_dir": "./data/dataset/aist/beatdance_features",
-    "ann_dir": "",
+    "dataset_name": "musiconly",
+    "videos_dir": "/data/han_data/dance_data/beatdance",
+    "ann_dir": "/data/han_data/dance_data/mo_chopped_10.csv",
     "msrvtt_train_file": "9k",
     "num_frames": 10,
     "video_sample_type": "uniform",
     "input_res": 224,
   
-    "exp_name": "seglen10_L10_batchsize32_framewise_v2",
-    "output_dir": "./log/beatdance",
-    "save_every": 50,
+    "exp_name": "seglen10_L10_batchsize32_framewise",
+    "output_dir": "/data/han_data/dance_data/beatdance/models",
+    "save_every": 20,
     "log_step": 20,
     "evals_per_epoch": 1,
     "load_epoch": null,
@@ -53,6 +53,6 @@
     "num_workers": 4,
     "seed": 24,
     "no_tensorboard": false,
-    "tb_log_dir": "./log/beatdance/logs"
+    "tb_log_dir": "logs"
   }
   
