@@ -20,12 +20,12 @@ from audioldm_train.utilities.data.keypoints import (
 class AISTDataset(AudioDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.strech_rate = None
+        self.stretch_rate = None
 
     def build_setting_parameters(self):
         super().build_setting_parameters()
-        self.additional_strech_rate = self.config["preprocessing"].get("strech_augmentation", {}).get("additional_strech_rate", 0.)  # type: ignore
-        self.stretch_prob = self.config["preprocessing"].get("strech_augmentation", {}).get("stretch_prob", 0.)  # type: ignore
+        self.additional_stretch_rate = self.config["preprocessing"].get("stretch_augmentation", {}).get("additional_stretch_rate", 0.)  # type: ignore
+        self.stretch_prob = self.config["preprocessing"].get("stretch_augmentation", {}).get("stretch_prob", 0.)  # type: ignore
         self.camera_shape = (
             self.config["preprocessing"]["motion"]["camera_height"],  # type: ignore
             self.config["preprocessing"]["motion"]["camera_width"],   # type: ignore
@@ -49,10 +49,10 @@ class AISTDataset(AudioDataset):
     def process_keypoints(self, kpt_path):
         k2d = load_keypoints(kpt_path)  # shape: (T, 17, 3)
         k2d = interp_nan_keypoints(k2d)  # shape: (T, 17, 3)
-        if self.strech_rate is not None:
-            k2d = resample_keypoints_2d(k2d, int(self.motion_target_length / self.strech_rate))
+        if self.stretch_rate is not None:
+            k2d = resample_keypoints_2d(k2d, int(self.motion_target_length / self.stretch_rate))
             k2d = k2d[:self.motion_target_length]
-            self.strech_rate = None
+            self.stretch_rate = None
         else:
             k2d = resample_keypoints_2d(k2d, self.motion_target_length)
         k2d_score = k2d[:, :, 2]  # shape: (T, 17)
@@ -156,8 +156,8 @@ class AISTDataset(AudioDataset):
         
         if self.split == "train" and torch.rand(1).item() < self.stretch_prob:
             original_length = stft_spec.size(2)
-            self.strech_rate = float(torch.empty(1).uniform_(1.0 - self.additional_strech_rate, 1.0))
-            ts = T.TimeStretch(n_freq=stft_spec.size(1), fixed_rate=self.strech_rate).to(y.device)
+            self.stretch_rate = float(torch.empty(1).uniform_(1.0 - self.additional_stretch_rate, 1.0))
+            ts = T.TimeStretch(n_freq=stft_spec.size(1), fixed_rate=self.stretch_rate).to(y.device)
             stft_spec = ts(stft_spec)
             stft_spec = stft_spec[:, :, :original_length]
 
@@ -184,7 +184,7 @@ class AISTBeatDanceDataset(AISTDataset):
         data = AudioDataset.__getitem__(self, index)
         datum = self.data[index]
         kpt_path = datum.get("motion", None)
-        beat_feature = self.process_beat_feature(kpt_path)  # call first not to lose strech_rate
+        beat_feature = self.process_beat_feature(kpt_path)  # call first not to lose stretch_rate
         k2d = self.process_keypoints(kpt_path)
         data.update({"motion": {
             'motion_feature': k2d,
@@ -199,9 +199,9 @@ class AISTBeatDanceDataset(AISTDataset):
     def process_beat_feature(self, kpt_path):
         k2d = load_keypoints(kpt_path)  # shape: (T, 17, 3)
         k2d = interp_nan_keypoints(k2d)  # shape: (T, 17, 3)
-        if self.strech_rate is not None:
+        if self.stretch_rate is not None:
             original_length = len(k2d)
-            k2d = resample_keypoints_2d(k2d, int(original_length / self.strech_rate))
+            k2d = resample_keypoints_2d(k2d, int(original_length / self.stretch_rate))
             k2d = k2d[:original_length]
         beat_feature = extract_motion_beat(
             k2d,

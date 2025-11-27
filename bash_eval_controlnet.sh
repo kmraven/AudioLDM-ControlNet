@@ -1,3 +1,3 @@
 export CUDA_VISIBLE_DEVICES=1
-python3 audioldm_train/train/latent_diffusion_controlnet_test.py -c audioldm_train/config/2025_11_08_dance_controlnet/audioldm_original_medium_strech.yaml --reload_from_ckpt /data/rkimura/audioldm-controlnet/20251123_audioldm_original_medium_strech/checkpoints/checkpoint-global_step=367009.ckpt
+python3 audioldm_train/train/latent_diffusion_controlnet_test.py -c audioldm_train/config/2025_11_08_dance_controlnet/audioldm_original_medium_stretch.yaml --reload_from_ckpt /data/rkimura/audioldm-controlnet/20251123_audioldm_original_medium_stretch/checkpoints/checkpoint-global_step=367009.ckpt
 # python3 audioldm_train/train/latent_diffusion_controlnet_test.py -c audioldm_train/config/2025_11_08_dance_controlnet/audioldm_original_medium.yaml --reload_from_ckpt data/checkpoints/audioldm-m-full.ckpt

@@ -105,7 +105,6 @@ class DanceOnlyBeatDanceWrapper(CLIPTransformer):
         config.embed_dim = beatdance_output_dim
         config.num_frames = num_frames
         super(DanceOnlyBeatDanceWrapper, self).__init__(config)
-        del self.dropout2
         del self.music_transformer
         del self.music_linear
         del self.clip_logit_scale
@@ -120,7 +119,7 @@ class DanceOnlyBeatDanceWrapper(CLIPTransformer):
         """
         motion_feature: [B, T, J, F]  (MotionBERT get_representation() output)
         motion_beat_feature: [B, T, beat_dim]  (extracted motion beat feature)
-        return: [B, C, T, Freq]  (AudioLDM/ControlNet input)
+        return: [B, T, embed_dim]
         """
         B, T, J, F = motion_feature.shape
         motion_feature = motion_feature.reshape(B, T, J * F)

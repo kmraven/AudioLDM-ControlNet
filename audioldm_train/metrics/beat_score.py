@@ -1,7 +1,7 @@
 """
 from LORIS: https://github.com/OpenGVLab/LORIS/blob/443e4b992a1dc32ab594373012e9fef9928ce404/beats_scores.py
 - time resolution of beat detection is modified to 5 Hz (following the setting of textual inversion)
-- tempo_difference is originally implemented since BeatDance authors doesn't 
+- tempo_difference is originally implemented since textual inversion authors doesn't 
 """
 
 import librosa
