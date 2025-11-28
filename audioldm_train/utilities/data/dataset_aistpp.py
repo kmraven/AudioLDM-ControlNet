@@ -18,9 +18,10 @@ from audioldm_train.utilities.data.keypoints import (
 
 
 class AISTDataset(AudioDataset):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, use_text_condition=True, **kwargs):
         super().__init__(*args, **kwargs)
         self.stretch_rate = None
+        self.use_text_condition = use_text_condition
 
     def build_setting_parameters(self):
         super().build_setting_parameters()
@@ -43,6 +44,8 @@ class AISTDataset(AudioDataset):
         k2d = self.process_keypoints(kpt_path)
         data.update({"motion": k2d})
         if self.split=="train" and "text" in data and np.random.rand() < 0.5:
+            data["text"] = ""
+        if self.split=="test" and not self.use_text_condition and "text" in data:
             data["text"] = ""
         return data
     
