@@ -95,9 +95,9 @@ class ControlNetEvaluationHelper(EvaluationHelper):
 
         # FAD
         ######################################################################################################################
-        if(recalculate): 
+        if(recalculate):
             print("Calculate FAD score from scratch")
-        fad_score = self.frechet.score(generate_files_path, groundtruth_path, limit_num=limit_num, recalculate=recalculate)
+        fad_score = self.frechet.score(generate_files_path, groundtruth_path, limit_num=limit_num)
         out.update(fad_score)
 
         # Beat Score & CLAP Score
