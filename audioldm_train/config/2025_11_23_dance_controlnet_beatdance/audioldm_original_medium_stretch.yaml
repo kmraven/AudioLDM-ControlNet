@@ -65,8 +65,8 @@ preprocessing:
     mel_fmin: 0
     mel_fmax: 8000
   # added for dance-controlnet
-  strech_augmentation:
-    additional_strech_rate: 0.2
+  stretch_augmentation:
+    additional_stretch_rate: 0.2
     stretch_prob: 0.7
   motion:
     target_length: *latent_t_size
