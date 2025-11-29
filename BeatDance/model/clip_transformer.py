@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
-from config.base_config import Config
-from config.all_config import CusConfig
-from modules.transformer import PoseTransformer, PositionalEncoding
-from modules.metrics import sim_matrix_training, sim_matrix_inference, generate_embeds_per_video_id, beat_similarity, qb_norm
+from ..config.base_config import Config
+from ..config.all_config import CusConfig
+from ..modules.transformer import PoseTransformer, PositionalEncoding
+from ..modules.metrics import sim_matrix_training, sim_matrix_inference, generate_embeds_per_video_id, beat_similarity, qb_norm
 from torch import nn
 import torch
 from einops import rearrange
@@ -25,7 +25,7 @@ class CLIPTransformer(nn.Module):
 
         self.music_linear = nn.Linear(768, config.embed_dim)
         self.video_linear = nn.Linear(17* 512, config.embed_dim)
-    
+
         self.clip_logit_scale = torch.FloatTensor([4.6052]).cuda()
 
         video_beat_encoder_layer = nn.TransformerEncoderLayer(d_model=config.embed_dim, nhead=config.num_mha_heads, dropout=self.dropout1)
@@ -108,7 +108,7 @@ class CLIPTransformer(nn.Module):
 class DanceOnlyBeatDanceWrapper(CLIPTransformer):
     def __init__(
             self,
-            beatdance_config_path, 
+            beatdance_config_path,
             kpt_num_joints: int,
             kpt_feat_dim: int,
             beat_dim: int,

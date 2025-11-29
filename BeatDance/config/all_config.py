@@ -1,7 +1,7 @@
 import os
 import argparse
-from config.base_config import Config
-from modules.basic_utils import mkdirp, deletedir
+from ..config.base_config import Config
+from ..modules.basic_utils import mkdirp, deletedir
 import json
 from types import SimpleNamespace
 
