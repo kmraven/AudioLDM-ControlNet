@@ -3,7 +3,7 @@ import sys
 import warnings
 
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
-sys.path.append("src")
+sys.path.append("./BeatDance")
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 import argparse
