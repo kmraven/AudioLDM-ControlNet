@@ -145,10 +145,10 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
             monitor="global_step",
             mode="max",
             filename="checkpoint-global_step={global_step:.0f}",
-            every_n_epochs=validation_every_n_epochs,
+            every_n_train_steps=100000,
             auto_insert_metric_name=False,
             save_last=True,
-            save_top_k=3,
+            save_top_k=4,
         ),
         # ModelCheckpoint(
         #     # dirpath=checkpoint_save_path,

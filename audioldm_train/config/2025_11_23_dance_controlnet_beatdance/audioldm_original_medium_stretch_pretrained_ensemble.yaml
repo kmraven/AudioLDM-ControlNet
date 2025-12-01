@@ -1,0 +1,208 @@
+metadata_root: "./data/dataset/metadata/dataset_root.json"
+log_directory: "./log/latent_diffusion_controlnet_beatdance"
+project: "audioldm_controlnet"
+precision: "high"
+
+variables:
+  sampling_rate: &sampling_rate 16000 
+  mel_bins: &mel_bins 64
+  latent_embed_dim: &latent_embed_dim 8 # TODO might need to change
+  latent_t_size: &latent_t_size 128 # TODO might need to change
+  latent_f_size: &latent_f_size 16
+  in_channels: &unet_in_channels 8 # The input channel of the UNet model
+  model_channels: &unet_model_channels 192
+  optimize_ddpm_parameter: &optimize_ddpm_parameter true
+  optimize_gpt: &optimize_gpt true
+  warmup_steps: &warmup_steps 2000
+  default_unet_params: &default_unet_params
+    image_size: 64 
+    extra_film_condition_dim: 512 # If you use film as extra condition, set this parameter. For example if you have two conditioning vectors each have dimension 512, then this number would be 1024
+    # context_dim: 
+    # - 768
+    in_channels: *unet_in_channels
+    out_channels: *latent_embed_dim
+    model_channels: *unet_model_channels
+    attention_resolutions:
+    - 8
+    - 4
+    - 2
+    num_res_blocks: 2
+    channel_mult: 
+    - 1
+    - 2
+    - 3
+    - 5
+    num_head_channels: 32
+    use_spatial_transformer: true
+    transformer_depth: 1
+    extra_sa_layer: False
+
+data: 
+  train: ["aist"]
+  val: "aist"
+  test: "aist"
+  class_label_indices: ""
+  dataloader_add_ons: [] 
+
+step:
+  validation_every_n_epochs: 10
+  save_checkpoint_every_n_steps: 10000
+  # limit_val_batches: 2
+  max_steps: 1000000
+  save_top_k: 1
+
+preprocessing:
+  audio:
+    sampling_rate: *sampling_rate
+    max_wav_value: 32768.0
+    duration: 5.12
+  stft:
+    filter_length: 1024
+    hop_length: 160
+    win_length: 1024
+  mel:
+    n_mel_channels: *mel_bins
+    mel_fmin: 0
+    mel_fmax: 8000 
+  # added for dance-controlnet
+  strech_augmentation:
+    additional_strech_rate: 0.2
+    stretch_prob: 0.7
+  motion:
+    target_length: *latent_t_size
+    camera_height: 1080
+    camera_width: 1920
+    scale_range_train: [1, 3]
+    scale_range_test: [2, 2]
+    fps_keypoints: 60
+    beat_dim: 2
+
+augmentation:
+  mixup: 0.0
+
+model:
+  target: audioldm_train.modules.latent_diffusion.controlnet.ControlLDM
+  params: 
+    # Autoencoder
+    first_stage_config:
+      base_learning_rate: 8.0e-06
+      target: audioldm_train.modules.latent_encoder.autoencoder.AutoencoderKL
+      params: 
+        reload_from_ckpt: "data/checkpoints/vae_mel_16k_64bins.ckpt"
+        sampling_rate: *sampling_rate
+        batchsize: 8
+        monitor: val/rec_loss
+        image_key: fbank
+        subband: 1
+        embed_dim: *latent_embed_dim
+        time_shuffle: 1
+        lossconfig:
+          target: audioldm_train.losses.LPIPSWithDiscriminator
+          params:
+            disc_start: 50001
+            kl_weight: 1000.0
+            disc_weight: 0.5
+            disc_in_channels: 1
+        ddconfig: 
+          double_z: true
+          mel_bins: *mel_bins # The frequency bins of mel spectrogram
+          z_channels: 8
+          resolution: 256
+          downsample_time: false
+          in_channels: 1
+          out_ch: 1
+          ch: 128 
+          ch_mult:
+          - 1
+          - 2
+          - 4
+          num_res_blocks: 2
+          attn_resolutions: []
+          dropout: 0.0
+    # Other parameters
+    base_learning_rate: 1.0e-4
+    warmup_steps: *warmup_steps
+    optimize_ddpm_parameter: *optimize_ddpm_parameter
+    sampling_rate: *sampling_rate
+    batchsize: 8
+    linear_start: 0.0015
+    linear_end: 0.0195
+    num_timesteps_cond: 1
+    log_every_t: 200
+    timesteps: 1000
+    unconditional_prob_cfg: 0.1
+    parameterization: eps # [eps, x0, v]
+    first_stage_key: fbank
+    latent_t_size: *latent_t_size # TODO might need to change
+    latent_f_size: *latent_f_size
+    channels: *latent_embed_dim # TODO might need to change
+    monitor: val/loss_simple_ema
+    scale_by_std: true
+    unet_config:
+      target: audioldm_train.modules.latent_diffusion.controlnet.ControlledUnetModel
+      params:
+        <<: *default_unet_params
+    cond_stage_config:
+      film_clap_cond1:
+        cond_stage_key: text
+        conditioning_key: film
+        target: audioldm_train.conditional_models.CLAPAudioEmbeddingClassifierFreev2
+        params:
+          pretrained_path: data/checkpoints/clap_music_speech_audioset_epoch_15_esc_89.98.pt
+          sampling_rate: 16000
+          embed_mode: text # or text
+          amodel: HTSAT-base
+    # added for ControlNet
+    controlnet_stage_config:
+      dance_controlnet:
+        controlnet_stage_key: motion
+        target: audioldm_train.modules.latent_diffusion.dance_controlnet.DanceControlNetWrapper
+        params:
+          feature_encoder_config:
+            target: audioldm_train.modules.motion_encoder.encoder.BeatDanceEncoderWrapper
+            params:
+              motion_bert_config:
+                target: audioldm_train.modules.motion_encoder.MotionBERT.DSTformer.DSTformerWrapper
+                params:
+                  dim_in: 3
+                  dim_out: 3
+                  dim_feat: 512 # default value: intermediate representation
+                  dim_rep: &dim_rep 512 # default value
+                  depth: 5 # default value
+                  num_heads: 8 # default value
+                  mlp_ratio: 2 # default value
+                  maxlen: 243 # default value
+                  num_joints: &num_joints 17
+              motion_bert_pretrained_weights_path: data/checkpoints/latest_epoch.bin
+              feature_mapper_config:
+                target: audioldm_train.modules.motion_encoder.encoder.EnsembledMotionBERT2BeatDance2AudioLDMEncoder
+                params:
+                  kpt_num_joints: *num_joints
+                  kpt_feat_dim: *dim_rep
+                  audio_channels: *unet_model_channels
+                  audio_freq: *latent_f_size
+                  beatdance_output_dim: &beatdance_output_dim 256
+                  beatdance_config:
+                    target: BeatDance.model.clip_transformer.DanceOnlyBeatDanceWrapper
+                    params:
+                      beatdance_config_path: audioldm_train/config/2025_11_23_dance_controlnet_beatdance/aist_seg10_L10.json
+                      kpt_num_joints: *num_joints
+                      kpt_feat_dim: *dim_rep
+                      beat_dim: 2
+                      beatdance_output_dim: *beatdance_output_dim
+                      num_frames: *latent_t_size
+                  beatdance_pretrained_weights_path: data/checkpoints/model_best.pth
+                  freeze_beatdance: true
+                  ensemble_rate_of_pretrained_model: 0.5
+          controlnet_model_config:
+            target: audioldm_train.modules.latent_diffusion.controlnet.ControlNet
+            params:
+              <<: *default_unet_params
+    evaluation_params:
+      unconditional_guidance_scale: 3.5
+      ddim_sampling_steps: 200
+      n_candidates_per_samples: 3
+    evaluator_config:
+      target: audioldm_train.metrics.eval.ControlNetEvaluationHelper
+      params:
+        sampling_rate: *sampling_rate

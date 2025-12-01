@@ -137,6 +137,50 @@ class MotionBERT2BeatDance2AudioLDMEncoder(nn.Module):
         return h
 
 
+class EnsembledMotionBERT2BeatDance2AudioLDMEncoder(MotionBERT2BeatDance2AudioLDMEncoder):
+    def __init__(
+        self,
+        kpt_num_joints: int,
+        kpt_feat_dim: int,
+        audio_channels: int,
+        audio_freq: int,
+        beatdance_output_dim: int,
+        beatdance_config: Any,
+        beatdance_pretrained_weights_path: str | None = None,
+        freeze_beatdance: bool = False,
+        ensemble_rate_of_pretrained_model: float = 0.5,
+    ):
+        super().__init__(
+            kpt_num_joints,
+            kpt_feat_dim,
+            audio_channels,
+            audio_freq,
+            beatdance_output_dim,
+            beatdance_config,
+            beatdance_pretrained_weights_path,
+            freeze_beatdance,
+        )
+        assert beatdance_pretrained_weights_path is not None, "Ensembled model requires pretrained BeatDance weights."
+        self.ensemble_rate_of_pretrained_model = ensemble_rate_of_pretrained_model
+        self.beatdance_scratch: Any = instantiate_from_config(beatdance_config)
+        self.output_proj_scratch = ZeroConv1dProject(beatdance_output_dim, audio_channels, audio_freq)
+
+    def forward(self, motion_feature, motion_beat_feature):
+        """
+        motion_feature: [B, T, J, F]  (MotionBERT get_representation() output)
+        motion_beat_feature: [B, T, beat_dim]  (extracted motion beat feature)
+        return: [B, C, T, Freq]  (AudioLDM/ControlNet input)
+        """
+        B, T, J, F = motion_feature.shape
+        assert J == self.kpt_num_joints and F == self.kpt_feat_dim
+        h = self.beatdance(motion_feature, motion_beat_feature)  # [B, T, beatdance_output_dim]
+        h = self.output_proj(h)         # [B, C, T, Freq]
+        h_scratch = self.beatdance_scratch(motion_feature, motion_beat_feature)  # [B, T, beatdance_output_dim]
+        h_scratch = self.output_proj_scratch(h_scratch)  # [B, C, T, Freq]
+        h_ensembled = self.ensemble_rate_of_pretrained_model * h + (1.0 - self.ensemble_rate_of_pretrained_model) * h_scratch
+        return h_ensembled
+
+
 class BeatDanceEncoderWrapper(MotionEncoderWrapper):
     def forward(self, x):
         """
