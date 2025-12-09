@@ -145,7 +145,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
             monitor="global_step",
             mode="max",
             filename="checkpoint-global_step={global_step:.0f}",
-            every_n_train_steps=100000,
+            every_n_train_steps=save_checkpoint_every_n_steps,
             auto_insert_metric_name=False,
             save_last=True,
             save_top_k=4,
@@ -245,17 +245,18 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
             except FileNotFoundError:
                 ckpt_path = download_checkpoint(resume_from_checkpoint)
                 ckpt = torch.load(ckpt_path)["state_dict"]
-            modify_dict = {
-                "cond_stage_model": {
-                    "new_key": "cond_stage_models.0",
-                    "duplicate": False,
-                },
-                "model.diffusion_model": {
-                    "new_key": "controlnet_stage_models.0",
-                    "duplicate": True,
-                },
-            }
-            ckpt = modify_state_dict(ckpt, modify_dict)
+            if not any("controlnet" in key for key in ckpt.keys()):
+                modify_dict = {
+                    "cond_stage_model": {
+                        "new_key": "cond_stage_models.0",
+                        "duplicate": False,
+                    },
+                    "model.diffusion_model": {
+                        "new_key": "controlnet_stage_models.0",
+                        "duplicate": True,
+                    },
+                }
+                ckpt = modify_state_dict(ckpt, modify_dict)
 
             key_not_in_model_state_dict = []
             size_mismatch_keys = []

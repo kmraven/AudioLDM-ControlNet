@@ -175,7 +175,7 @@ model:
                   num_joints: &num_joints 17
               motion_bert_pretrained_weights_path: data/checkpoints/latest_epoch.bin
               feature_mapper_config:
-                target: audioldm_train.modules.motion_encoder.encoder.EnsembledMotionBERT2BeatDance2AudioLDMEncoder
+                target: audioldm_train.modules.motion_encoder.encoder.ConcatenatedMotionBERT2BeatDance2AudioLDMEncoder
                 params:
                   kpt_num_joints: *num_joints
                   kpt_feat_dim: *dim_rep
@@ -193,7 +193,6 @@ model:
                       num_frames: *latent_t_size
                   beatdance_pretrained_weights_path: data/checkpoints/model_best.pth
                   freeze_beatdance: true
-                  ensemble_rate_of_pretrained_model: 0.5
           controlnet_model_config:
             target: audioldm_train.modules.latent_diffusion.controlnet.ControlNet
             params:

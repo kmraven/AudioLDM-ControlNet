@@ -526,7 +526,7 @@ class ControlLDM(LatentDiffusion):
             controlnet_hint = [c * scale for c, scale in zip(controlnet_hint, self.controlnet_scales)]
             controlnet_hint_list.append(controlnet_hint)
 
-        # call the unet model directly, without through DiffusionWrapper
+        # call the unet model directly, not via DiffusionWrapper
         diffusion_model: Any = self.model.diffusion_model
         out = diffusion_model(
             xc,
@@ -547,4 +547,5 @@ class ControlLDM(LatentDiffusion):
         for each in self.controlnet_stage_models:
             params += list(each.parameters())
         opt = torch.optim.AdamW(params, lr=lr)
+        print("Number of trainable parameters: ", sum(p.numel() for p in params if p.requires_grad))
         return opt

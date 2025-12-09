@@ -3,7 +3,7 @@ import sys
 import warnings
 
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
-sys.path.append("src")
+sys.path.append("./BeatDance")
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 import shutil
@@ -54,7 +54,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     else:
         dataloader_add_ons = []
 
-    val_dataset = AISTBeatDanceDataset(configs, split="test", add_ons=dataloader_add_ons, use_text_condition=use_text_condition)
+    val_dataset = AISTBeatDanceDataset(configs, split="test", add_ons=dataloader_add_ons) # , use_text_condition=use_text_condition)
     val_loader = DataLoader(
         val_dataset,
         batch_size=8,
