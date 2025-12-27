@@ -1,0 +1,585 @@
+nohup: ignoring input
+2025-11-26 00:01:36.566823: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX_VNNI FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-11-26 00:01:36.628939: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-11-26 00:01:36.644789: E tensorflow/stream_executor/cuda/cuda_blas.cc:2981] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-11-26 00:01:36.997795: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer.so.7'; dlerror: libnvinfer.so.7: cannot open shared object file: No such file or directory
+2025-11-26 00:01:36.997832: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer_plugin.so.7'; dlerror: libnvinfer_plugin.so.7: cannot open shared object file: No such file or directory
+2025-11-26 00:01:36.997835: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Cannot dlopen some TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please make sure the missing libraries mentioned above are installed properly.
+/home/sangheon/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/lightning_fabric/__init__.py:40: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+Loading checkpoint: ./outputs/MotionBERT_pos/model_best.pth ...
+Checkpoint loaded
+0it [00:00, ?it/s]1it [00:00,  4.64it/s]1it [00:00,  4.63it/s]
+Total Validation Population (N): music clip length: 32 video clip length:32
+
+=== Rank Distribution ===
+Mean Rank: 10.28
+Median Rank: 9.00
+Min Rank: 1
+Max Rank: 32
+Std Rank: 8.89
+
+=== Directory-Based Metrics ===
+Average Rank Metrics (per query, averaged over all correct videos):
+  Dir_R@1:  0.00%
+  Dir_R@5:  25.00%
+  Dir_R@10: 62.50%
+  Dir_R@50: 100.00%
+  Dir_MedR: 8.88
+  Dir_MeanR: 10.82
+
+Individual Correct Video Metrics (all correct videos across all queries):
+  All_R@1:  11.67%
+  All_R@5:  33.33%
+  All_R@10: 58.33%
+  All_MedR: 9.00
+  All_MeanR: 11.03
+
+=== Top-10 Most Frequently Retrieved Videos (Across All Queries) ===
+  1. mLH4/gLH_sBM_c01_d18_mLH4_ch02_2: appears 18 times (56.2% of queries)
+  2. mLO2/gLO_sBM_c01_d15_mLO2_ch02_1: appears 16 times (50.0% of queries)
+  3. mLO2/gLO_sBM_c01_d15_mLO2_ch02_2: appears 16 times (50.0% of queries)
+  4. mBR0/gBR_sBM_c01_d04_mBR0_ch02_1: appears 16 times (50.0% of queries)
+  5. mWA0/gWA_sBM_c01_d26_mWA0_ch02_1: appears 14 times (43.8% of queries)
+  6. mLH4/gLH_sBM_c01_d18_mLH4_ch02_1: appears 14 times (43.8% of queries)
+  7. mLH4/gLH_sBM_c01_d17_mLH4_ch02_1: appears 14 times (43.8% of queries)
+  8. mLH4/gLH_sBM_c01_d17_mLH4_ch02_2: appears 14 times (43.8% of queries)
+  9. mPO1/gPO_sBM_c01_d11_mPO1_ch02_1: appears 14 times (43.8% of queries)
+  10. mLO2/gLO_sBM_c01_d13_mLO2_ch02_1: appears 12 times (37.5% of queries)
+
+=== Top-10 Most Common Query Music IDs (Original Files) ===
+  1. mJS3/gJS_sBM_c01_d03_mJS3_ch02_1: 1 queries
+  2. mJS3/gJS_sBM_c01_d03_mJS3_ch02_2: 1 queries
+  3. mJS3/gJS_sBM_c01_d01_mJS3_ch02_2: 1 queries
+  4. mJS3/gJS_sBM_c01_d01_mJS3_ch02_1: 1 queries
+  5. mWA0/gWA_sBM_c01_d26_mWA0_ch02_1: 1 queries
+  6. mWA0/gWA_sBM_c01_d26_mWA0_ch02_2: 1 queries
+  7. mWA0/gWA_sBM_c01_d25_mWA0_ch02_2: 1 queries
+  8. mWA0/gWA_sBM_c01_d25_mWA0_ch02_1: 1 queries
+  9. mLO2/gLO_sBM_c01_d15_mLO2_ch02_2: 1 queries
+  10. mLO2/gLO_sBM_c01_d13_mLO2_ch02_2: 1 queries
+
+=== Top-10 Retrieved Videos for Each Music Query ===
+
+[Query 1] Music: mJS3/gJS_sBM_c01_d03_mJS3_ch02_1
+Ground Truth Video: mJS3/gJS_sBM_c01_d03_mJS3_ch02_1 (should match music ID)
+Exact match rank: 25
+Same directory videos found: 4, Average rank: 26.25
+Top-10 Retrieved Videos:
+  Rank 1: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (sim: 1.0221) 
+  Rank 2: mLO2/gLO_sBM_c01_d13_mLO2_ch02_1 (sim: 1.0204) 
+  Rank 3: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (sim: 1.0202) 
+  Rank 4: mWA0/gWA_sBM_c01_d26_mWA0_ch02_1 (sim: 1.0187) 
+  Rank 5: mBR0/gBR_sBM_c01_d05_mBR0_ch02_1 (sim: 1.0175) 
+  Rank 6: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0155) 
+  Rank 7: mLH4/gLH_sBM_c01_d18_mLH4_ch02_1 (sim: 1.0151) 
+  Rank 8: mLO2/gLO_sBM_c01_d13_mLO2_ch02_2 (sim: 1.0137) 
+  Rank 9: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (sim: 1.0135) 
+  Rank 10: mLH4/gLH_sBM_c01_d17_mLH4_ch02_1 (sim: 1.0124) 
+
+[Query 2] Music: mJS3/gJS_sBM_c01_d03_mJS3_ch02_2
+Ground Truth Video: mJS3/gJS_sBM_c01_d03_mJS3_ch02_2 (should match music ID)
+Exact match rank: 29
+Same directory videos found: 4, Average rank: 30.50
+Top-10 Retrieved Videos:
+  Rank 1: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (sim: 1.0352) 
+  Rank 2: mBR0/gBR_sBM_c01_d04_mBR0_ch02_2 (sim: 1.0348) 
+  Rank 3: mMH3/gMH_sBM_c01_d22_mMH3_ch02_2 (sim: 1.0340) 
+  Rank 4: mMH3/gMH_sBM_c01_d22_mMH3_ch02_1 (sim: 1.0304) 
+  Rank 5: mBR0/gBR_sBM_c01_d05_mBR0_ch02_2 (sim: 1.0289) 
+  Rank 6: mPO1/gPO_sBM_c01_d11_mPO1_ch02_2 (sim: 1.0262) 
+  Rank 7: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0255) 
+  Rank 8: mLH4/gLH_sBM_c01_d17_mLH4_ch02_2 (sim: 1.0228) 
+  Rank 9: mLH4/gLH_sBM_c01_d18_mLH4_ch02_1 (sim: 1.0228) 
+  Rank 10: mPO1/gPO_sBM_c01_d11_mPO1_ch02_1 (sim: 1.0210) 
+
+[Query 3] Music: mJS3/gJS_sBM_c01_d01_mJS3_ch02_2
+Ground Truth Video: mJS3/gJS_sBM_c01_d01_mJS3_ch02_2 (should match music ID)
+Exact match rank: 31
+Same directory videos found: 4, Average rank: 30.50
+Top-10 Retrieved Videos:
+  Rank 1: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (sim: 1.0352) 
+  Rank 2: mBR0/gBR_sBM_c01_d04_mBR0_ch02_2 (sim: 1.0348) 
+  Rank 3: mMH3/gMH_sBM_c01_d22_mMH3_ch02_2 (sim: 1.0340) 
+  Rank 4: mMH3/gMH_sBM_c01_d22_mMH3_ch02_1 (sim: 1.0304) 
+  Rank 5: mBR0/gBR_sBM_c01_d05_mBR0_ch02_2 (sim: 1.0289) 
+  Rank 6: mPO1/gPO_sBM_c01_d11_mPO1_ch02_2 (sim: 1.0262) 
+  Rank 7: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0255) 
+  Rank 8: mLH4/gLH_sBM_c01_d17_mLH4_ch02_2 (sim: 1.0228) 
+  Rank 9: mLH4/gLH_sBM_c01_d18_mLH4_ch02_1 (sim: 1.0228) 
+  Rank 10: mPO1/gPO_sBM_c01_d11_mPO1_ch02_1 (sim: 1.0210) 
+
+[Query 4] Music: mJS3/gJS_sBM_c01_d01_mJS3_ch02_1
+Ground Truth Video: mJS3/gJS_sBM_c01_d01_mJS3_ch02_1 (should match music ID)
+Exact match rank: 32
+Same directory videos found: 4, Average rank: 26.25
+Top-10 Retrieved Videos:
+  Rank 1: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (sim: 1.0221) 
+  Rank 2: mLO2/gLO_sBM_c01_d13_mLO2_ch02_1 (sim: 1.0204) 
+  Rank 3: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (sim: 1.0202) 
+  Rank 4: mWA0/gWA_sBM_c01_d26_mWA0_ch02_1 (sim: 1.0187) 
+  Rank 5: mBR0/gBR_sBM_c01_d05_mBR0_ch02_1 (sim: 1.0175) 
+  Rank 6: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0155) 
+  Rank 7: mLH4/gLH_sBM_c01_d18_mLH4_ch02_1 (sim: 1.0151) 
+  Rank 8: mLO2/gLO_sBM_c01_d13_mLO2_ch02_2 (sim: 1.0137) 
+  Rank 9: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (sim: 1.0135) 
+  Rank 10: mLH4/gLH_sBM_c01_d17_mLH4_ch02_1 (sim: 1.0124) 
+
+[Query 5] Music: mWA0/gWA_sBM_c01_d26_mWA0_ch02_1
+Ground Truth Video: mWA0/gWA_sBM_c01_d26_mWA0_ch02_1 (should match music ID)
+Exact match rank: 7
+Same directory videos found: 4, Average rank: 9.00
+Top-10 Retrieved Videos:
+  Rank 1: mJS3/gJS_sBM_c01_d03_mJS3_ch02_2 (sim: 1.0389) 
+  Rank 2: mJS3/gJS_sBM_c01_d01_mJS3_ch02_1 (sim: 1.0381) 
+  Rank 3: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (sim: 1.0378) 
+  Rank 4: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (sim: 1.0375) 
+  Rank 5: mJS3/gJS_sBM_c01_d01_mJS3_ch02_2 (sim: 1.0354) 
+  Rank 6: mJS3/gJS_sBM_c01_d03_mJS3_ch02_1 (sim: 1.0346) 
+  Rank 7: mWA0/gWA_sBM_c01_d26_mWA0_ch02_1 (sim: 1.0325) ✓ EXACT
+  Rank 8: mWA0/gWA_sBM_c01_d25_mWA0_ch02_1 (sim: 1.0287) ✓ SAME DIR
+  Rank 9: mWA0/gWA_sBM_c01_d25_mWA0_ch02_2 (sim: 1.0272) ✓ SAME DIR
+  Rank 10: mKR2/gKR_sBM_c01_d28_mKR2_ch02_2 (sim: 1.0255) 
+
+[Query 6] Music: mWA0/gWA_sBM_c01_d26_mWA0_ch02_2
+Ground Truth Video: mWA0/gWA_sBM_c01_d26_mWA0_ch02_2 (should match music ID)
+Exact match rank: 12
+Same directory videos found: 4, Average rank: 5.25
+Top-10 Retrieved Videos:
+  Rank 1: mWA0/gWA_sBM_c01_d25_mWA0_ch02_1 (sim: 1.0495) ✓ SAME DIR
+  Rank 2: mJS3/gJS_sBM_c01_d01_mJS3_ch02_1 (sim: 1.0477) 
+  Rank 3: mWA0/gWA_sBM_c01_d26_mWA0_ch02_1 (sim: 1.0442) ✓ SAME DIR
+  Rank 4: mKR2/gKR_sBM_c01_d28_mKR2_ch02_2 (sim: 1.0399) 
+  Rank 5: mWA0/gWA_sBM_c01_d25_mWA0_ch02_2 (sim: 1.0391) ✓ SAME DIR
+  Rank 6: mJS3/gJS_sBM_c01_d01_mJS3_ch02_2 (sim: 1.0373) 
+  Rank 7: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (sim: 1.0353) 
+  Rank 8: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (sim: 1.0345) 
+  Rank 9: mKR2/gKR_sBM_c01_d30_mKR2_ch02_2 (sim: 1.0334) 
+  Rank 10: mJS3/gJS_sBM_c01_d03_mJS3_ch02_2 (sim: 1.0318) 
+
+[Query 7] Music: mWA0/gWA_sBM_c01_d25_mWA0_ch02_2
+Ground Truth Video: mWA0/gWA_sBM_c01_d25_mWA0_ch02_2 (should match music ID)
+Exact match rank: 5
+Same directory videos found: 4, Average rank: 5.25
+Top-10 Retrieved Videos:
+  Rank 1: mWA0/gWA_sBM_c01_d25_mWA0_ch02_1 (sim: 1.0495) ✓ SAME DIR
+  Rank 2: mJS3/gJS_sBM_c01_d01_mJS3_ch02_1 (sim: 1.0477) 
+  Rank 3: mWA0/gWA_sBM_c01_d26_mWA0_ch02_1 (sim: 1.0442) ✓ SAME DIR
+  Rank 4: mKR2/gKR_sBM_c01_d28_mKR2_ch02_2 (sim: 1.0399) 
+  Rank 5: mWA0/gWA_sBM_c01_d25_mWA0_ch02_2 (sim: 1.0391) ✓ EXACT
+  Rank 6: mJS3/gJS_sBM_c01_d01_mJS3_ch02_2 (sim: 1.0373) 
+  Rank 7: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (sim: 1.0353) 
+  Rank 8: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (sim: 1.0345) 
+  Rank 9: mKR2/gKR_sBM_c01_d30_mKR2_ch02_2 (sim: 1.0334) 
+  Rank 10: mJS3/gJS_sBM_c01_d03_mJS3_ch02_2 (sim: 1.0318) 
+
+[Query 8] Music: mWA0/gWA_sBM_c01_d25_mWA0_ch02_1
+Ground Truth Video: mWA0/gWA_sBM_c01_d25_mWA0_ch02_1 (should match music ID)
+Exact match rank: 8
+Same directory videos found: 4, Average rank: 9.00
+Top-10 Retrieved Videos:
+  Rank 1: mJS3/gJS_sBM_c01_d03_mJS3_ch02_2 (sim: 1.0389) 
+  Rank 2: mJS3/gJS_sBM_c01_d01_mJS3_ch02_1 (sim: 1.0381) 
+  Rank 3: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (sim: 1.0378) 
+  Rank 4: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (sim: 1.0375) 
+  Rank 5: mJS3/gJS_sBM_c01_d01_mJS3_ch02_2 (sim: 1.0354) 
+  Rank 6: mJS3/gJS_sBM_c01_d03_mJS3_ch02_1 (sim: 1.0346) 
+  Rank 7: mWA0/gWA_sBM_c01_d26_mWA0_ch02_1 (sim: 1.0325) ✓ SAME DIR
+  Rank 8: mWA0/gWA_sBM_c01_d25_mWA0_ch02_1 (sim: 1.0287) ✓ EXACT
+  Rank 9: mWA0/gWA_sBM_c01_d25_mWA0_ch02_2 (sim: 1.0272) ✓ SAME DIR
+  Rank 10: mKR2/gKR_sBM_c01_d28_mKR2_ch02_2 (sim: 1.0255) 
+
+[Query 9] Music: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2
+Ground Truth Video: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (should match music ID)
+Exact match rank: 2
+Same directory videos found: 4, Average rank: 3.00
+Top-10 Retrieved Videos:
+  Rank 1: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (sim: 1.0415) ✓ SAME DIR
+  Rank 2: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (sim: 1.0389) ✓ EXACT
+  Rank 3: mLO2/gLO_sBM_c01_d13_mLO2_ch02_2 (sim: 1.0372) ✓ SAME DIR
+  Rank 4: mWA0/gWA_sBM_c01_d26_mWA0_ch02_1 (sim: 1.0362) 
+  Rank 5: mWA0/gWA_sBM_c01_d25_mWA0_ch02_1 (sim: 1.0335) 
+  Rank 6: mLO2/gLO_sBM_c01_d13_mLO2_ch02_1 (sim: 1.0307) ✓ SAME DIR
+  Rank 7: mWA0/gWA_sBM_c01_d25_mWA0_ch02_2 (sim: 1.0307) 
+  Rank 8: mPO1/gPO_sBM_c01_d11_mPO1_ch02_1 (sim: 1.0293) 
+  Rank 9: mPO1/gPO_sBM_c01_d11_mPO1_ch02_2 (sim: 1.0275) 
+  Rank 10: mJS3/gJS_sBM_c01_d03_mJS3_ch02_2 (sim: 1.0271) 
+
+[Query 10] Music: mLO2/gLO_sBM_c01_d13_mLO2_ch02_2
+Ground Truth Video: mLO2/gLO_sBM_c01_d13_mLO2_ch02_2 (should match music ID)
+Exact match rank: 3
+Same directory videos found: 4, Average rank: 3.00
+Top-10 Retrieved Videos:
+  Rank 1: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (sim: 1.0415) ✓ SAME DIR
+  Rank 2: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (sim: 1.0389) ✓ SAME DIR
+  Rank 3: mLO2/gLO_sBM_c01_d13_mLO2_ch02_2 (sim: 1.0372) ✓ EXACT
+  Rank 4: mWA0/gWA_sBM_c01_d26_mWA0_ch02_1 (sim: 1.0362) 
+  Rank 5: mWA0/gWA_sBM_c01_d25_mWA0_ch02_1 (sim: 1.0335) 
+  Rank 6: mLO2/gLO_sBM_c01_d13_mLO2_ch02_1 (sim: 1.0307) ✓ SAME DIR
+  Rank 7: mWA0/gWA_sBM_c01_d25_mWA0_ch02_2 (sim: 1.0307) 
+  Rank 8: mPO1/gPO_sBM_c01_d11_mPO1_ch02_1 (sim: 1.0293) 
+  Rank 9: mPO1/gPO_sBM_c01_d11_mPO1_ch02_2 (sim: 1.0275) 
+  Rank 10: mJS3/gJS_sBM_c01_d03_mJS3_ch02_2 (sim: 1.0271) 
+
+[Query 11] Music: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1
+Ground Truth Video: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (should match music ID)
+Exact match rank: 1
+Same directory videos found: 4, Average rank: 2.75
+Top-10 Retrieved Videos:
+  Rank 1: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (sim: 1.0439) ✓ EXACT
+  Rank 2: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (sim: 1.0421) ✓ SAME DIR
+  Rank 3: mLO2/gLO_sBM_c01_d13_mLO2_ch02_1 (sim: 1.0408) ✓ SAME DIR
+  Rank 4: mJS3/gJS_sBM_c01_d03_mJS3_ch02_2 (sim: 1.0354) 
+  Rank 5: mLO2/gLO_sBM_c01_d13_mLO2_ch02_2 (sim: 1.0330) ✓ SAME DIR
+  Rank 6: mJS3/gJS_sBM_c01_d03_mJS3_ch02_1 (sim: 1.0289) 
+  Rank 7: mWA0/gWA_sBM_c01_d26_mWA0_ch02_1 (sim: 1.0280) 
+  Rank 8: mPO1/gPO_sBM_c01_d10_mPO1_ch02_1 (sim: 1.0234) 
+  Rank 9: mPO1/gPO_sBM_c01_d10_mPO1_ch02_2 (sim: 1.0228) 
+  Rank 10: mPO1/gPO_sBM_c01_d11_mPO1_ch02_2 (sim: 1.0223) 
+
+[Query 12] Music: mLO2/gLO_sBM_c01_d13_mLO2_ch02_1
+Ground Truth Video: mLO2/gLO_sBM_c01_d13_mLO2_ch02_1 (should match music ID)
+Exact match rank: 3
+Same directory videos found: 4, Average rank: 2.75
+Top-10 Retrieved Videos:
+  Rank 1: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (sim: 1.0439) ✓ SAME DIR
+  Rank 2: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (sim: 1.0421) ✓ SAME DIR
+  Rank 3: mLO2/gLO_sBM_c01_d13_mLO2_ch02_1 (sim: 1.0408) ✓ EXACT
+  Rank 4: mJS3/gJS_sBM_c01_d03_mJS3_ch02_2 (sim: 1.0354) 
+  Rank 5: mLO2/gLO_sBM_c01_d13_mLO2_ch02_2 (sim: 1.0330) ✓ SAME DIR
+  Rank 6: mJS3/gJS_sBM_c01_d03_mJS3_ch02_1 (sim: 1.0289) 
+  Rank 7: mWA0/gWA_sBM_c01_d26_mWA0_ch02_1 (sim: 1.0280) 
+  Rank 8: mPO1/gPO_sBM_c01_d10_mPO1_ch02_1 (sim: 1.0234) 
+  Rank 9: mPO1/gPO_sBM_c01_d10_mPO1_ch02_2 (sim: 1.0228) 
+  Rank 10: mPO1/gPO_sBM_c01_d11_mPO1_ch02_2 (sim: 1.0223) 
+
+[Query 13] Music: mHO5/gHO_sBM_c01_d20_mHO5_ch02_1
+Ground Truth Video: mHO5/gHO_sBM_c01_d20_mHO5_ch02_1 (should match music ID)
+Exact match rank: 3
+Same directory videos found: 2, Average rank: 2.00
+Top-10 Retrieved Videos:
+  Rank 1: mHO5/gHO_sBM_c01_d21_mHO5_ch02_1 (sim: 1.0392) ✓ SAME DIR
+  Rank 2: mLH4/gLH_sBM_c01_d17_mLH4_ch02_1 (sim: 1.0376) 
+  Rank 3: mHO5/gHO_sBM_c01_d20_mHO5_ch02_1 (sim: 1.0375) ✓ EXACT
+  Rank 4: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (sim: 1.0359) 
+  Rank 5: mLH4/gLH_sBM_c01_d18_mLH4_ch02_1 (sim: 1.0356) 
+  Rank 6: mBR0/gBR_sBM_c01_d04_mBR0_ch02_2 (sim: 1.0353) 
+  Rank 7: mMH3/gMH_sBM_c01_d22_mMH3_ch02_2 (sim: 1.0338) 
+  Rank 8: mLH4/gLH_sBM_c01_d17_mLH4_ch02_2 (sim: 1.0330) 
+  Rank 9: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0303) 
+  Rank 10: mBR0/gBR_sBM_c01_d05_mBR0_ch02_1 (sim: 1.0263) 
+
+[Query 14] Music: mHO5/gHO_sBM_c01_d21_mHO5_ch02_1
+Ground Truth Video: mHO5/gHO_sBM_c01_d21_mHO5_ch02_1 (should match music ID)
+Exact match rank: 1
+Same directory videos found: 2, Average rank: 2.00
+Top-10 Retrieved Videos:
+  Rank 1: mHO5/gHO_sBM_c01_d21_mHO5_ch02_1 (sim: 1.0392) ✓ EXACT
+  Rank 2: mLH4/gLH_sBM_c01_d17_mLH4_ch02_1 (sim: 1.0376) 
+  Rank 3: mHO5/gHO_sBM_c01_d20_mHO5_ch02_1 (sim: 1.0375) ✓ SAME DIR
+  Rank 4: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (sim: 1.0359) 
+  Rank 5: mLH4/gLH_sBM_c01_d18_mLH4_ch02_1 (sim: 1.0356) 
+  Rank 6: mBR0/gBR_sBM_c01_d04_mBR0_ch02_2 (sim: 1.0353) 
+  Rank 7: mMH3/gMH_sBM_c01_d22_mMH3_ch02_2 (sim: 1.0338) 
+  Rank 8: mLH4/gLH_sBM_c01_d17_mLH4_ch02_2 (sim: 1.0330) 
+  Rank 9: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0303) 
+  Rank 10: mBR0/gBR_sBM_c01_d05_mBR0_ch02_1 (sim: 1.0263) 
+
+[Query 15] Music: mMH3/gMH_sBM_c01_d24_mMH3_ch02_2
+Ground Truth Video: mMH3/gMH_sBM_c01_d24_mMH3_ch02_2 (should match music ID)
+Exact match rank: 1
+Same directory videos found: 4, Average rank: 5.25
+Top-10 Retrieved Videos:
+  Rank 1: mMH3/gMH_sBM_c01_d24_mMH3_ch02_2 (sim: 1.0409) ✓ EXACT
+  Rank 2: mMH3/gMH_sBM_c01_d22_mMH3_ch02_2 (sim: 1.0397) ✓ SAME DIR
+  Rank 3: mPO1/gPO_sBM_c01_d11_mPO1_ch02_2 (sim: 1.0346) 
+  Rank 4: mLH4/gLH_sBM_c01_d17_mLH4_ch02_2 (sim: 1.0340) 
+  Rank 5: mPO1/gPO_sBM_c01_d11_mPO1_ch02_1 (sim: 1.0340) 
+  Rank 6: mMH3/gMH_sBM_c01_d24_mMH3_ch02_1 (sim: 1.0321) ✓ SAME DIR
+  Rank 7: mLH4/gLH_sBM_c01_d17_mLH4_ch02_1 (sim: 1.0311) 
+  Rank 8: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0275) 
+  Rank 9: mPO1/gPO_sBM_c01_d10_mPO1_ch02_2 (sim: 1.0266) 
+  Rank 10: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (sim: 1.0259) 
+
+[Query 16] Music: mMH3/gMH_sBM_c01_d22_mMH3_ch02_1
+Ground Truth Video: mMH3/gMH_sBM_c01_d22_mMH3_ch02_1 (should match music ID)
+Exact match rank: 21
+Same directory videos found: 4, Average rank: 10.25
+Top-10 Retrieved Videos:
+  Rank 1: mPO1/gPO_sBM_c01_d11_mPO1_ch02_1 (sim: 1.0347) 
+  Rank 2: mPO1/gPO_sBM_c01_d10_mPO1_ch02_2 (sim: 1.0324) 
+  Rank 3: mMH3/gMH_sBM_c01_d24_mMH3_ch02_1 (sim: 1.0321) ✓ SAME DIR
+  Rank 4: mPO1/gPO_sBM_c01_d11_mPO1_ch02_2 (sim: 1.0303) 
+  Rank 5: mPO1/gPO_sBM_c01_d10_mPO1_ch02_1 (sim: 1.0295) 
+  Rank 6: mMH3/gMH_sBM_c01_d24_mMH3_ch02_2 (sim: 1.0293) ✓ SAME DIR
+  Rank 7: mKR2/gKR_sBM_c01_d30_mKR2_ch02_2 (sim: 1.0263) 
+  Rank 8: mLH4/gLH_sBM_c01_d17_mLH4_ch02_2 (sim: 1.0247) 
+  Rank 9: mLO2/gLO_sBM_c01_d13_mLO2_ch02_1 (sim: 1.0234) 
+  Rank 10: mLH4/gLH_sBM_c01_d17_mLH4_ch02_1 (sim: 1.0226) 
+
+[Query 17] Music: mMH3/gMH_sBM_c01_d24_mMH3_ch02_1
+Ground Truth Video: mMH3/gMH_sBM_c01_d24_mMH3_ch02_1 (should match music ID)
+Exact match rank: 3
+Same directory videos found: 4, Average rank: 10.25
+Top-10 Retrieved Videos:
+  Rank 1: mPO1/gPO_sBM_c01_d11_mPO1_ch02_1 (sim: 1.0347) 
+  Rank 2: mPO1/gPO_sBM_c01_d10_mPO1_ch02_2 (sim: 1.0324) 
+  Rank 3: mMH3/gMH_sBM_c01_d24_mMH3_ch02_1 (sim: 1.0321) ✓ EXACT
+  Rank 4: mPO1/gPO_sBM_c01_d11_mPO1_ch02_2 (sim: 1.0303) 
+  Rank 5: mPO1/gPO_sBM_c01_d10_mPO1_ch02_1 (sim: 1.0295) 
+  Rank 6: mMH3/gMH_sBM_c01_d24_mMH3_ch02_2 (sim: 1.0293) ✓ SAME DIR
+  Rank 7: mKR2/gKR_sBM_c01_d30_mKR2_ch02_2 (sim: 1.0263) 
+  Rank 8: mLH4/gLH_sBM_c01_d17_mLH4_ch02_2 (sim: 1.0247) 
+  Rank 9: mLO2/gLO_sBM_c01_d13_mLO2_ch02_1 (sim: 1.0234) 
+  Rank 10: mLH4/gLH_sBM_c01_d17_mLH4_ch02_1 (sim: 1.0226) 
+
+[Query 18] Music: mMH3/gMH_sBM_c01_d22_mMH3_ch02_2
+Ground Truth Video: mMH3/gMH_sBM_c01_d22_mMH3_ch02_2 (should match music ID)
+Exact match rank: 2
+Same directory videos found: 4, Average rank: 5.25
+Top-10 Retrieved Videos:
+  Rank 1: mMH3/gMH_sBM_c01_d24_mMH3_ch02_2 (sim: 1.0409) ✓ SAME DIR
+  Rank 2: mMH3/gMH_sBM_c01_d22_mMH3_ch02_2 (sim: 1.0397) ✓ EXACT
+  Rank 3: mPO1/gPO_sBM_c01_d11_mPO1_ch02_2 (sim: 1.0346) 
+  Rank 4: mLH4/gLH_sBM_c01_d17_mLH4_ch02_2 (sim: 1.0340) 
+  Rank 5: mPO1/gPO_sBM_c01_d11_mPO1_ch02_1 (sim: 1.0340) 
+  Rank 6: mMH3/gMH_sBM_c01_d24_mMH3_ch02_1 (sim: 1.0321) ✓ SAME DIR
+  Rank 7: mLH4/gLH_sBM_c01_d17_mLH4_ch02_1 (sim: 1.0311) 
+  Rank 8: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0275) 
+  Rank 9: mPO1/gPO_sBM_c01_d10_mPO1_ch02_2 (sim: 1.0266) 
+  Rank 10: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (sim: 1.0259) 
+
+[Query 19] Music: mLH4/gLH_sBM_c01_d17_mLH4_ch02_1
+Ground Truth Video: mLH4/gLH_sBM_c01_d17_mLH4_ch02_1 (should match music ID)
+Exact match rank: 10
+Same directory videos found: 4, Average rank: 8.25
+Top-10 Retrieved Videos:
+  Rank 1: mLH4/gLH_sBM_c01_d18_mLH4_ch02_1 (sim: 1.0353) ✓ SAME DIR
+  Rank 2: mMH3/gMH_sBM_c01_d22_mMH3_ch02_2 (sim: 1.0302) 
+  Rank 3: mBR0/gBR_sBM_c01_d05_mBR0_ch02_2 (sim: 1.0289) 
+  Rank 4: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (sim: 1.0273) 
+  Rank 5: mBR0/gBR_sBM_c01_d04_mBR0_ch02_2 (sim: 1.0242) 
+  Rank 6: mBR0/gBR_sBM_c01_d05_mBR0_ch02_1 (sim: 1.0223) 
+  Rank 7: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0220) ✓ SAME DIR
+  Rank 8: mPO1/gPO_sBM_c01_d11_mPO1_ch02_1 (sim: 1.0217) 
+  Rank 9: mMH3/gMH_sBM_c01_d22_mMH3_ch02_1 (sim: 1.0198) 
+  Rank 10: mLH4/gLH_sBM_c01_d17_mLH4_ch02_1 (sim: 1.0185) ✓ EXACT
+
+[Query 20] Music: mLH4/gLH_sBM_c01_d17_mLH4_ch02_2
+Ground Truth Video: mLH4/gLH_sBM_c01_d17_mLH4_ch02_2 (should match music ID)
+Exact match rank: 10
+Same directory videos found: 4, Average rank: 8.75
+Top-10 Retrieved Videos:
+  Rank 1: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (sim: 1.0360) 
+  Rank 2: mMH3/gMH_sBM_c01_d22_mMH3_ch02_1 (sim: 1.0325) 
+  Rank 3: mBR0/gBR_sBM_c01_d05_mBR0_ch02_1 (sim: 1.0317) 
+  Rank 4: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0303) ✓ SAME DIR
+  Rank 5: mBR0/gBR_sBM_c01_d05_mBR0_ch02_2 (sim: 1.0296) 
+  Rank 6: mLH4/gLH_sBM_c01_d18_mLH4_ch02_1 (sim: 1.0292) ✓ SAME DIR
+  Rank 7: mBR0/gBR_sBM_c01_d04_mBR0_ch02_2 (sim: 1.0289) 
+  Rank 8: mMH3/gMH_sBM_c01_d22_mMH3_ch02_2 (sim: 1.0269) 
+  Rank 9: mWA0/gWA_sBM_c01_d26_mWA0_ch02_2 (sim: 1.0157) 
+  Rank 10: mLH4/gLH_sBM_c01_d17_mLH4_ch02_2 (sim: 1.0149) ✓ EXACT
+
+[Query 21] Music: mLH4/gLH_sBM_c01_d18_mLH4_ch02_1
+Ground Truth Video: mLH4/gLH_sBM_c01_d18_mLH4_ch02_1 (should match music ID)
+Exact match rank: 1
+Same directory videos found: 4, Average rank: 8.25
+Top-10 Retrieved Videos:
+  Rank 1: mLH4/gLH_sBM_c01_d18_mLH4_ch02_1 (sim: 1.0353) ✓ EXACT
+  Rank 2: mMH3/gMH_sBM_c01_d22_mMH3_ch02_2 (sim: 1.0302) 
+  Rank 3: mBR0/gBR_sBM_c01_d05_mBR0_ch02_2 (sim: 1.0289) 
+  Rank 4: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (sim: 1.0273) 
+  Rank 5: mBR0/gBR_sBM_c01_d04_mBR0_ch02_2 (sim: 1.0242) 
+  Rank 6: mBR0/gBR_sBM_c01_d05_mBR0_ch02_1 (sim: 1.0223) 
+  Rank 7: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0220) ✓ SAME DIR
+  Rank 8: mPO1/gPO_sBM_c01_d11_mPO1_ch02_1 (sim: 1.0217) 
+  Rank 9: mMH3/gMH_sBM_c01_d22_mMH3_ch02_1 (sim: 1.0198) 
+  Rank 10: mLH4/gLH_sBM_c01_d17_mLH4_ch02_1 (sim: 1.0185) ✓ SAME DIR
+
+[Query 22] Music: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2
+Ground Truth Video: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (should match music ID)
+Exact match rank: 4
+Same directory videos found: 4, Average rank: 8.75
+Top-10 Retrieved Videos:
+  Rank 1: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (sim: 1.0360) 
+  Rank 2: mMH3/gMH_sBM_c01_d22_mMH3_ch02_1 (sim: 1.0325) 
+  Rank 3: mBR0/gBR_sBM_c01_d05_mBR0_ch02_1 (sim: 1.0317) 
+  Rank 4: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0303) ✓ EXACT
+  Rank 5: mBR0/gBR_sBM_c01_d05_mBR0_ch02_2 (sim: 1.0296) 
+  Rank 6: mLH4/gLH_sBM_c01_d18_mLH4_ch02_1 (sim: 1.0292) ✓ SAME DIR
+  Rank 7: mBR0/gBR_sBM_c01_d04_mBR0_ch02_2 (sim: 1.0289) 
+  Rank 8: mMH3/gMH_sBM_c01_d22_mMH3_ch02_2 (sim: 1.0269) 
+  Rank 9: mWA0/gWA_sBM_c01_d26_mWA0_ch02_2 (sim: 1.0157) 
+  Rank 10: mLH4/gLH_sBM_c01_d17_mLH4_ch02_2 (sim: 1.0149) ✓ SAME DIR
+
+[Query 23] Music: mPO1/gPO_sBM_c01_d10_mPO1_ch02_1
+Ground Truth Video: mPO1/gPO_sBM_c01_d10_mPO1_ch02_1 (should match music ID)
+Exact match rank: 11
+Same directory videos found: 4, Average rank: 15.75
+Top-10 Retrieved Videos:
+  Rank 1: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (sim: 1.0180) 
+  Rank 2: mLO2/gLO_sBM_c01_d13_mLO2_ch02_1 (sim: 1.0172) 
+  Rank 3: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (sim: 1.0164) 
+  Rank 4: mJS3/gJS_sBM_c01_d03_mJS3_ch02_2 (sim: 1.0154) 
+  Rank 5: mKR2/gKR_sBM_c01_d30_mKR2_ch02_2 (sim: 1.0133) 
+  Rank 6: mWA0/gWA_sBM_c01_d26_mWA0_ch02_1 (sim: 1.0125) 
+  Rank 7: mJS3/gJS_sBM_c01_d03_mJS3_ch02_1 (sim: 1.0117) 
+  Rank 8: mKR2/gKR_sBM_c01_d28_mKR2_ch02_2 (sim: 1.0115) 
+  Rank 9: mPO1/gPO_sBM_c01_d11_mPO1_ch02_1 (sim: 1.0107) ✓ SAME DIR
+  Rank 10: mLO2/gLO_sBM_c01_d13_mLO2_ch02_2 (sim: 1.0102) 
+
+[Query 24] Music: mPO1/gPO_sBM_c01_d10_mPO1_ch02_2
+Ground Truth Video: mPO1/gPO_sBM_c01_d10_mPO1_ch02_2 (should match music ID)
+Exact match rank: 16
+Same directory videos found: 4, Average rank: 18.25
+Top-10 Retrieved Videos:
+  Rank 1: mWA0/gWA_sBM_c01_d26_mWA0_ch02_1 (sim: 1.0288) 
+  Rank 2: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (sim: 1.0274) 
+  Rank 3: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (sim: 1.0265) 
+  Rank 4: mWA0/gWA_sBM_c01_d25_mWA0_ch02_1 (sim: 1.0239) 
+  Rank 5: mWA0/gWA_sBM_c01_d26_mWA0_ch02_2 (sim: 1.0237) 
+  Rank 6: mBR0/gBR_sBM_c01_d05_mBR0_ch02_1 (sim: 1.0216) 
+  Rank 7: mBR0/gBR_sBM_c01_d05_mBR0_ch02_2 (sim: 1.0216) 
+  Rank 8: mWA0/gWA_sBM_c01_d25_mWA0_ch02_2 (sim: 1.0212) 
+  Rank 9: mLO2/gLO_sBM_c01_d13_mLO2_ch02_1 (sim: 1.0198) 
+  Rank 10: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0190) 
+
+[Query 25] Music: mPO1/gPO_sBM_c01_d11_mPO1_ch02_2
+Ground Truth Video: mPO1/gPO_sBM_c01_d11_mPO1_ch02_2 (should match music ID)
+Exact match rank: 12
+Same directory videos found: 4, Average rank: 18.25
+Top-10 Retrieved Videos:
+  Rank 1: mWA0/gWA_sBM_c01_d26_mWA0_ch02_1 (sim: 1.0288) 
+  Rank 2: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (sim: 1.0274) 
+  Rank 3: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (sim: 1.0265) 
+  Rank 4: mWA0/gWA_sBM_c01_d25_mWA0_ch02_1 (sim: 1.0239) 
+  Rank 5: mWA0/gWA_sBM_c01_d26_mWA0_ch02_2 (sim: 1.0237) 
+  Rank 6: mBR0/gBR_sBM_c01_d05_mBR0_ch02_1 (sim: 1.0216) 
+  Rank 7: mBR0/gBR_sBM_c01_d05_mBR0_ch02_2 (sim: 1.0216) 
+  Rank 8: mWA0/gWA_sBM_c01_d25_mWA0_ch02_2 (sim: 1.0212) 
+  Rank 9: mLO2/gLO_sBM_c01_d13_mLO2_ch02_1 (sim: 1.0198) 
+  Rank 10: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0190) 
+
+[Query 26] Music: mPO1/gPO_sBM_c01_d11_mPO1_ch02_1
+Ground Truth Video: mPO1/gPO_sBM_c01_d11_mPO1_ch02_1 (should match music ID)
+Exact match rank: 9
+Same directory videos found: 4, Average rank: 15.75
+Top-10 Retrieved Videos:
+  Rank 1: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (sim: 1.0180) 
+  Rank 2: mLO2/gLO_sBM_c01_d13_mLO2_ch02_1 (sim: 1.0172) 
+  Rank 3: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (sim: 1.0164) 
+  Rank 4: mJS3/gJS_sBM_c01_d03_mJS3_ch02_2 (sim: 1.0154) 
+  Rank 5: mKR2/gKR_sBM_c01_d30_mKR2_ch02_2 (sim: 1.0133) 
+  Rank 6: mWA0/gWA_sBM_c01_d26_mWA0_ch02_1 (sim: 1.0125) 
+  Rank 7: mJS3/gJS_sBM_c01_d03_mJS3_ch02_1 (sim: 1.0117) 
+  Rank 8: mKR2/gKR_sBM_c01_d28_mKR2_ch02_2 (sim: 1.0115) 
+  Rank 9: mPO1/gPO_sBM_c01_d11_mPO1_ch02_1 (sim: 1.0107) ✓ EXACT
+  Rank 10: mLO2/gLO_sBM_c01_d13_mLO2_ch02_2 (sim: 1.0102) 
+
+[Query 27] Music: mBR0/gBR_sBM_c01_d05_mBR0_ch02_2
+Ground Truth Video: mBR0/gBR_sBM_c01_d05_mBR0_ch02_2 (should match music ID)
+Exact match rank: 13
+Same directory videos found: 4, Average rank: 4.75
+Top-10 Retrieved Videos:
+  Rank 1: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (sim: 1.0268) ✓ SAME DIR
+  Rank 2: mBR0/gBR_sBM_c01_d05_mBR0_ch02_1 (sim: 1.0234) ✓ SAME DIR
+  Rank 3: mBR0/gBR_sBM_c01_d04_mBR0_ch02_2 (sim: 1.0181) ✓ SAME DIR
+  Rank 4: mLH4/gLH_sBM_c01_d18_mLH4_ch02_1 (sim: 1.0166) 
+  Rank 5: mHO5/gHO_sBM_c01_d21_mHO5_ch02_1 (sim: 1.0164) 
+  Rank 6: mLH4/gLH_sBM_c01_d17_mLH4_ch02_2 (sim: 1.0163) 
+  Rank 7: mLH4/gLH_sBM_c01_d17_mLH4_ch02_1 (sim: 1.0161) 
+  Rank 8: mHO5/gHO_sBM_c01_d20_mHO5_ch02_1 (sim: 1.0158) 
+  Rank 9: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0145) 
+  Rank 10: mMH3/gMH_sBM_c01_d22_mMH3_ch02_2 (sim: 1.0127) 
+
+[Query 28] Music: mBR0/gBR_sBM_c01_d05_mBR0_ch02_1
+Ground Truth Video: mBR0/gBR_sBM_c01_d05_mBR0_ch02_1 (should match music ID)
+Exact match rank: 15
+Same directory videos found: 4, Average rank: 9.50
+Top-10 Retrieved Videos:
+  Rank 1: mLH4/gLH_sBM_c01_d17_mLH4_ch02_1 (sim: 1.0283) 
+  Rank 2: mHO5/gHO_sBM_c01_d21_mHO5_ch02_1 (sim: 1.0255) 
+  Rank 3: mLH4/gLH_sBM_c01_d18_mLH4_ch02_1 (sim: 1.0241) 
+  Rank 4: mHO5/gHO_sBM_c01_d20_mHO5_ch02_1 (sim: 1.0240) 
+  Rank 5: mLH4/gLH_sBM_c01_d17_mLH4_ch02_2 (sim: 1.0231) 
+  Rank 6: mBR0/gBR_sBM_c01_d04_mBR0_ch02_2 (sim: 1.0225) ✓ SAME DIR
+  Rank 7: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0217) 
+  Rank 8: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (sim: 1.0202) ✓ SAME DIR
+  Rank 9: mBR0/gBR_sBM_c01_d05_mBR0_ch02_2 (sim: 1.0197) ✓ SAME DIR
+  Rank 10: mMH3/gMH_sBM_c01_d22_mMH3_ch02_1 (sim: 1.0125) 
+
+[Query 29] Music: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1
+Ground Truth Video: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (should match music ID)
+Exact match rank: 9
+Same directory videos found: 4, Average rank: 9.75
+Top-10 Retrieved Videos:
+  Rank 1: mLH4/gLH_sBM_c01_d17_mLH4_ch02_1 (sim: 1.0252) 
+  Rank 2: mLH4/gLH_sBM_c01_d18_mLH4_ch02_1 (sim: 1.0223) 
+  Rank 3: mHO5/gHO_sBM_c01_d20_mHO5_ch02_1 (sim: 1.0209) 
+  Rank 4: mHO5/gHO_sBM_c01_d21_mHO5_ch02_1 (sim: 1.0207) 
+  Rank 5: mLH4/gLH_sBM_c01_d17_mLH4_ch02_2 (sim: 1.0188) 
+  Rank 6: mBR0/gBR_sBM_c01_d04_mBR0_ch02_2 (sim: 1.0187) ✓ SAME DIR
+  Rank 7: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0182) 
+  Rank 8: mBR0/gBR_sBM_c01_d05_mBR0_ch02_2 (sim: 1.0157) ✓ SAME DIR
+  Rank 9: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (sim: 1.0143) ✓ EXACT
+  Rank 10: mMH3/gMH_sBM_c01_d22_mMH3_ch02_1 (sim: 1.0110) 
+
+[Query 30] Music: mBR0/gBR_sBM_c01_d04_mBR0_ch02_2
+Ground Truth Video: mBR0/gBR_sBM_c01_d04_mBR0_ch02_2 (should match music ID)
+Exact match rank: 3
+Same directory videos found: 4, Average rank: 4.75
+Top-10 Retrieved Videos:
+  Rank 1: mBR0/gBR_sBM_c01_d04_mBR0_ch02_1 (sim: 1.0257) ✓ SAME DIR
+  Rank 2: mBR0/gBR_sBM_c01_d05_mBR0_ch02_1 (sim: 1.0219) ✓ SAME DIR
+  Rank 3: mBR0/gBR_sBM_c01_d04_mBR0_ch02_2 (sim: 1.0161) ✓ EXACT
+  Rank 4: mLH4/gLH_sBM_c01_d18_mLH4_ch02_1 (sim: 1.0156) 
+  Rank 5: mHO5/gHO_sBM_c01_d21_mHO5_ch02_1 (sim: 1.0129) 
+  Rank 6: mMH3/gMH_sBM_c01_d22_mMH3_ch02_2 (sim: 1.0112) 
+  Rank 7: mLH4/gLH_sBM_c01_d17_mLH4_ch02_1 (sim: 1.0110) 
+  Rank 8: mLH4/gLH_sBM_c01_d17_mLH4_ch02_2 (sim: 1.0110) 
+  Rank 9: mLH4/gLH_sBM_c01_d18_mLH4_ch02_2 (sim: 1.0107) 
+  Rank 10: mHO5/gHO_sBM_c01_d20_mHO5_ch02_1 (sim: 1.0101) 
+
+[Query 31] Music: mKR2/gKR_sBM_c01_d28_mKR2_ch02_2
+Ground Truth Video: mKR2/gKR_sBM_c01_d28_mKR2_ch02_2 (should match music ID)
+Exact match rank: 17
+Same directory videos found: 2, Average rank: 13.50
+Top-10 Retrieved Videos:
+  Rank 1: mPO1/gPO_sBM_c01_d11_mPO1_ch02_1 (sim: 1.0269) 
+  Rank 2: mWA0/gWA_sBM_c01_d25_mWA0_ch02_1 (sim: 1.0236) 
+  Rank 3: mPO1/gPO_sBM_c01_d11_mPO1_ch02_2 (sim: 1.0220) 
+  Rank 4: mPO1/gPO_sBM_c01_d10_mPO1_ch02_2 (sim: 1.0206) 
+  Rank 5: mPO1/gPO_sBM_c01_d10_mPO1_ch02_1 (sim: 1.0203) 
+  Rank 6: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (sim: 1.0171) 
+  Rank 7: mWA0/gWA_sBM_c01_d25_mWA0_ch02_2 (sim: 1.0168) 
+  Rank 8: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (sim: 1.0158) 
+  Rank 9: mMH3/gMH_sBM_c01_d24_mMH3_ch02_2 (sim: 1.0145) 
+  Rank 10: mKR2/gKR_sBM_c01_d30_mKR2_ch02_2 (sim: 1.0134) ✓ SAME DIR
+
+[Query 32] Music: mKR2/gKR_sBM_c01_d30_mKR2_ch02_2
+Ground Truth Video: mKR2/gKR_sBM_c01_d30_mKR2_ch02_2 (should match music ID)
+Exact match rank: 10
+Same directory videos found: 2, Average rank: 13.50
+Top-10 Retrieved Videos:
+  Rank 1: mPO1/gPO_sBM_c01_d11_mPO1_ch02_1 (sim: 1.0269) 
+  Rank 2: mWA0/gWA_sBM_c01_d25_mWA0_ch02_1 (sim: 1.0236) 
+  Rank 3: mPO1/gPO_sBM_c01_d11_mPO1_ch02_2 (sim: 1.0220) 
+  Rank 4: mPO1/gPO_sBM_c01_d10_mPO1_ch02_2 (sim: 1.0206) 
+  Rank 5: mPO1/gPO_sBM_c01_d10_mPO1_ch02_1 (sim: 1.0203) 
+  Rank 6: mLO2/gLO_sBM_c01_d15_mLO2_ch02_2 (sim: 1.0171) 
+  Rank 7: mWA0/gWA_sBM_c01_d25_mWA0_ch02_2 (sim: 1.0168) 
+  Rank 8: mLO2/gLO_sBM_c01_d15_mLO2_ch02_1 (sim: 1.0158) 
+  Rank 9: mMH3/gMH_sBM_c01_d24_mMH3_ch02_2 (sim: 1.0145) 
+  Rank 10: mKR2/gKR_sBM_c01_d30_mKR2_ch02_2 (sim: 1.0134) ✓ EXACT
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 0, dl: 0/0-----
+ R@1: 12.5 (window: 12.5)
+ R@5: 40.625 (window: 40.625)
+ R@10: 62.5 (window: 62.5)
+ R@50: 100.0 (window: 100.0)
+ R@100: 100.0 (window: 100.0)
+ MedR: 9.0 (window: 9.0)
+ Means: 10.28125 (window: 10.28125)
+ AVG: 313.69687500000003 (window: 313.69687500000003)
+ Loss: 5.210334777832031

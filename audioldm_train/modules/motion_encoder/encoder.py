@@ -106,12 +106,22 @@ class MotionBERT2BeatDance2AudioLDMEncoder(nn.Module):
         audio_freq: int,
         beatdance_output_dim: int,
         beatdance_config: Any,
+        beatdance_pretrained_weights_path: str | None = None,
+        freeze_beatdance: bool = False,
     ):
         super().__init__()
         self.kpt_num_joints = kpt_num_joints
         self.kpt_feat_dim = kpt_feat_dim
 
         self.beatdance: Any = instantiate_from_config(beatdance_config)
+        if beatdance_pretrained_weights_path is not None:
+            print("Reload BeatDance from %s" % beatdance_pretrained_weights_path)
+            checkpoint = torch.load(beatdance_pretrained_weights_path, map_location=lambda storage, loc: storage)
+            self.beatdance.load_state_dict(checkpoint['state_dict'], strict=False)
+        if freeze_beatdance:
+            self.beatdance.eval()
+            for param in self.beatdance.parameters():
+                param.requires_grad = False
         self.output_proj = ZeroConv1dProject(beatdance_output_dim, audio_channels, audio_freq)
 
     def forward(self, motion_feature, motion_beat_feature):

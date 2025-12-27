@@ -3,7 +3,7 @@ import sys
 import warnings
 
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
-sys.path.append("src")
+sys.path.append("./BeatDance")
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 import argparse
@@ -145,10 +145,10 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
             monitor="global_step",
             mode="max",
             filename="checkpoint-global_step={global_step:.0f}",
-            every_n_epochs=validation_every_n_epochs,
+            every_n_train_steps=100000,
             auto_insert_metric_name=False,
             save_last=True,
-            save_top_k=3,
+            save_top_k=4,
         ),
         # ModelCheckpoint(
         #     # dirpath=checkpoint_save_path,
@@ -241,10 +241,10 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     if is_external_checkpoints:
         if resume_from_checkpoint is not None:
             try:
-                ckpt = torch.load(resume_from_checkpoint)["state_dict"]
+                ckpt = torch.load(resume_from_checkpoint, weights_only=False)["state_dict"]
             except FileNotFoundError:
                 ckpt_path = download_checkpoint(resume_from_checkpoint)
-                ckpt = torch.load(ckpt_path)["state_dict"]
+                ckpt = torch.load(ckpt_path, weights_only=False)["state_dict"]
             modify_dict = {
                 "cond_stage_model": {
                     "new_key": "cond_stage_models.0",

@@ -12,7 +12,9 @@
 4. put the BeatDance your config somewhere, then write the path into line 188 of `audioldm_train/config/2025_11_23_dance_controlnet_beatdance/audioldm_original_medium.yaml`
 Called params in this AudioLDM-ControlNet is only model-related params. Please check `audioldm_train/modules/motion_encoder/BeatDance/model/clip_transformer.py`
 
-5. start training  
+5. start training
 ```
 % sh ./bash_train_controlnet_beatdance.sh
+
+sh ./bash_eval_controlnet_beatdance.sh
 ```

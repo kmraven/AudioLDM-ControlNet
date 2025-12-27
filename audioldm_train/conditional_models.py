@@ -421,7 +421,7 @@ class CLAPGenAudioMAECond(CLAP2AudioMAE):
 
         if pretrained_path is not None:
             print("Reload CLAPGenAudioMAECond from %s" % pretrained_path)
-            state_dict = torch.load(pretrained_path)["state_dict"]
+            state_dict = torch.load(pretrained_path, weights_only=False)["state_dict"]
             self.load_state_dict(state_dict)
 
         self.use_gt_mae_output = use_gt_mae_output
@@ -538,7 +538,7 @@ class SequenceGenAudioMAECond(Sequence2AudioMAE):
     def load_pretrain_model(self):
         if self.pretrained_path is not None:
             print("Reload SequenceGenAudioMAECond from %s" % self.pretrained_path)
-            state_dict = torch.load(self.pretrained_path)["state_dict"]
+            state_dict = torch.load(self.pretrained_path, weights_only=False)["state_dict"]
             self.load_state_dict(state_dict)
 
     # Required
@@ -661,7 +661,7 @@ class SequenceGenAudioMAECond_AudioMAE_PostNet(Sequence2AudioMAE):
     def load_pretrain_model(self):
         if self.pretrained_path is not None:
             print("Reload SequenceGenAudioMAECond from %s" % self.pretrained_path)
-            state_dict = torch.load(self.pretrained_path)["state_dict"]
+            state_dict = torch.load(self.pretrained_path, weights_only=False)["state_dict"]
             self.load_state_dict(state_dict)
 
     # Required

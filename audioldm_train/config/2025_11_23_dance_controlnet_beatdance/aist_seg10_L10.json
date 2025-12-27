@@ -7,7 +7,7 @@
     "save_inference": 0,
 
     "dataset_name": "aist",
-    "videos_dir": "/home/rkimura/ra/aist++/beatdance_features",
+    "videos_dir": "./data/dataset/aist/beatdance_features",
     "ann_dir": "",
     "msrvtt_train_file": "9k",
     "num_frames": 10,
@@ -15,7 +15,7 @@
     "input_res": 224,
   
     "exp_name": "seglen10_L10_batchsize32_framewise_v2",
-    "output_dir": "/data/rkimura/beatdance",
+    "output_dir": "./log/beatdance",
     "save_every": 50,
     "log_step": 20,
     "evals_per_epoch": 1,
@@ -53,6 +53,6 @@
     "num_workers": 4,
     "seed": 24,
     "no_tensorboard": false,
-    "tb_log_dir": "/data/rkimura/beatdance/logs"
+    "tb_log_dir": "./log/beatdance/logs"
   }
   

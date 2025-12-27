@@ -1,9 +1,7 @@
 import os
-
 import numpy as np
 import torch
 import torchaudio.transforms as T
-
 from audioldm_train.utilities.data.dataset import AudioDataset, spectral_normalize_torch
 from librosa.filters import mel as librosa_mel_fn
 from audioldm_train.utilities.data.keypoints import (
@@ -15,7 +13,6 @@ from audioldm_train.utilities.data.keypoints import (
     crop_scale,
     extract_motion_beat,
 )
-
 
 class AISTDataset(AudioDataset):
     def __init__(self, *args, use_text_condition=True, **kwargs):
@@ -120,11 +117,11 @@ class AISTDataset(AudioDataset):
 
         if self.mel_fmax not in self.mel_basis:
             mel = librosa_mel_fn(
-                self.sampling_rate,
-                self.filter_length,
-                self.n_mel,
-                self.mel_fmin,
-                self.mel_fmax,
+                sr=self.sampling_rate,
+                n_fft=self.filter_length,
+                n_mels=self.n_mel,
+                fmin=self.mel_fmin,
+                fmax=self.mel_fmax,
             )
             self.mel_basis[str(self.mel_fmax) + "_" + str(y.device)] = (
                 torch.from_numpy(mel).float().to(y.device)
@@ -172,8 +169,9 @@ class AISTDataset(AudioDataset):
         )
 
         return mel[0], stft_spec[0]
+    
 
-
+    
 class AISTBeatDanceDataset(AISTDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

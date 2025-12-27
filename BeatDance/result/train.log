@@ -1,0 +1,3023 @@
+nohup: ignoring input
+2025-12-25 14:01:45.892676: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX_VNNI FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-12-25 14:01:45.960546: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-12-25 14:01:45.975737: E tensorflow/stream_executor/cuda/cuda_blas.cc:2981] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-12-25 14:01:46.193412: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer.so.7'; dlerror: libnvinfer.so.7: cannot open shared object file: No such file or directory; LD_LIBRARY_PATH: /home/sangheon/.local/lib/python3.10/site-packages/nvidia/cusparselt/lib:/home/sangheon/.local/lib/python3.10/site-packages/nvidia/nvshmem/lib:/home/sangheon/.local/lib/python3.10/site-packages/nvidia/nvjitlink/lib:/home/sangheon/.local/lib/python3.10/site-packages/nvidia/cufft/lib:/home/sangheon/.local/lib/python3.10/site-packages/nvidia/cufile/lib:
+2025-12-25 14:01:46.193457: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer_plugin.so.7'; dlerror: libnvinfer_plugin.so.7: cannot open shared object file: No such file or directory; LD_LIBRARY_PATH: /home/sangheon/.local/lib/python3.10/site-packages/nvidia/cusparselt/lib:/home/sangheon/.local/lib/python3.10/site-packages/nvidia/nvshmem/lib:/home/sangheon/.local/lib/python3.10/site-packages/nvidia/nvjitlink/lib:/home/sangheon/.local/lib/python3.10/site-packages/nvidia/cufft/lib:/home/sangheon/.local/lib/python3.10/site-packages/nvidia/cufile/lib:
+2025-12-25 14:01:46.193461: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Cannot dlopen some TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please make sure the missing libraries mentioned above are installed properly.
+/home/sangheon/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'Could not load this library: /home/sangheon/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/image.so'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+/home/sangheon/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/lightning_fabric/__init__.py:40: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+/home/sangheon/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+  warnings.warn(
+Current device:  NVIDIA GeForce RTX 4090
+Train Epoch: 1 dl: 0/84 Loss: 266.195862
+Train Epoch: 1 dl: 20/84 Loss: 286.694763
+Train Epoch: 1 dl: 40/84 Loss: 286.976440
+Train Epoch: 1 dl: 60/84 Loss: 190.151978
+Train Epoch: 1 dl: 80/84 Loss: 212.352051
+0it [00:00, ?it/s]1it [00:00, 11.61it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 1, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 12.50)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.00 (window: 18.00)
+MeanR: 16.69 (window: 16.69)
+AVG: 243.41 (window: 243.41)
+Loss: 77.0038
+Saving current best: model_best.pth ...
+ Current Best Window Average R@1 is 243.40625
+ Current Best R@1 is 243.40625
+
+Train Epoch: 2 dl: 0/84 Loss: 169.158325
+Train Epoch: 2 dl: 20/84 Loss: 214.977585
+Train Epoch: 2 dl: 40/84 Loss: 163.680176
+Train Epoch: 2 dl: 60/84 Loss: 169.205215
+Train Epoch: 2 dl: 80/84 Loss: 142.648941
+0it [00:00, ?it/s]1it [00:00, 11.36it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 2, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 14.06)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.00 (window: 18.00)
+MeanR: 16.91 (window: 16.80)
+AVG: 246.51 (window: 244.96)
+Loss: 50.9917
+Saving current best: model_best.pth ...
+ Current Best Window Average R@1 is 244.9578125
+ Current Best R@1 is 246.50937499999998
+
+Train Epoch: 3 dl: 0/84 Loss: 131.683990
+Train Epoch: 3 dl: 20/84 Loss: 125.750267
+Train Epoch: 3 dl: 40/84 Loss: 151.424301
+Train Epoch: 3 dl: 60/84 Loss: 148.745438
+Train Epoch: 3 dl: 80/84 Loss: 154.353149
+0it [00:00, ?it/s]1it [00:00, 11.93it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 3, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 18.75 (window: 15.62)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 17.83)
+MeanR: 16.66 (window: 16.75)
+AVG: 249.71 (window: 246.54)
+Loss: 40.6623
+Saving current best: model_best.pth ...
+ Current Best Window Average R@1 is 246.54166666666666
+ Current Best R@1 is 249.709375
+
+Train Epoch: 4 dl: 0/84 Loss: 124.567413
+Train Epoch: 4 dl: 20/84 Loss: 95.937843
+Train Epoch: 4 dl: 40/84 Loss: 114.774963
+Train Epoch: 4 dl: 60/84 Loss: 102.257385
+Train Epoch: 4 dl: 80/84 Loss: 90.640053
+0it [00:00, ?it/s]1it [00:00, 12.02it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 4, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 14.84)
+R10: 37.50 (window: 32.81)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.00 (window: 17.12)
+MeanR: 16.41 (window: 16.66)
+AVG: 249.98 (window: 247.40)
+Loss: 27.9159
+Saving current best: model_best.pth ...
+ Current Best Window Average R@1 is 247.40234375
+ Current Best R@1 is 249.984375
+
+Train Epoch: 5 dl: 0/84 Loss: 107.682922
+Train Epoch: 5 dl: 20/84 Loss: 89.716003
+Train Epoch: 5 dl: 40/84 Loss: 102.874069
+Train Epoch: 5 dl: 60/84 Loss: 122.237320
+Train Epoch: 5 dl: 80/84 Loss: 87.251648
+0it [00:00, ?it/s]1it [00:00, 11.86it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 5, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.00)
+R10: 31.25 (window: 32.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 17.00)
+MeanR: 16.66 (window: 16.66)
+AVG: 246.68 (window: 247.26)
+Loss: 17.4940
+ Current Best Window Average R@1 is 247.40234375
+ Current Best R@1 is 249.984375
+
+Train Epoch: 6 dl: 0/84 Loss: 76.631012
+Train Epoch: 6 dl: 20/84 Loss: 80.380859
+Train Epoch: 6 dl: 40/84 Loss: 73.301270
+Train Epoch: 6 dl: 60/84 Loss: 79.405197
+Train Epoch: 6 dl: 80/84 Loss: 72.034721
+0it [00:00, ?it/s]1it [00:00, 11.75it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 6, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.62)
+R10: 28.12 (window: 31.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.00 (window: 16.80)
+MeanR: 16.69 (window: 16.66)
+AVG: 243.51 (window: 247.28)
+Loss: 18.5150
+ Current Best Window Average R@1 is 247.40234375
+ Current Best R@1 is 249.984375
+
+Train Epoch: 7 dl: 0/84 Loss: 78.763504
+Train Epoch: 7 dl: 20/84 Loss: 62.418026
+Train Epoch: 7 dl: 40/84 Loss: 59.084541
+Train Epoch: 7 dl: 60/84 Loss: 62.746773
+Train Epoch: 7 dl: 80/84 Loss: 62.862946
+0it [00:00, ?it/s]1it [00:00, 11.25it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 7, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.62)
+R10: 28.12 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 16.70)
+MeanR: 16.72 (window: 16.62)
+AVG: 243.45 (window: 246.67)
+Loss: 12.6673
+ Current Best Window Average R@1 is 247.40234375
+ Current Best R@1 is 249.984375
+
+Train Epoch: 8 dl: 0/84 Loss: 56.078773
+Train Epoch: 8 dl: 20/84 Loss: 63.793278
+Train Epoch: 8 dl: 40/84 Loss: 56.832653
+Train Epoch: 8 dl: 60/84 Loss: 48.214844
+Train Epoch: 8 dl: 80/84 Loss: 43.731323
+0it [00:00, ?it/s]1it [00:00, 11.40it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 8, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.00)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 16.50)
+MeanR: 16.94 (window: 16.68)
+AVG: 246.66 (window: 246.06)
+Loss: 10.9616
+ Current Best Window Average R@1 is 247.40234375
+ Current Best R@1 is 249.984375
+
+Train Epoch: 9 dl: 0/84 Loss: 48.830528
+Train Epoch: 9 dl: 20/84 Loss: 39.850334
+Train Epoch: 9 dl: 40/84 Loss: 41.802338
+Train Epoch: 9 dl: 60/84 Loss: 42.376102
+Train Epoch: 9 dl: 80/84 Loss: 35.520660
+0it [00:00, ?it/s]1it [00:00, 11.49it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 9, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 18.75 (window: 16.25)
+R10: 31.25 (window: 30.00)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.00 (window: 16.70)
+MeanR: 16.59 (window: 16.72)
+AVG: 249.87 (window: 246.03)
+Loss: 11.5309
+ Current Best Window Average R@1 is 247.40234375
+ Current Best R@1 is 249.984375
+
+Train Epoch: 10 dl: 0/84 Loss: 46.875988
+Train Epoch: 10 dl: 20/84 Loss: 35.503613
+Train Epoch: 10 dl: 40/84 Loss: 33.313782
+Train Epoch: 10 dl: 60/84 Loss: 32.297729
+Train Epoch: 10 dl: 80/84 Loss: 34.082161
+0it [00:00, ?it/s]1it [00:00, 12.02it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 10, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 15.62)
+R10: 31.25 (window: 30.00)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 16.70)
+MeanR: 16.62 (window: 16.71)
+AVG: 243.56 (window: 245.41)
+Loss: 9.0431
+ Current Best Window Average R@1 is 247.40234375
+ Current Best R@1 is 249.984375
+
+Train Epoch: 11 dl: 0/84 Loss: 28.386480
+Train Epoch: 11 dl: 20/84 Loss: 30.492027
+Train Epoch: 11 dl: 40/84 Loss: 28.510321
+Train Epoch: 11 dl: 60/84 Loss: 29.974819
+Train Epoch: 11 dl: 80/84 Loss: 28.223015
+0it [00:00, ?it/s]1it [00:00, 11.61it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 11, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.62)
+R10: 34.38 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.50 (window: 17.00)
+MeanR: 16.72 (window: 16.72)
+AVG: 249.60 (window: 246.63)
+Loss: 7.8766
+ Current Best Window Average R@1 is 247.40234375
+ Current Best R@1 is 249.984375
+
+Train Epoch: 12 dl: 0/84 Loss: 23.654774
+Train Epoch: 12 dl: 20/84 Loss: 24.973953
+Train Epoch: 12 dl: 40/84 Loss: 27.728258
+Train Epoch: 12 dl: 60/84 Loss: 23.660202
+Train Epoch: 12 dl: 80/84 Loss: 19.963779
+0it [00:00, ?it/s]1it [00:00, 12.00it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 12, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.62)
+R10: 31.25 (window: 31.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.00 (window: 16.70)
+MeanR: 16.59 (window: 16.69)
+AVG: 246.74 (window: 247.29)
+Loss: 7.4665
+ Current Best Window Average R@1 is 247.40234375
+ Current Best R@1 is 249.984375
+
+Train Epoch: 13 dl: 0/84 Loss: 20.560106
+Train Epoch: 13 dl: 20/84 Loss: 20.003332
+Train Epoch: 13 dl: 40/84 Loss: 18.650259
+Train Epoch: 13 dl: 60/84 Loss: 20.746090
+Train Epoch: 13 dl: 80/84 Loss: 19.474918
+0it [00:00, ?it/s]1it [00:00, 11.42it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 13, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.62)
+R10: 31.25 (window: 31.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 16.90)
+MeanR: 16.62 (window: 16.63)
+AVG: 246.59 (window: 247.27)
+Loss: 7.1996
+ Current Best Window Average R@1 is 247.40234375
+ Current Best R@1 is 249.984375
+
+Train Epoch: 14 dl: 0/84 Loss: 18.545704
+Train Epoch: 14 dl: 20/84 Loss: 17.866005
+Train Epoch: 14 dl: 40/84 Loss: 16.822939
+Train Epoch: 14 dl: 60/84 Loss: 19.073137
+Train Epoch: 14 dl: 80/84 Loss: 17.427345
+0it [00:00, ?it/s]1it [00:00, 11.89it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 14, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.00)
+R10: 31.25 (window: 31.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 17.20)
+MeanR: 16.59 (window: 16.63)
+AVG: 246.59 (window: 246.62)
+Loss: 7.1808
+ Current Best Window Average R@1 is 247.40234375
+ Current Best R@1 is 249.984375
+
+Train Epoch: 15 dl: 0/84 Loss: 18.417049
+Train Epoch: 15 dl: 20/84 Loss: 15.974405
+Train Epoch: 15 dl: 40/84 Loss: 14.594608
+Train Epoch: 15 dl: 60/84 Loss: 14.322683
+Train Epoch: 15 dl: 80/84 Loss: 14.612708
+0it [00:00, ?it/s]1it [00:00, 11.39it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 15, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.62)
+R10: 34.38 (window: 32.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.50 (window: 17.00)
+MeanR: 16.62 (window: 16.63)
+AVG: 249.91 (window: 247.89)
+Loss: 7.1728
+Saving current best: model_best.pth ...
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 16 dl: 0/84 Loss: 13.985246
+Train Epoch: 16 dl: 20/84 Loss: 13.249173
+Train Epoch: 16 dl: 40/84 Loss: 11.813786
+Train Epoch: 16 dl: 60/84 Loss: 13.119147
+Train Epoch: 16 dl: 80/84 Loss: 12.436139
+0it [00:00, ?it/s]1it [00:00, 12.11it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 16, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.62)
+R10: 31.25 (window: 31.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.00 (window: 16.50)
+MeanR: 16.59 (window: 16.61)
+AVG: 246.74 (window: 247.31)
+Loss: 7.0292
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 17 dl: 0/84 Loss: 13.117767
+Train Epoch: 17 dl: 20/84 Loss: 10.882199
+Train Epoch: 17 dl: 40/84 Loss: 12.025814
+Train Epoch: 17 dl: 60/84 Loss: 11.063910
+Train Epoch: 17 dl: 80/84 Loss: 11.341778
+0it [00:00, ?it/s]1it [00:00, 11.96it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 17, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.62)
+R10: 28.12 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 16.60)
+MeanR: 16.47 (window: 16.58)
+AVG: 243.58 (window: 246.68)
+Loss: 7.0158
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 18 dl: 0/84 Loss: 11.206577
+Train Epoch: 18 dl: 20/84 Loss: 10.936176
+Train Epoch: 18 dl: 40/84 Loss: 11.251667
+Train Epoch: 18 dl: 60/84 Loss: 10.414280
+Train Epoch: 18 dl: 80/84 Loss: 9.994967
+0it [00:00, ?it/s]1it [00:00, 11.36it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 18, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.62)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.50 (window: 16.20)
+MeanR: 16.75 (window: 16.61)
+AVG: 246.77 (window: 246.72)
+Loss: 6.9772
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 19 dl: 0/84 Loss: 10.061408
+Train Epoch: 19 dl: 20/84 Loss: 9.783238
+Train Epoch: 19 dl: 40/84 Loss: 9.352911
+Train Epoch: 19 dl: 60/84 Loss: 9.469604
+Train Epoch: 19 dl: 80/84 Loss: 9.274213
+0it [00:00, ?it/s]1it [00:00, 12.00it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 19, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 14.38)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 16.20)
+MeanR: 16.91 (window: 16.67)
+AVG: 240.31 (window: 245.46)
+Loss: 6.9693
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 20 dl: 0/84 Loss: 9.531755
+Train Epoch: 20 dl: 20/84 Loss: 8.899739
+Train Epoch: 20 dl: 40/84 Loss: 9.320161
+Train Epoch: 20 dl: 60/84 Loss: 9.117992
+Train Epoch: 20 dl: 80/84 Loss: 9.013227
+0it [00:00, ?it/s]1it [00:00, 11.62it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 20, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 13.75)
+R10: 28.12 (window: 30.00)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 16.40)
+MeanR: 16.69 (window: 16.68)
+AVG: 240.43 (window: 243.57)
+Loss: 6.9520
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 21 dl: 0/84 Loss: 8.602049
+Train Epoch: 21 dl: 20/84 Loss: 8.611188
+Train Epoch: 21 dl: 40/84 Loss: 8.873145
+Train Epoch: 21 dl: 60/84 Loss: 8.201200
+Train Epoch: 21 dl: 80/84 Loss: 8.464600
+0it [00:00, ?it/s]1it [00:00, 11.72it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 21, dl: 84/84-----
+R1: 0.00 (window: 2.50)
+R5: 15.62 (window: 13.75)
+R10: 28.12 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 16.50)
+MeanR: 16.66 (window: 16.69)
+AVG: 240.43 (window: 242.31)
+Loss: 6.9638
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 22 dl: 0/84 Loss: 8.549089
+Train Epoch: 22 dl: 20/84 Loss: 8.053488
+Train Epoch: 22 dl: 40/84 Loss: 8.156616
+Train Epoch: 22 dl: 60/84 Loss: 8.360724
+Train Epoch: 22 dl: 80/84 Loss: 8.114718
+0it [00:00, ?it/s]1it [00:00, 10.99it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 22, dl: 84/84-----
+R1: 3.12 (window: 2.50)
+R5: 12.50 (window: 13.12)
+R10: 31.25 (window: 30.00)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.00 (window: 16.60)
+MeanR: 16.78 (window: 16.76)
+AVG: 243.50 (window: 242.29)
+Loss: 6.9464
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 23 dl: 0/84 Loss: 8.391077
+Train Epoch: 23 dl: 20/84 Loss: 8.078953
+Train Epoch: 23 dl: 40/84 Loss: 7.657781
+Train Epoch: 23 dl: 60/84 Loss: 8.132301
+Train Epoch: 23 dl: 80/84 Loss: 7.849748
+0it [00:00, ?it/s]1it [00:00, 11.95it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 23, dl: 84/84-----
+R1: 3.12 (window: 2.50)
+R5: 15.62 (window: 13.12)
+R10: 28.12 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 17.00)
+MeanR: 16.88 (window: 16.78)
+AVG: 243.44 (window: 241.62)
+Loss: 6.9488
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 24 dl: 0/84 Loss: 8.193130
+Train Epoch: 24 dl: 20/84 Loss: 7.947014
+Train Epoch: 24 dl: 40/84 Loss: 7.658950
+Train Epoch: 24 dl: 60/84 Loss: 7.816950
+Train Epoch: 24 dl: 80/84 Loss: 7.885923
+0it [00:00, ?it/s]1it [00:00, 11.98it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 24, dl: 84/84-----
+R1: 6.25 (window: 3.12)
+R5: 15.62 (window: 14.38)
+R10: 25.00 (window: 28.12)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 16.80)
+MeanR: 16.81 (window: 16.76)
+AVG: 243.54 (window: 242.27)
+Loss: 6.9387
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 25 dl: 0/84 Loss: 7.612276
+Train Epoch: 25 dl: 20/84 Loss: 7.770634
+Train Epoch: 25 dl: 40/84 Loss: 7.550446
+Train Epoch: 25 dl: 60/84 Loss: 7.686363
+Train Epoch: 25 dl: 80/84 Loss: 7.569415
+0it [00:00, ?it/s]1it [00:00, 11.94it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 25, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.00)
+R10: 31.25 (window: 28.75)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.00 (window: 16.70)
+MeanR: 16.62 (window: 16.75)
+AVG: 246.74 (window: 243.53)
+Loss: 6.9406
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 26 dl: 0/84 Loss: 7.588532
+Train Epoch: 26 dl: 20/84 Loss: 7.599926
+Train Epoch: 26 dl: 40/84 Loss: 7.545419
+Train Epoch: 26 dl: 60/84 Loss: 7.567774
+Train Epoch: 26 dl: 80/84 Loss: 7.689244
+0it [00:00, ?it/s]1it [00:00, 11.92it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 26, dl: 84/84-----
+R1: 0.00 (window: 3.12)
+R5: 15.62 (window: 15.00)
+R10: 31.25 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.50 (window: 16.50)
+MeanR: 16.88 (window: 16.79)
+AVG: 243.64 (window: 244.17)
+Loss: 6.9396
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 27 dl: 0/84 Loss: 7.334861
+Train Epoch: 27 dl: 20/84 Loss: 7.604018
+Train Epoch: 27 dl: 40/84 Loss: 7.679159
+Train Epoch: 27 dl: 60/84 Loss: 7.452639
+Train Epoch: 27 dl: 80/84 Loss: 7.654613
+0it [00:00, ?it/s]1it [00:00, 11.82it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 27, dl: 84/84-----
+R1: 0.00 (window: 2.50)
+R5: 15.62 (window: 15.62)
+R10: 31.25 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.00 (window: 16.50)
+MeanR: 16.69 (window: 16.77)
+AVG: 243.51 (window: 244.17)
+Loss: 6.9347
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 28 dl: 0/84 Loss: 7.399569
+Train Epoch: 28 dl: 20/84 Loss: 7.450154
+Train Epoch: 28 dl: 40/84 Loss: 7.413912
+Train Epoch: 28 dl: 60/84 Loss: 7.358439
+Train Epoch: 28 dl: 80/84 Loss: 7.555003
+0it [00:00, ?it/s]1it [00:00, 12.05it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 28, dl: 84/84-----
+R1: 3.12 (window: 2.50)
+R5: 15.62 (window: 15.62)
+R10: 31.25 (window: 30.00)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.00 (window: 16.60)
+MeanR: 16.62 (window: 16.73)
+AVG: 246.54 (window: 244.79)
+Loss: 6.9352
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 29 dl: 0/84 Loss: 7.409169
+Train Epoch: 29 dl: 20/84 Loss: 7.463002
+Train Epoch: 29 dl: 40/84 Loss: 7.296370
+Train Epoch: 29 dl: 60/84 Loss: 7.316578
+Train Epoch: 29 dl: 80/84 Loss: 7.378104
+0it [00:00, ?it/s]1it [00:00, 12.11it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 29, dl: 84/84-----
+R1: 3.12 (window: 1.88)
+R5: 15.62 (window: 15.62)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 16.60)
+MeanR: 16.75 (window: 16.71)
+AVG: 246.67 (window: 245.42)
+Loss: 6.9331
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 30 dl: 0/84 Loss: 7.275846
+Train Epoch: 30 dl: 20/84 Loss: 7.450684
+Train Epoch: 30 dl: 40/84 Loss: 7.332853
+Train Epoch: 30 dl: 60/84 Loss: 7.344141
+Train Epoch: 30 dl: 80/84 Loss: 7.282128
+0it [00:00, ?it/s]1it [00:00, 11.79it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 30, dl: 84/84-----
+R1: 3.12 (window: 1.88)
+R5: 15.62 (window: 15.62)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 16.90)
+MeanR: 17.03 (window: 16.79)
+AVG: 246.55 (window: 245.38)
+Loss: 6.9360
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 31 dl: 0/84 Loss: 7.350521
+Train Epoch: 31 dl: 20/84 Loss: 7.165924
+Train Epoch: 31 dl: 40/84 Loss: 7.269562
+Train Epoch: 31 dl: 60/84 Loss: 7.227824
+Train Epoch: 31 dl: 80/84 Loss: 7.353609
+0it [00:00, ?it/s]1it [00:00, 13.04it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 31, dl: 84/84-----
+R1: 3.12 (window: 2.50)
+R5: 15.62 (window: 15.62)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.00 (window: 17.20)
+MeanR: 16.66 (window: 16.75)
+AVG: 246.63 (window: 245.98)
+Loss: 6.9339
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 32 dl: 0/84 Loss: 7.378224
+Train Epoch: 32 dl: 20/84 Loss: 7.220993
+Train Epoch: 32 dl: 40/84 Loss: 7.193722
+Train Epoch: 32 dl: 60/84 Loss: 7.201919
+Train Epoch: 32 dl: 80/84 Loss: 7.241307
+0it [00:00, ?it/s]1it [00:00, 11.61it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 32, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 18.75 (window: 16.25)
+R10: 25.00 (window: 30.00)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 17.10)
+MeanR: 16.62 (window: 16.74)
+AVG: 243.56 (window: 245.99)
+Loss: 6.9346
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 33 dl: 0/84 Loss: 7.160223
+Train Epoch: 33 dl: 20/84 Loss: 7.220705
+Train Epoch: 33 dl: 40/84 Loss: 7.229786
+Train Epoch: 33 dl: 60/84 Loss: 7.202324
+Train Epoch: 33 dl: 80/84 Loss: 7.292583
+0it [00:00, ?it/s]1it [00:00, 12.98it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 33, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 16.25)
+R10: 28.12 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.00 (window: 16.90)
+MeanR: 16.47 (window: 16.71)
+AVG: 243.53 (window: 245.39)
+Loss: 6.9335
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 34 dl: 0/84 Loss: 7.086358
+Train Epoch: 34 dl: 20/84 Loss: 7.160386
+Train Epoch: 34 dl: 40/84 Loss: 7.137639
+Train Epoch: 34 dl: 60/84 Loss: 7.095271
+Train Epoch: 34 dl: 80/84 Loss: 7.184945
+0it [00:00, ?it/s]1it [00:00, 11.56it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 34, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 16.25)
+R10: 31.25 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.00 (window: 17.00)
+MeanR: 16.69 (window: 16.69)
+AVG: 246.63 (window: 245.38)
+Loss: 6.9341
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 35 dl: 0/84 Loss: 7.069251
+Train Epoch: 35 dl: 20/84 Loss: 7.191467
+Train Epoch: 35 dl: 40/84 Loss: 7.143418
+Train Epoch: 35 dl: 60/84 Loss: 7.154808
+Train Epoch: 35 dl: 80/84 Loss: 7.160711
+0it [00:00, ?it/s]1it [00:00, 12.11it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 35, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 16.25)
+R10: 28.12 (window: 28.75)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 16.80)
+MeanR: 16.59 (window: 16.61)
+AVG: 243.57 (window: 244.78)
+Loss: 6.9342
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 36 dl: 0/84 Loss: 7.282319
+Train Epoch: 36 dl: 20/84 Loss: 7.251346
+Train Epoch: 36 dl: 40/84 Loss: 7.054894
+Train Epoch: 36 dl: 60/84 Loss: 7.051017
+Train Epoch: 36 dl: 80/84 Loss: 7.198843
+0it [00:00, ?it/s]1it [00:00, 11.36it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 36, dl: 84/84-----
+R1: 0.00 (window: 2.50)
+R5: 15.62 (window: 16.25)
+R10: 31.25 (window: 28.75)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.00 (window: 16.60)
+MeanR: 16.69 (window: 16.61)
+AVG: 243.61 (window: 244.18)
+Loss: 6.9350
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 37 dl: 0/84 Loss: 7.157090
+Train Epoch: 37 dl: 20/84 Loss: 7.148533
+Train Epoch: 37 dl: 40/84 Loss: 7.119654
+Train Epoch: 37 dl: 60/84 Loss: 7.132361
+Train Epoch: 37 dl: 80/84 Loss: 7.157784
+0it [00:00, ?it/s]1it [00:00, 13.08it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 37, dl: 84/84-----
+R1: 3.12 (window: 2.50)
+R5: 15.62 (window: 15.62)
+R10: 28.12 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 16.80)
+MeanR: 16.69 (window: 16.62)
+AVG: 243.46 (window: 244.16)
+Loss: 6.9328
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 38 dl: 0/84 Loss: 7.073661
+Train Epoch: 38 dl: 20/84 Loss: 7.077293
+Train Epoch: 38 dl: 40/84 Loss: 7.079834
+Train Epoch: 38 dl: 60/84 Loss: 7.145793
+Train Epoch: 38 dl: 80/84 Loss: 7.068707
+0it [00:00, ?it/s]1it [00:00, 11.90it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 38, dl: 84/84-----
+R1: 3.12 (window: 2.50)
+R5: 15.62 (window: 15.62)
+R10: 28.12 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.00 (window: 16.80)
+MeanR: 16.66 (window: 16.66)
+AVG: 243.51 (window: 244.15)
+Loss: 6.9335
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 39 dl: 0/84 Loss: 7.149541
+Train Epoch: 39 dl: 20/84 Loss: 7.065484
+Train Epoch: 39 dl: 40/84 Loss: 7.134794
+Train Epoch: 39 dl: 60/84 Loss: 7.042243
+Train Epoch: 39 dl: 80/84 Loss: 6.977655
+0it [00:00, ?it/s]1it [00:00, 11.53it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 39, dl: 84/84-----
+R1: 3.12 (window: 2.50)
+R5: 18.75 (window: 16.25)
+R10: 31.25 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 16.70)
+MeanR: 16.53 (window: 16.63)
+AVG: 249.82 (window: 244.79)
+Loss: 6.9342
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 40 dl: 0/84 Loss: 7.060944
+Train Epoch: 40 dl: 20/84 Loss: 7.182276
+Train Epoch: 40 dl: 40/84 Loss: 7.100832
+Train Epoch: 40 dl: 60/84 Loss: 6.982374
+Train Epoch: 40 dl: 80/84 Loss: 7.079512
+0it [00:00, ?it/s]1it [00:00, 11.90it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 40, dl: 84/84-----
+R1: 3.12 (window: 2.50)
+R5: 12.50 (window: 15.62)
+R10: 31.25 (window: 30.00)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.00 (window: 16.60)
+MeanR: 16.88 (window: 16.69)
+AVG: 243.59 (window: 244.80)
+Loss: 6.9339
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 41 dl: 0/84 Loss: 6.989842
+Train Epoch: 41 dl: 20/84 Loss: 6.934334
+Train Epoch: 41 dl: 40/84 Loss: 7.063363
+Train Epoch: 41 dl: 60/84 Loss: 7.028089
+Train Epoch: 41 dl: 80/84 Loss: 7.156569
+0it [00:00, ?it/s]1it [00:00, 12.04it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 41, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.62)
+R10: 31.25 (window: 30.00)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.00 (window: 16.60)
+MeanR: 16.56 (window: 16.66)
+AVG: 246.74 (window: 245.42)
+Loss: 6.9371
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 42 dl: 0/84 Loss: 6.984853
+Train Epoch: 42 dl: 20/84 Loss: 7.045005
+Train Epoch: 42 dl: 40/84 Loss: 6.957002
+Train Epoch: 42 dl: 60/84 Loss: 7.056171
+Train Epoch: 42 dl: 80/84 Loss: 6.934471
+0it [00:00, ?it/s]1it [00:00, 11.88it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 42, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 15.00)
+R10: 31.25 (window: 30.62)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.00 (window: 16.70)
+MeanR: 16.88 (window: 16.70)
+AVG: 243.39 (window: 245.41)
+Loss: 6.9414
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 43 dl: 0/84 Loss: 7.080507
+Train Epoch: 43 dl: 20/84 Loss: 7.000848
+Train Epoch: 43 dl: 40/84 Loss: 7.023769
+Train Epoch: 43 dl: 60/84 Loss: 7.118606
+Train Epoch: 43 dl: 80/84 Loss: 7.126392
+0it [00:00, ?it/s]1it [00:00, 11.63it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 43, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.00)
+R10: 28.12 (window: 30.62)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.00 (window: 16.70)
+MeanR: 16.97 (window: 16.76)
+AVG: 243.48 (window: 245.40)
+Loss: 6.9435
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 44 dl: 0/84 Loss: 7.092463
+Train Epoch: 44 dl: 20/84 Loss: 6.948979
+Train Epoch: 44 dl: 40/84 Loss: 6.996036
+Train Epoch: 44 dl: 60/84 Loss: 6.996922
+Train Epoch: 44 dl: 80/84 Loss: 6.840558
+0it [00:00, ?it/s]1it [00:00, 11.99it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 44, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 13.75)
+R10: 21.88 (window: 28.75)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 16.90)
+MeanR: 17.50 (window: 16.96)
+AVG: 234.00 (window: 242.24)
+Loss: 6.9445
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 45 dl: 0/84 Loss: 7.065974
+Train Epoch: 45 dl: 20/84 Loss: 6.991457
+Train Epoch: 45 dl: 40/84 Loss: 6.817022
+Train Epoch: 45 dl: 60/84 Loss: 6.872462
+Train Epoch: 45 dl: 80/84 Loss: 6.717778
+0it [00:00, ?it/s]1it [00:00, 11.98it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 45, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 18.75 (window: 15.00)
+R10: 28.12 (window: 28.12)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 22.50 (window: 18.20)
+MeanR: 18.41 (window: 17.26)
+AVG: 245.91 (window: 242.70)
+Loss: 6.9470
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 46 dl: 0/84 Loss: 6.858788
+Train Epoch: 46 dl: 20/84 Loss: 6.953065
+Train Epoch: 46 dl: 40/84 Loss: 6.865268
+Train Epoch: 46 dl: 60/84 Loss: 6.976819
+Train Epoch: 46 dl: 80/84 Loss: 6.908846
+0it [00:00, ?it/s]1it [00:00, 11.94it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 46, dl: 84/84-----
+R1: 0.00 (window: 2.50)
+R5: 12.50 (window: 14.38)
+R10: 28.12 (window: 27.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.00 (window: 18.40)
+MeanR: 16.97 (window: 17.34)
+AVG: 237.23 (window: 240.80)
+Loss: 6.9623
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 47 dl: 0/84 Loss: 6.730700
+Train Epoch: 47 dl: 20/84 Loss: 7.037572
+Train Epoch: 47 dl: 40/84 Loss: 7.102751
+Train Epoch: 47 dl: 60/84 Loss: 6.932332
+Train Epoch: 47 dl: 80/84 Loss: 6.922386
+0it [00:00, ?it/s]1it [00:00, 11.36it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 47, dl: 84/84-----
+R1: 3.12 (window: 2.50)
+R5: 6.25 (window: 13.12)
+R10: 31.25 (window: 27.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 19.50 (window: 18.70)
+MeanR: 18.19 (window: 17.61)
+AVG: 236.86 (window: 239.49)
+Loss: 6.9755
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 249.984375
+
+Train Epoch: 48 dl: 0/84 Loss: 6.893901
+Train Epoch: 48 dl: 20/84 Loss: 6.730867
+Train Epoch: 48 dl: 40/84 Loss: 6.862282
+Train Epoch: 48 dl: 60/84 Loss: 6.945180
+Train Epoch: 48 dl: 80/84 Loss: 6.898190
+0it [00:00, ?it/s]1it [00:00, 11.93it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 48, dl: 84/84-----
+R1: 6.25 (window: 3.12)
+R5: 18.75 (window: 13.75)
+R10: 31.25 (window: 28.12)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 23.00 (window: 19.90)
+MeanR: 18.75 (window: 17.96)
+AVG: 252.07 (window: 241.21)
+Loss: 6.9909
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 252.075
+
+Train Epoch: 49 dl: 0/84 Loss: 7.005613
+Train Epoch: 49 dl: 20/84 Loss: 6.802392
+Train Epoch: 49 dl: 40/84 Loss: 6.821054
+Train Epoch: 49 dl: 60/84 Loss: 7.036059
+Train Epoch: 49 dl: 80/84 Loss: 6.832729
+0it [00:00, ?it/s]1it [00:00, 11.72it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 49, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 21.88 (window: 15.62)
+R10: 28.12 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 21.00 (window: 20.60)
+MeanR: 18.28 (window: 18.12)
+AVG: 249.20 (window: 244.25)
+Loss: 7.0205
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 252.075
+
+Train Epoch: 50 dl: 0/84 Loss: 6.768244
+Train Epoch: 50 dl: 20/84 Loss: 6.780874
+Train Epoch: 50 dl: 40/84 Loss: 6.787138
+Train Epoch: 50 dl: 60/84 Loss: 6.946414
+Train Epoch: 50 dl: 80/84 Loss: 6.827601
+0it [00:00, ?it/s]1it [00:00, 12.92it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 50, dl: 84/84-----
+R1: 6.25 (window: 3.75)
+R5: 21.88 (window: 16.25)
+R10: 25.00 (window: 28.75)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 23.00 (window: 20.70)
+MeanR: 18.56 (window: 18.15)
+AVG: 248.97 (window: 244.86)
+Loss: 7.0268
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 252.075
+
+Saving checkpoint: /home/sangheon/Desktop/AudioLDM-ControlNet/BeatDance/outputs/seglen110_L110_batchsize32_framewise/checkpoint-epoch50.pth ...
+Train Epoch: 51 dl: 0/84 Loss: 6.677066
+Train Epoch: 51 dl: 20/84 Loss: 6.913883
+Train Epoch: 51 dl: 40/84 Loss: 6.817053
+Train Epoch: 51 dl: 60/84 Loss: 6.748174
+Train Epoch: 51 dl: 80/84 Loss: 6.604459
+0it [00:00, ?it/s]1it [00:00, 11.62it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 51, dl: 84/84-----
+R1: 6.25 (window: 5.00)
+R5: 15.62 (window: 16.88)
+R10: 25.00 (window: 28.12)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 19.50 (window: 21.20)
+MeanR: 18.81 (window: 18.52)
+AVG: 243.04 (window: 246.03)
+Loss: 7.0881
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 252.075
+
+Train Epoch: 52 dl: 0/84 Loss: 6.899339
+Train Epoch: 52 dl: 20/84 Loss: 6.700119
+Train Epoch: 52 dl: 40/84 Loss: 6.686978
+Train Epoch: 52 dl: 60/84 Loss: 6.616888
+Train Epoch: 52 dl: 80/84 Loss: 6.763333
+0it [00:00, ?it/s]1it [00:00, 12.30it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 52, dl: 84/84-----
+R1: 6.25 (window: 5.62)
+R5: 15.62 (window: 18.75)
+R10: 25.00 (window: 26.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 22.50 (window: 21.80)
+MeanR: 19.16 (window: 18.71)
+AVG: 242.71 (window: 247.20)
+Loss: 7.1212
+ Current Best Window Average R@1 is 247.88687499999997
+ Current Best R@1 is 252.075
+
+Train Epoch: 53 dl: 0/84 Loss: 6.723371
+Train Epoch: 53 dl: 20/84 Loss: 6.576275
+Train Epoch: 53 dl: 40/84 Loss: 6.718342
+Train Epoch: 53 dl: 60/84 Loss: 6.613760
+Train Epoch: 53 dl: 80/84 Loss: 6.622577
+0it [00:00, ?it/s]1it [00:00, 11.42it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 53, dl: 84/84-----
+R1: 6.25 (window: 5.62)
+R5: 21.88 (window: 19.38)
+R10: 31.25 (window: 26.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 20.70)
+MeanR: 17.00 (window: 18.36)
+AVG: 255.93 (window: 247.97)
+Loss: 7.1362
+Saving current best: model_best.pth ...
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 54 dl: 0/84 Loss: 6.378415
+Train Epoch: 54 dl: 20/84 Loss: 6.614935
+Train Epoch: 54 dl: 40/84 Loss: 6.691920
+Train Epoch: 54 dl: 60/84 Loss: 6.813366
+Train Epoch: 54 dl: 80/84 Loss: 6.361448
+0it [00:00, ?it/s]1it [00:00, 12.06it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 54, dl: 84/84-----
+R1: 6.25 (window: 6.25)
+R5: 12.50 (window: 17.50)
+R10: 25.00 (window: 26.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.50 (window: 20.20)
+MeanR: 18.34 (window: 18.38)
+AVG: 240.07 (window: 246.14)
+Loss: 7.2216
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 55 dl: 0/84 Loss: 6.538929
+Train Epoch: 55 dl: 20/84 Loss: 6.527055
+Train Epoch: 55 dl: 40/84 Loss: 6.576355
+Train Epoch: 55 dl: 60/84 Loss: 6.852582
+Train Epoch: 55 dl: 80/84 Loss: 6.464814
+0it [00:00, ?it/s]1it [00:00, 11.41it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 55, dl: 84/84-----
+R1: 6.25 (window: 6.25)
+R5: 12.50 (window: 15.62)
+R10: 15.62 (window: 24.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 22.00 (window: 20.00)
+MeanR: 20.03 (window: 18.67)
+AVG: 230.17 (window: 242.38)
+Loss: 7.2215
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 56 dl: 0/84 Loss: 6.757343
+Train Epoch: 56 dl: 20/84 Loss: 6.378198
+Train Epoch: 56 dl: 40/84 Loss: 6.547151
+Train Epoch: 56 dl: 60/84 Loss: 6.564164
+Train Epoch: 56 dl: 80/84 Loss: 6.552494
+0it [00:00, ?it/s]1it [00:00, 12.37it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 56, dl: 84/84-----
+R1: 6.25 (window: 6.25)
+R5: 15.62 (window: 15.62)
+R10: 18.75 (window: 23.12)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 23.00 (window: 20.70)
+MeanR: 20.16 (window: 18.94)
+AVG: 236.31 (window: 241.04)
+Loss: 7.2937
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 57 dl: 0/84 Loss: 6.633102
+Train Epoch: 57 dl: 20/84 Loss: 6.531705
+Train Epoch: 57 dl: 40/84 Loss: 6.490495
+Train Epoch: 57 dl: 60/84 Loss: 6.589806
+Train Epoch: 57 dl: 80/84 Loss: 6.618814
+0it [00:00, ?it/s]1it [00:00, 11.53it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 57, dl: 84/84-----
+R1: 6.25 (window: 6.25)
+R5: 12.50 (window: 15.00)
+R10: 31.25 (window: 24.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 19.50)
+MeanR: 16.50 (window: 18.41)
+AVG: 246.70 (window: 241.83)
+Loss: 7.3055
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 58 dl: 0/84 Loss: 6.394803
+Train Epoch: 58 dl: 20/84 Loss: 6.665945
+Train Epoch: 58 dl: 40/84 Loss: 6.401510
+Train Epoch: 58 dl: 60/84 Loss: 6.542705
+Train Epoch: 58 dl: 80/84 Loss: 6.351095
+0it [00:00, ?it/s]1it [00:00, 11.71it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 58, dl: 84/84-----
+R1: 6.25 (window: 6.25)
+R5: 12.50 (window: 13.12)
+R10: 12.50 (window: 20.62)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 22.00 (window: 20.40)
+MeanR: 19.56 (window: 18.92)
+AVG: 227.09 (window: 236.07)
+Loss: 7.2951
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 59 dl: 0/84 Loss: 6.514224
+Train Epoch: 59 dl: 20/84 Loss: 6.427513
+Train Epoch: 59 dl: 40/84 Loss: 6.731252
+Train Epoch: 59 dl: 60/84 Loss: 6.518915
+Train Epoch: 59 dl: 80/84 Loss: 6.405684
+0it [00:00, ?it/s]1it [00:00, 12.04it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 59, dl: 84/84-----
+R1: 9.38 (window: 6.88)
+R5: 15.62 (window: 13.75)
+R10: 18.75 (window: 19.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 20.50 (window: 20.80)
+MeanR: 18.31 (window: 18.91)
+AVG: 239.87 (window: 236.03)
+Loss: 7.3233
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 60 dl: 0/84 Loss: 6.483126
+Train Epoch: 60 dl: 20/84 Loss: 6.478896
+Train Epoch: 60 dl: 40/84 Loss: 6.459355
+Train Epoch: 60 dl: 60/84 Loss: 6.139132
+Train Epoch: 60 dl: 80/84 Loss: 6.717597
+0it [00:00, ?it/s]1it [00:00, 11.93it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 60, dl: 84/84-----
+R1: 3.12 (window: 6.25)
+R5: 12.50 (window: 13.75)
+R10: 21.88 (window: 20.62)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 19.00 (window: 20.20)
+MeanR: 17.44 (window: 18.39)
+AVG: 233.86 (window: 236.77)
+Loss: 7.3566
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 61 dl: 0/84 Loss: 6.185642
+Train Epoch: 61 dl: 20/84 Loss: 6.494992
+Train Epoch: 61 dl: 40/84 Loss: 6.378273
+Train Epoch: 61 dl: 60/84 Loss: 6.315292
+Train Epoch: 61 dl: 80/84 Loss: 6.646199
+0it [00:00, ?it/s]1it [00:00, 12.00it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 61, dl: 84/84-----
+R1: 6.25 (window: 6.25)
+R5: 15.62 (window: 13.75)
+R10: 21.88 (window: 21.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.00 (window: 19.20)
+MeanR: 17.91 (window: 17.94)
+AVG: 240.16 (window: 237.54)
+Loss: 7.3915
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 62 dl: 0/84 Loss: 6.055234
+Train Epoch: 62 dl: 20/84 Loss: 5.753286
+Train Epoch: 62 dl: 40/84 Loss: 6.169025
+Train Epoch: 62 dl: 60/84 Loss: 6.564094
+Train Epoch: 62 dl: 80/84 Loss: 6.612146
+0it [00:00, ?it/s]1it [00:00, 11.85it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 62, dl: 84/84-----
+R1: 3.12 (window: 5.62)
+R5: 12.50 (window: 13.75)
+R10: 21.88 (window: 19.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 19.00 (window: 19.70)
+MeanR: 17.47 (window: 18.14)
+AVG: 233.85 (window: 234.97)
+Loss: 7.4643
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 63 dl: 0/84 Loss: 5.816345
+Train Epoch: 63 dl: 20/84 Loss: 6.238031
+Train Epoch: 63 dl: 40/84 Loss: 6.547509
+Train Epoch: 63 dl: 60/84 Loss: 6.176398
+Train Epoch: 63 dl: 80/84 Loss: 5.967642
+0it [00:00, ?it/s]1it [00:00, 12.36it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 63, dl: 84/84-----
+R1: 6.25 (window: 5.62)
+R5: 12.50 (window: 13.75)
+R10: 21.88 (window: 21.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 18.80)
+MeanR: 17.88 (window: 17.80)
+AVG: 237.09 (window: 236.97)
+Loss: 7.4152
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 64 dl: 0/84 Loss: 6.298550
+Train Epoch: 64 dl: 20/84 Loss: 6.245800
+Train Epoch: 64 dl: 40/84 Loss: 6.245591
+Train Epoch: 64 dl: 60/84 Loss: 6.265851
+Train Epoch: 64 dl: 80/84 Loss: 6.360306
+0it [00:00, ?it/s]1it [00:00, 12.01it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 64, dl: 84/84-----
+R1: 6.25 (window: 5.00)
+R5: 12.50 (window: 13.12)
+R10: 18.75 (window: 21.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 21.50 (window: 19.00)
+MeanR: 19.19 (window: 17.98)
+AVG: 233.43 (window: 235.68)
+Loss: 7.4718
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 65 dl: 0/84 Loss: 6.026594
+Train Epoch: 65 dl: 20/84 Loss: 5.913714
+Train Epoch: 65 dl: 40/84 Loss: 6.580810
+Train Epoch: 65 dl: 60/84 Loss: 6.208078
+Train Epoch: 65 dl: 80/84 Loss: 6.384826
+0it [00:00, ?it/s]1it [00:00, 12.11it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 65, dl: 84/84-----
+R1: 6.25 (window: 5.62)
+R5: 21.88 (window: 15.00)
+R10: 31.25 (window: 23.12)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 18.70)
+MeanR: 17.25 (window: 17.94)
+AVG: 255.90 (window: 240.09)
+Loss: 7.3983
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 66 dl: 0/84 Loss: 6.162424
+Train Epoch: 66 dl: 20/84 Loss: 6.283943
+Train Epoch: 66 dl: 40/84 Loss: 6.207603
+Train Epoch: 66 dl: 60/84 Loss: 5.953943
+Train Epoch: 66 dl: 80/84 Loss: 6.146851
+0it [00:00, ?it/s]1it [00:00, 12.09it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 66, dl: 84/84-----
+R1: 6.25 (window: 5.62)
+R5: 12.50 (window: 14.38)
+R10: 18.75 (window: 22.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 20.00 (window: 19.10)
+MeanR: 18.84 (window: 18.12)
+AVG: 233.62 (window: 238.78)
+Loss: 7.4211
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 67 dl: 0/84 Loss: 6.037346
+Train Epoch: 67 dl: 20/84 Loss: 6.471412
+Train Epoch: 67 dl: 40/84 Loss: 6.347270
+Train Epoch: 67 dl: 60/84 Loss: 6.138412
+Train Epoch: 67 dl: 80/84 Loss: 5.886611
+0it [00:00, ?it/s]1it [00:00, 11.73it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 67, dl: 84/84-----
+R1: 6.25 (window: 6.25)
+R5: 15.62 (window: 15.00)
+R10: 28.12 (window: 23.75)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.00 (window: 18.90)
+MeanR: 17.00 (window: 18.03)
+AVG: 246.50 (window: 241.31)
+Loss: 7.4309
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 68 dl: 0/84 Loss: 6.155833
+Train Epoch: 68 dl: 20/84 Loss: 6.051450
+Train Epoch: 68 dl: 40/84 Loss: 6.204489
+Train Epoch: 68 dl: 60/84 Loss: 6.050282
+Train Epoch: 68 dl: 80/84 Loss: 6.082427
+0it [00:00, ?it/s]1it [00:00, 11.77it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 68, dl: 84/84-----
+R1: 3.12 (window: 5.62)
+R5: 9.38 (window: 14.38)
+R10: 21.88 (window: 23.75)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 19.00 (window: 19.20)
+MeanR: 18.62 (window: 18.18)
+AVG: 230.61 (window: 240.01)
+Loss: 7.4307
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 69 dl: 0/84 Loss: 6.177495
+Train Epoch: 69 dl: 20/84 Loss: 6.162243
+Train Epoch: 69 dl: 40/84 Loss: 6.325668
+Train Epoch: 69 dl: 60/84 Loss: 6.148588
+Train Epoch: 69 dl: 80/84 Loss: 6.112447
+0it [00:00, ?it/s]1it [00:00, 11.38it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 69, dl: 84/84-----
+R1: 6.25 (window: 5.62)
+R5: 9.38 (window: 13.75)
+R10: 21.88 (window: 24.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.50 (window: 18.60)
+MeanR: 18.09 (window: 17.96)
+AVG: 233.84 (window: 240.09)
+Loss: 7.6146
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 70 dl: 0/84 Loss: 5.855078
+Train Epoch: 70 dl: 20/84 Loss: 6.184108
+Train Epoch: 70 dl: 40/84 Loss: 5.774455
+Train Epoch: 70 dl: 60/84 Loss: 6.221536
+Train Epoch: 70 dl: 80/84 Loss: 5.890087
+0it [00:00, ?it/s]1it [00:00, 11.94it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 70, dl: 84/84-----
+R1: 3.12 (window: 5.00)
+R5: 9.38 (window: 11.25)
+R10: 25.00 (window: 23.12)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 20.00 (window: 19.10)
+MeanR: 18.25 (window: 18.16)
+AVG: 233.68 (window: 235.65)
+Loss: 7.5285
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 71 dl: 0/84 Loss: 5.787079
+Train Epoch: 71 dl: 20/84 Loss: 5.820281
+Train Epoch: 71 dl: 40/84 Loss: 5.873114
+Train Epoch: 71 dl: 60/84 Loss: 5.820415
+Train Epoch: 71 dl: 80/84 Loss: 6.182580
+0it [00:00, ?it/s]1it [00:00, 11.93it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 71, dl: 84/84-----
+R1: 0.00 (window: 3.75)
+R5: 9.38 (window: 10.62)
+R10: 34.38 (window: 26.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 19.00 (window: 18.90)
+MeanR: 17.78 (window: 17.95)
+AVG: 240.07 (window: 236.94)
+Loss: 7.6031
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 72 dl: 0/84 Loss: 6.127703
+Train Epoch: 72 dl: 20/84 Loss: 5.838343
+Train Epoch: 72 dl: 40/84 Loss: 6.101645
+Train Epoch: 72 dl: 60/84 Loss: 6.103971
+Train Epoch: 72 dl: 80/84 Loss: 5.726870
+0it [00:00, ?it/s]1it [00:00, 11.60it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 72, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 10.00)
+R10: 28.12 (window: 26.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.50 (window: 19.00)
+MeanR: 18.00 (window: 18.15)
+AVG: 240.10 (window: 235.66)
+Loss: 7.5323
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 73 dl: 0/84 Loss: 5.755687
+Train Epoch: 73 dl: 20/84 Loss: 6.220845
+Train Epoch: 73 dl: 40/84 Loss: 5.864530
+Train Epoch: 73 dl: 60/84 Loss: 6.574898
+Train Epoch: 73 dl: 80/84 Loss: 6.068377
+0it [00:00, ?it/s]1it [00:00, 11.91it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 73, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 10.62)
+R10: 21.88 (window: 26.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 20.00 (window: 19.20)
+MeanR: 18.03 (window: 18.03)
+AVG: 233.70 (window: 236.28)
+Loss: 7.6113
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 74 dl: 0/84 Loss: 5.703654
+Train Epoch: 74 dl: 20/84 Loss: 6.232055
+Train Epoch: 74 dl: 40/84 Loss: 5.740352
+Train Epoch: 74 dl: 60/84 Loss: 5.948545
+Train Epoch: 74 dl: 80/84 Loss: 6.899253
+0it [00:00, ?it/s]1it [00:00, 11.88it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 74, dl: 84/84-----
+R1: 3.12 (window: 2.50)
+R5: 9.38 (window: 10.62)
+R10: 25.00 (window: 26.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 19.50 (window: 19.40)
+MeanR: 18.19 (window: 18.05)
+AVG: 233.73 (window: 236.26)
+Loss: 7.5691
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 75 dl: 0/84 Loss: 5.956964
+Train Epoch: 75 dl: 20/84 Loss: 6.118179
+Train Epoch: 75 dl: 40/84 Loss: 5.921621
+Train Epoch: 75 dl: 60/84 Loss: 5.813711
+Train Epoch: 75 dl: 80/84 Loss: 6.180208
+0it [00:00, ?it/s]1it [00:00, 12.36it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 75, dl: 84/84-----
+R1: 3.12 (window: 2.50)
+R5: 18.75 (window: 12.50)
+R10: 34.38 (window: 28.75)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 18.90)
+MeanR: 17.03 (window: 17.81)
+AVG: 252.80 (window: 240.08)
+Loss: 7.5471
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 76 dl: 0/84 Loss: 5.560677
+Train Epoch: 76 dl: 20/84 Loss: 5.806209
+Train Epoch: 76 dl: 40/84 Loss: 6.243664
+Train Epoch: 76 dl: 60/84 Loss: 6.206881
+Train Epoch: 76 dl: 80/84 Loss: 5.902180
+0it [00:00, ?it/s]1it [00:00, 11.98it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 76, dl: 84/84-----
+R1: 0.00 (window: 2.50)
+R5: 15.62 (window: 13.75)
+R10: 25.00 (window: 26.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.00 (window: 18.70)
+MeanR: 17.59 (window: 17.77)
+AVG: 237.07 (window: 239.48)
+Loss: 7.5720
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 77 dl: 0/84 Loss: 5.494612
+Train Epoch: 77 dl: 20/84 Loss: 6.369209
+Train Epoch: 77 dl: 40/84 Loss: 5.733964
+Train Epoch: 77 dl: 60/84 Loss: 5.626309
+Train Epoch: 77 dl: 80/84 Loss: 6.204876
+0it [00:00, ?it/s]1it [00:00, 11.99it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 77, dl: 84/84-----
+R1: 6.25 (window: 3.12)
+R5: 15.62 (window: 14.38)
+R10: 25.00 (window: 26.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 19.00 (window: 18.80)
+MeanR: 17.38 (window: 17.64)
+AVG: 243.24 (window: 240.11)
+Loss: 7.4889
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 78 dl: 0/84 Loss: 5.917429
+Train Epoch: 78 dl: 20/84 Loss: 5.529208
+Train Epoch: 78 dl: 40/84 Loss: 6.699346
+Train Epoch: 78 dl: 60/84 Loss: 6.265916
+Train Epoch: 78 dl: 80/84 Loss: 5.670594
+0it [00:00, ?it/s]1it [00:00, 11.21it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 78, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 13.75)
+R10: 25.00 (window: 26.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.00 (window: 18.40)
+MeanR: 17.59 (window: 17.56)
+AVG: 233.94 (window: 240.15)
+Loss: 7.5450
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 79 dl: 0/84 Loss: 5.435126
+Train Epoch: 79 dl: 20/84 Loss: 5.764131
+Train Epoch: 79 dl: 40/84 Loss: 5.905864
+Train Epoch: 79 dl: 60/84 Loss: 6.065290
+Train Epoch: 79 dl: 80/84 Loss: 5.744098
+0it [00:00, ?it/s]1it [00:00, 12.12it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 79, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.00)
+R10: 28.12 (window: 27.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 18.00)
+MeanR: 17.06 (window: 17.33)
+AVG: 243.42 (window: 242.09)
+Loss: 7.5638
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 80 dl: 0/84 Loss: 6.543106
+Train Epoch: 80 dl: 20/84 Loss: 6.081387
+Train Epoch: 80 dl: 40/84 Loss: 5.756244
+Train Epoch: 80 dl: 60/84 Loss: 5.539976
+Train Epoch: 80 dl: 80/84 Loss: 6.197330
+0it [00:00, ?it/s]1it [00:00, 12.01it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 80, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 13.75)
+R10: 25.00 (window: 25.62)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.00 (window: 17.90)
+MeanR: 16.97 (window: 17.32)
+AVG: 237.23 (window: 238.98)
+Loss: 7.6224
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 81 dl: 0/84 Loss: 5.514816
+Train Epoch: 81 dl: 20/84 Loss: 5.927223
+Train Epoch: 81 dl: 40/84 Loss: 5.719591
+Train Epoch: 81 dl: 60/84 Loss: 5.941890
+Train Epoch: 81 dl: 80/84 Loss: 5.721456
+0it [00:00, ?it/s]1it [00:00, 11.87it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 81, dl: 84/84-----
+R1: 3.12 (window: 3.75)
+R5: 18.75 (window: 14.38)
+R10: 31.25 (window: 26.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.50 (window: 18.00)
+MeanR: 17.25 (window: 17.25)
+AVG: 249.55 (window: 241.47)
+Loss: 7.6211
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 82 dl: 0/84 Loss: 5.610802
+Train Epoch: 82 dl: 20/84 Loss: 6.454607
+Train Epoch: 82 dl: 40/84 Loss: 5.477138
+Train Epoch: 82 dl: 60/84 Loss: 5.746603
+Train Epoch: 82 dl: 80/84 Loss: 5.723834
+0it [00:00, ?it/s]1it [00:00, 11.92it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 82, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 13.12)
+R10: 25.00 (window: 26.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.00 (window: 17.40)
+MeanR: 17.12 (window: 17.20)
+AVG: 234.19 (window: 239.67)
+Loss: 7.6246
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 255.925
+
+Train Epoch: 83 dl: 0/84 Loss: 6.023382
+Train Epoch: 83 dl: 20/84 Loss: 5.934453
+Train Epoch: 83 dl: 40/84 Loss: 5.859080
+Train Epoch: 83 dl: 60/84 Loss: 5.610572
+Train Epoch: 83 dl: 80/84 Loss: 5.511513
+0it [00:00, ?it/s]1it [00:00, 11.54it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 83, dl: 84/84-----
+R1: 6.25 (window: 3.75)
+R5: 21.88 (window: 15.62)
+R10: 37.50 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.00 (window: 17.40)
+MeanR: 16.84 (window: 17.05)
+AVG: 262.14 (window: 245.31)
+Loss: 7.8142
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 84 dl: 0/84 Loss: 5.698416
+Train Epoch: 84 dl: 20/84 Loss: 5.881328
+Train Epoch: 84 dl: 40/84 Loss: 5.514001
+Train Epoch: 84 dl: 60/84 Loss: 5.662591
+Train Epoch: 84 dl: 80/84 Loss: 5.959591
+0it [00:00, ?it/s]1it [00:00, 11.09it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 84, dl: 84/84-----
+R1: 3.12 (window: 3.75)
+R5: 12.50 (window: 15.00)
+R10: 28.12 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 17.20)
+MeanR: 16.53 (window: 16.94)
+AVG: 240.45 (window: 244.71)
+Loss: 7.8276
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 85 dl: 0/84 Loss: 5.733435
+Train Epoch: 85 dl: 20/84 Loss: 5.579742
+Train Epoch: 85 dl: 40/84 Loss: 5.576807
+Train Epoch: 85 dl: 60/84 Loss: 5.875503
+Train Epoch: 85 dl: 80/84 Loss: 5.749262
+0it [00:00, ?it/s]1it [00:00, 12.67it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 85, dl: 84/84-----
+R1: 3.12 (window: 3.75)
+R5: 12.50 (window: 15.00)
+R10: 25.00 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 17.10)
+MeanR: 16.94 (window: 16.94)
+AVG: 237.28 (window: 244.72)
+Loss: 7.7805
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 86 dl: 0/84 Loss: 5.648519
+Train Epoch: 86 dl: 20/84 Loss: 5.797713
+Train Epoch: 86 dl: 40/84 Loss: 5.374870
+Train Epoch: 86 dl: 60/84 Loss: 5.700617
+Train Epoch: 86 dl: 80/84 Loss: 5.886851
+0it [00:00, ?it/s]1it [00:00, 11.34it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 86, dl: 84/84-----
+R1: 6.25 (window: 4.38)
+R5: 15.62 (window: 14.38)
+R10: 31.25 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.50 (window: 17.10)
+MeanR: 17.06 (window: 16.90)
+AVG: 249.57 (window: 244.72)
+Loss: 7.7189
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 87 dl: 0/84 Loss: 5.691491
+Train Epoch: 87 dl: 20/84 Loss: 5.802134
+Train Epoch: 87 dl: 40/84 Loss: 6.397410
+Train Epoch: 87 dl: 60/84 Loss: 5.192327
+Train Epoch: 87 dl: 80/84 Loss: 5.642885
+0it [00:00, ?it/s]1it [00:00, 11.64it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 87, dl: 84/84-----
+R1: 3.12 (window: 4.38)
+R5: 15.62 (window: 15.62)
+R10: 31.25 (window: 30.62)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.00 (window: 17.50)
+MeanR: 16.81 (window: 16.84)
+AVG: 246.52 (window: 247.19)
+Loss: 7.8938
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 88 dl: 0/84 Loss: 5.939936
+Train Epoch: 88 dl: 20/84 Loss: 5.335954
+Train Epoch: 88 dl: 40/84 Loss: 5.524522
+Train Epoch: 88 dl: 60/84 Loss: 5.808839
+Train Epoch: 88 dl: 80/84 Loss: 5.750951
+0it [00:00, ?it/s]1it [00:00, 10.89it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 88, dl: 84/84-----
+R1: 3.12 (window: 3.75)
+R5: 15.62 (window: 14.38)
+R10: 28.12 (window: 28.75)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.00 (window: 17.30)
+MeanR: 16.75 (window: 16.82)
+AVG: 243.50 (window: 243.46)
+Loss: 7.6971
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 89 dl: 0/84 Loss: 6.271308
+Train Epoch: 89 dl: 20/84 Loss: 5.402080
+Train Epoch: 89 dl: 40/84 Loss: 5.901681
+Train Epoch: 89 dl: 60/84 Loss: 5.507522
+Train Epoch: 89 dl: 80/84 Loss: 5.736716
+0it [00:00, ?it/s]1it [00:00, 11.29it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 89, dl: 84/84-----
+R1: 3.12 (window: 3.75)
+R5: 12.50 (window: 14.38)
+R10: 25.00 (window: 28.12)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.50 (window: 17.10)
+MeanR: 16.81 (window: 16.88)
+AVG: 237.39 (window: 242.85)
+Loss: 7.6519
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 90 dl: 0/84 Loss: 6.238696
+Train Epoch: 90 dl: 20/84 Loss: 5.616704
+Train Epoch: 90 dl: 40/84 Loss: 5.362278
+Train Epoch: 90 dl: 60/84 Loss: 5.050856
+Train Epoch: 90 dl: 80/84 Loss: 5.630560
+0it [00:00, ?it/s]1it [00:00, 12.03it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 90, dl: 84/84-----
+R1: 3.12 (window: 3.75)
+R5: 15.62 (window: 15.00)
+R10: 28.12 (window: 28.75)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 17.30)
+MeanR: 16.75 (window: 16.84)
+AVG: 243.45 (window: 244.09)
+Loss: 7.9710
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 91 dl: 0/84 Loss: 5.846302
+Train Epoch: 91 dl: 20/84 Loss: 5.714304
+Train Epoch: 91 dl: 40/84 Loss: 5.863318
+Train Epoch: 91 dl: 60/84 Loss: 5.629110
+Train Epoch: 91 dl: 80/84 Loss: 5.271094
+0it [00:00, ?it/s]1it [00:00, 11.63it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 91, dl: 84/84-----
+R1: 6.25 (window: 3.75)
+R5: 15.62 (window: 15.00)
+R10: 25.00 (window: 27.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.00 (window: 17.20)
+MeanR: 16.91 (window: 16.81)
+AVG: 243.38 (window: 242.85)
+Loss: 7.8026
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 92 dl: 0/84 Loss: 5.485957
+Train Epoch: 92 dl: 20/84 Loss: 5.452959
+Train Epoch: 92 dl: 40/84 Loss: 5.340766
+Train Epoch: 92 dl: 60/84 Loss: 6.250953
+Train Epoch: 92 dl: 80/84 Loss: 5.657143
+0it [00:00, ?it/s]1it [00:00, 10.94it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 92, dl: 84/84-----
+R1: 3.12 (window: 3.75)
+R5: 15.62 (window: 15.00)
+R10: 34.38 (window: 28.12)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 17.10)
+MeanR: 17.12 (window: 16.87)
+AVG: 249.66 (window: 243.48)
+Loss: 7.8181
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 93 dl: 0/84 Loss: 5.700514
+Train Epoch: 93 dl: 20/84 Loss: 5.322722
+Train Epoch: 93 dl: 40/84 Loss: 5.871074
+Train Epoch: 93 dl: 60/84 Loss: 5.976561
+Train Epoch: 93 dl: 80/84 Loss: 5.955069
+0it [00:00, ?it/s]1it [00:00, 11.83it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 93, dl: 84/84-----
+R1: 3.12 (window: 3.75)
+R5: 15.62 (window: 15.00)
+R10: 31.25 (window: 28.75)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.00 (window: 17.10)
+MeanR: 16.69 (window: 16.86)
+AVG: 246.63 (window: 244.10)
+Loss: 7.7010
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 94 dl: 0/84 Loss: 5.942329
+Train Epoch: 94 dl: 20/84 Loss: 5.863844
+Train Epoch: 94 dl: 40/84 Loss: 5.141539
+Train Epoch: 94 dl: 60/84 Loss: 6.026082
+Train Epoch: 94 dl: 80/84 Loss: 5.110132
+0it [00:00, ?it/s]1it [00:00, 10.88it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 94, dl: 84/84-----
+R1: 3.12 (window: 3.75)
+R5: 18.75 (window: 16.25)
+R10: 34.38 (window: 30.62)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 18.00 (window: 17.60)
+MeanR: 17.19 (window: 16.93)
+AVG: 252.73 (window: 247.17)
+Loss: 7.9324
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 95 dl: 0/84 Loss: 5.457596
+Train Epoch: 95 dl: 20/84 Loss: 5.828667
+Train Epoch: 95 dl: 40/84 Loss: 5.453986
+Train Epoch: 95 dl: 60/84 Loss: 5.953821
+Train Epoch: 95 dl: 80/84 Loss: 5.137290
+0it [00:00, ?it/s]1it [00:00, 11.46it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 95, dl: 84/84-----
+R1: 3.12 (window: 3.75)
+R5: 15.62 (window: 16.25)
+R10: 28.12 (window: 30.62)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.00 (window: 17.10)
+MeanR: 16.12 (window: 16.81)
+AVG: 243.76 (window: 247.23)
+Loss: 7.9778
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 96 dl: 0/84 Loss: 5.452055
+Train Epoch: 96 dl: 20/84 Loss: 5.289911
+Train Epoch: 96 dl: 40/84 Loss: 6.015216
+Train Epoch: 96 dl: 60/84 Loss: 6.159265
+Train Epoch: 96 dl: 80/84 Loss: 5.513423
+0it [00:00, ?it/s]1it [00:00, 11.45it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 96, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 18.75 (window: 16.88)
+R10: 28.12 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.00 (window: 16.50)
+MeanR: 16.34 (window: 16.69)
+AVG: 246.87 (window: 247.93)
+Loss: 7.8795
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 97 dl: 0/84 Loss: 5.993517
+Train Epoch: 97 dl: 20/84 Loss: 5.095797
+Train Epoch: 97 dl: 40/84 Loss: 5.036159
+Train Epoch: 97 dl: 60/84 Loss: 5.857612
+Train Epoch: 97 dl: 80/84 Loss: 5.812223
+0it [00:00, ?it/s]1it [00:00, 12.46it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 97, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 15.62)
+R10: 25.00 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.50 (window: 16.50)
+MeanR: 16.84 (window: 16.64)
+AVG: 234.07 (window: 244.81)
+Loss: 7.8542
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 98 dl: 0/84 Loss: 5.042524
+Train Epoch: 98 dl: 20/84 Loss: 5.201191
+Train Epoch: 98 dl: 40/84 Loss: 5.630727
+Train Epoch: 98 dl: 60/84 Loss: 5.443320
+Train Epoch: 98 dl: 80/84 Loss: 5.361476
+0it [00:00, ?it/s]1it [00:00, 11.48it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 98, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 15.00)
+R10: 31.25 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.00 (window: 16.50)
+MeanR: 16.84 (window: 16.67)
+AVG: 243.49 (window: 244.18)
+Loss: 7.9681
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 99 dl: 0/84 Loss: 5.340434
+Train Epoch: 99 dl: 20/84 Loss: 4.882944
+Train Epoch: 99 dl: 40/84 Loss: 5.544935
+Train Epoch: 99 dl: 60/84 Loss: 5.061094
+Train Epoch: 99 dl: 80/84 Loss: 5.636516
+0it [00:00, ?it/s]1it [00:00, 11.28it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 99, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 13.75)
+R10: 34.38 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.00 (window: 16.30)
+MeanR: 16.72 (window: 16.57)
+AVG: 246.63 (window: 242.96)
+Loss: 7.9632
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 100 dl: 0/84 Loss: 6.053555
+Train Epoch: 100 dl: 20/84 Loss: 5.644485
+Train Epoch: 100 dl: 40/84 Loss: 5.857250
+Train Epoch: 100 dl: 60/84 Loss: 5.632925
+Train Epoch: 100 dl: 80/84 Loss: 4.872570
+0it [00:00, ?it/s]1it [00:00, 11.25it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 100, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 13.12)
+R10: 31.25 (window: 30.00)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.00 (window: 16.50)
+MeanR: 16.62 (window: 16.68)
+AVG: 243.61 (window: 242.93)
+Loss: 8.0745
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Saving checkpoint: /home/sangheon/Desktop/AudioLDM-ControlNet/BeatDance/outputs/seglen110_L110_batchsize32_framewise/checkpoint-epoch100.pth ...
+Train Epoch: 101 dl: 0/84 Loss: 5.583139
+Train Epoch: 101 dl: 20/84 Loss: 5.192057
+Train Epoch: 101 dl: 40/84 Loss: 5.153898
+Train Epoch: 101 dl: 60/84 Loss: 5.486004
+Train Epoch: 101 dl: 80/84 Loss: 5.202536
+0it [00:00, ?it/s]1it [00:00, 11.71it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 101, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 12.50)
+R10: 31.25 (window: 30.62)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 16.80)
+MeanR: 16.91 (window: 16.79)
+AVG: 246.66 (window: 242.89)
+Loss: 8.0014
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 102 dl: 0/84 Loss: 5.612019
+Train Epoch: 102 dl: 20/84 Loss: 5.898968
+Train Epoch: 102 dl: 40/84 Loss: 6.094306
+Train Epoch: 102 dl: 60/84 Loss: 6.356927
+Train Epoch: 102 dl: 80/84 Loss: 5.339977
+0it [00:00, ?it/s]1it [00:00, 11.66it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 102, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 13.75)
+R10: 28.12 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 16.20)
+MeanR: 16.31 (window: 16.68)
+AVG: 243.79 (window: 244.84)
+Loss: 8.0620
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 103 dl: 0/84 Loss: 5.325860
+Train Epoch: 103 dl: 20/84 Loss: 5.486938
+Train Epoch: 103 dl: 40/84 Loss: 5.483871
+Train Epoch: 103 dl: 60/84 Loss: 5.203640
+Train Epoch: 103 dl: 80/84 Loss: 4.936187
+0it [00:00, ?it/s]1it [00:00, 12.20it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 103, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 13.75)
+R10: 28.12 (window: 30.62)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 16.10)
+MeanR: 16.69 (window: 16.65)
+AVG: 240.43 (window: 244.22)
+Loss: 7.9606
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 104 dl: 0/84 Loss: 5.103558
+Train Epoch: 104 dl: 20/84 Loss: 4.849841
+Train Epoch: 104 dl: 40/84 Loss: 5.856777
+Train Epoch: 104 dl: 60/84 Loss: 5.152644
+Train Epoch: 104 dl: 80/84 Loss: 4.941571
+0it [00:00, ?it/s]1it [00:00, 12.01it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 104, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 14.38)
+R10: 31.25 (window: 30.00)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 17.00 (window: 16.10)
+MeanR: 17.00 (window: 16.71)
+AVG: 246.60 (window: 244.22)
+Loss: 8.0619
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 105 dl: 0/84 Loss: 5.352419
+Train Epoch: 105 dl: 20/84 Loss: 5.173199
+Train Epoch: 105 dl: 40/84 Loss: 5.052777
+Train Epoch: 105 dl: 60/84 Loss: 5.055264
+Train Epoch: 105 dl: 80/84 Loss: 5.326623
+0it [00:00, ?it/s]1it [00:00, 11.37it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 105, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 15.00)
+R10: 28.12 (window: 29.38)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.00 (window: 15.90)
+MeanR: 16.81 (window: 16.74)
+AVG: 243.69 (window: 244.24)
+Loss: 8.0187
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 106 dl: 0/84 Loss: 5.592358
+Train Epoch: 106 dl: 20/84 Loss: 5.165311
+Train Epoch: 106 dl: 40/84 Loss: 4.953819
+Train Epoch: 106 dl: 60/84 Loss: 5.279685
+Train Epoch: 106 dl: 80/84 Loss: 5.005791
+0it [00:00, ?it/s]1it [00:00, 11.75it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 106, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 14.38)
+R10: 28.12 (window: 28.75)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.50 (window: 15.70)
+MeanR: 16.69 (window: 16.70)
+AVG: 240.53 (window: 243.01)
+Loss: 7.9276
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 107 dl: 0/84 Loss: 5.531456
+Train Epoch: 107 dl: 20/84 Loss: 5.421299
+Train Epoch: 107 dl: 40/84 Loss: 5.483150
+Train Epoch: 107 dl: 60/84 Loss: 5.423985
+Train Epoch: 107 dl: 80/84 Loss: 5.129058
+0it [00:00, ?it/s]1it [00:00, 11.30it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 107, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 13.75)
+R10: 34.38 (window: 30.00)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.00 (window: 15.80)
+MeanR: 16.12 (window: 16.66)
+AVG: 246.89 (window: 243.63)
+Loss: 8.1416
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 108 dl: 0/84 Loss: 5.636404
+Train Epoch: 108 dl: 20/84 Loss: 5.355064
+Train Epoch: 108 dl: 40/84 Loss: 5.047413
+Train Epoch: 108 dl: 60/84 Loss: 6.087824
+Train Epoch: 108 dl: 80/84 Loss: 6.143254
+0it [00:00, ?it/s]1it [00:00, 11.79it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 108, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 15.62 (window: 14.38)
+R10: 34.38 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.00 (window: 15.50)
+MeanR: 16.25 (window: 16.57)
+AVG: 250.00 (window: 245.54)
+Loss: 8.0354
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 109 dl: 0/84 Loss: 5.978151
+Train Epoch: 109 dl: 20/84 Loss: 5.336659
+Train Epoch: 109 dl: 40/84 Loss: 5.470577
+Train Epoch: 109 dl: 60/84 Loss: 5.463060
+Train Epoch: 109 dl: 80/84 Loss: 5.748604
+0it [00:00, ?it/s]1it [00:00, 11.31it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 109, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 13.75)
+R10: 25.00 (window: 30.00)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.50 (window: 15.20)
+MeanR: 17.06 (window: 16.59)
+AVG: 237.37 (window: 243.70)
+Loss: 8.0627
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 110 dl: 0/84 Loss: 4.887370
+Train Epoch: 110 dl: 20/84 Loss: 5.169924
+Train Epoch: 110 dl: 40/84 Loss: 5.576224
+Train Epoch: 110 dl: 60/84 Loss: 4.545806
+Train Epoch: 110 dl: 80/84 Loss: 5.432014
+0it [00:00, ?it/s]1it [00:00, 12.87it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 110, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 12.50)
+R10: 34.38 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 15.50)
+MeanR: 16.66 (window: 16.56)
+AVG: 243.56 (window: 243.67)
+Loss: 7.9293
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 111 dl: 0/84 Loss: 5.224755
+Train Epoch: 111 dl: 20/84 Loss: 5.501158
+Train Epoch: 111 dl: 40/84 Loss: 5.405224
+Train Epoch: 111 dl: 60/84 Loss: 5.316626
+Train Epoch: 111 dl: 80/84 Loss: 5.602520
+0it [00:00, ?it/s]1it [00:00, 11.57it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 111, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 12.50)
+R10: 34.38 (window: 32.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.50 (window: 15.50)
+MeanR: 16.16 (window: 16.45)
+AVG: 246.83 (window: 244.93)
+Loss: 8.2605
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 112 dl: 0/84 Loss: 5.700919
+Train Epoch: 112 dl: 20/84 Loss: 5.275822
+Train Epoch: 112 dl: 40/84 Loss: 5.626416
+Train Epoch: 112 dl: 60/84 Loss: 5.223845
+Train Epoch: 112 dl: 80/84 Loss: 5.348325
+0it [00:00, ?it/s]1it [00:00, 11.77it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 112, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 11.88)
+R10: 31.25 (window: 31.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.00 (window: 15.70)
+MeanR: 16.69 (window: 16.56)
+AVG: 240.48 (window: 243.65)
+Loss: 8.3042
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 113 dl: 0/84 Loss: 5.116748
+Train Epoch: 113 dl: 20/84 Loss: 5.776928
+Train Epoch: 113 dl: 40/84 Loss: 5.108462
+Train Epoch: 113 dl: 60/84 Loss: 5.904770
+Train Epoch: 113 dl: 80/84 Loss: 5.806244
+0it [00:00, ?it/s]1it [00:00, 11.70it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 113, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 10.62)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 15.60)
+MeanR: 16.44 (window: 16.60)
+AVG: 240.66 (window: 241.78)
+Loss: 8.2338
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 114 dl: 0/84 Loss: 4.842301
+Train Epoch: 114 dl: 20/84 Loss: 5.609255
+Train Epoch: 114 dl: 40/84 Loss: 5.732401
+Train Epoch: 114 dl: 60/84 Loss: 5.106599
+Train Epoch: 114 dl: 80/84 Loss: 5.343825
+0it [00:00, ?it/s]1it [00:00, 12.01it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 114, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 10.00)
+R10: 31.25 (window: 32.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.00 (window: 15.50)
+MeanR: 16.41 (window: 16.47)
+AVG: 240.61 (window: 242.43)
+Loss: 8.1280
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 115 dl: 0/84 Loss: 5.118760
+Train Epoch: 115 dl: 20/84 Loss: 5.048920
+Train Epoch: 115 dl: 40/84 Loss: 5.542319
+Train Epoch: 115 dl: 60/84 Loss: 5.263795
+Train Epoch: 115 dl: 80/84 Loss: 4.974436
+0it [00:00, ?it/s]1it [00:00, 11.39it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 115, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 10.62)
+R10: 31.25 (window: 31.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 15.10)
+MeanR: 16.38 (window: 16.41)
+AVG: 243.79 (window: 242.47)
+Loss: 8.1043
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 116 dl: 0/84 Loss: 5.203819
+Train Epoch: 116 dl: 20/84 Loss: 5.844308
+Train Epoch: 116 dl: 40/84 Loss: 5.395629
+Train Epoch: 116 dl: 60/84 Loss: 5.235379
+Train Epoch: 116 dl: 80/84 Loss: 5.222708
+0it [00:00, ?it/s]1it [00:00, 11.93it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 116, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 10.00)
+R10: 28.12 (window: 30.62)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.90)
+MeanR: 16.19 (window: 16.42)
+AVG: 237.56 (window: 240.62)
+Loss: 8.0894
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 117 dl: 0/84 Loss: 5.574581
+Train Epoch: 117 dl: 20/84 Loss: 5.293409
+Train Epoch: 117 dl: 40/84 Loss: 5.020515
+Train Epoch: 117 dl: 60/84 Loss: 5.229643
+Train Epoch: 117 dl: 80/84 Loss: 5.437549
+0it [00:00, ?it/s]1it [00:00, 11.86it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 117, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 9.38)
+R10: 31.25 (window: 30.62)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.50 (window: 14.80)
+MeanR: 16.59 (window: 16.40)
+AVG: 237.42 (window: 240.01)
+Loss: 8.2899
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 118 dl: 0/84 Loss: 5.013095
+Train Epoch: 118 dl: 20/84 Loss: 4.756662
+Train Epoch: 118 dl: 40/84 Loss: 5.254149
+Train Epoch: 118 dl: 60/84 Loss: 5.165477
+Train Epoch: 118 dl: 80/84 Loss: 5.417366
+0it [00:00, ?it/s]1it [00:00, 11.72it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 118, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 9.38)
+R10: 34.38 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.80)
+MeanR: 16.38 (window: 16.39)
+AVG: 243.79 (window: 240.63)
+Loss: 8.0476
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 119 dl: 0/84 Loss: 5.665549
+Train Epoch: 119 dl: 20/84 Loss: 4.948768
+Train Epoch: 119 dl: 40/84 Loss: 5.721009
+Train Epoch: 119 dl: 60/84 Loss: 4.965003
+Train Epoch: 119 dl: 80/84 Loss: 5.344197
+0it [00:00, ?it/s]1it [00:00, 11.39it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 119, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 8.75)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.00 (window: 14.80)
+MeanR: 16.41 (window: 16.39)
+AVG: 237.48 (window: 240.01)
+Loss: 8.1332
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 120 dl: 0/84 Loss: 5.555194
+Train Epoch: 120 dl: 20/84 Loss: 4.991328
+Train Epoch: 120 dl: 40/84 Loss: 5.358323
+Train Epoch: 120 dl: 60/84 Loss: 5.107235
+Train Epoch: 120 dl: 80/84 Loss: 4.827635
+0it [00:00, ?it/s]1it [00:00, 11.62it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 120, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 7.50)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.00 (window: 14.90)
+MeanR: 16.66 (window: 16.44)
+AVG: 237.46 (window: 238.74)
+Loss: 8.0564
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 121 dl: 0/84 Loss: 5.380182
+Train Epoch: 121 dl: 20/84 Loss: 5.345403
+Train Epoch: 121 dl: 40/84 Loss: 4.895759
+Train Epoch: 121 dl: 60/84 Loss: 5.153868
+Train Epoch: 121 dl: 80/84 Loss: 5.493505
+0it [00:00, ?it/s]1it [00:00, 11.68it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 121, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 6.88)
+R10: 31.25 (window: 31.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.00 (window: 15.00)
+MeanR: 16.72 (window: 16.55)
+AVG: 237.45 (window: 238.72)
+Loss: 8.1284
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 122 dl: 0/84 Loss: 5.164586
+Train Epoch: 122 dl: 20/84 Loss: 5.165473
+Train Epoch: 122 dl: 40/84 Loss: 5.563202
+Train Epoch: 122 dl: 60/84 Loss: 5.145795
+Train Epoch: 122 dl: 80/84 Loss: 5.462196
+0it [00:00, ?it/s]1it [00:00, 11.63it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 122, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 6.88)
+R10: 34.38 (window: 32.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.80)
+MeanR: 16.50 (window: 16.53)
+AVG: 240.65 (window: 239.37)
+Loss: 8.1776
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 123 dl: 0/84 Loss: 5.061104
+Train Epoch: 123 dl: 20/84 Loss: 4.767509
+Train Epoch: 123 dl: 40/84 Loss: 5.052439
+Train Epoch: 123 dl: 60/84 Loss: 5.306255
+Train Epoch: 123 dl: 80/84 Loss: 5.680404
+0it [00:00, ?it/s]1it [00:00, 10.79it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 123, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 7.50)
+R10: 34.38 (window: 32.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.00 (window: 14.90)
+MeanR: 16.25 (window: 16.51)
+AVG: 246.88 (window: 239.98)
+Loss: 8.2643
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 124 dl: 0/84 Loss: 5.318039
+Train Epoch: 124 dl: 20/84 Loss: 5.151180
+Train Epoch: 124 dl: 40/84 Loss: 4.890784
+Train Epoch: 124 dl: 60/84 Loss: 5.193974
+Train Epoch: 124 dl: 80/84 Loss: 4.908910
+0it [00:00, ?it/s]1it [00:00, 11.64it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 124, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 8.12)
+R10: 28.12 (window: 31.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.00 (window: 14.90)
+MeanR: 16.78 (window: 16.58)
+AVG: 237.45 (window: 239.98)
+Loss: 8.2582
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 125 dl: 0/84 Loss: 5.303107
+Train Epoch: 125 dl: 20/84 Loss: 4.973066
+Train Epoch: 125 dl: 40/84 Loss: 5.216493
+Train Epoch: 125 dl: 60/84 Loss: 5.523357
+Train Epoch: 125 dl: 80/84 Loss: 5.510324
+0it [00:00, ?it/s]1it [00:00, 11.70it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 125, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 8.12)
+R10: 31.25 (window: 31.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.00 (window: 14.90)
+MeanR: 16.47 (window: 16.54)
+AVG: 237.48 (window: 239.98)
+Loss: 8.2324
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 126 dl: 0/84 Loss: 5.634289
+Train Epoch: 126 dl: 20/84 Loss: 5.496470
+Train Epoch: 126 dl: 40/84 Loss: 4.919751
+Train Epoch: 126 dl: 60/84 Loss: 5.280729
+Train Epoch: 126 dl: 80/84 Loss: 5.292933
+0it [00:00, ?it/s]1it [00:00, 11.71it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 126, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 8.75)
+R10: 34.38 (window: 32.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.80)
+MeanR: 16.22 (window: 16.44)
+AVG: 243.80 (window: 241.25)
+Loss: 8.1937
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 127 dl: 0/84 Loss: 5.138586
+Train Epoch: 127 dl: 20/84 Loss: 6.064927
+Train Epoch: 127 dl: 40/84 Loss: 5.254608
+Train Epoch: 127 dl: 60/84 Loss: 5.277856
+Train Epoch: 127 dl: 80/84 Loss: 4.740871
+0it [00:00, ?it/s]1it [00:00, 12.79it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 127, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 8.75)
+R10: 34.38 (window: 32.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 16.50 (window: 15.20)
+MeanR: 16.94 (window: 16.53)
+AVG: 240.41 (window: 241.20)
+Loss: 8.2454
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 128 dl: 0/84 Loss: 5.130203
+Train Epoch: 128 dl: 20/84 Loss: 5.561715
+Train Epoch: 128 dl: 40/84 Loss: 4.800385
+Train Epoch: 128 dl: 60/84 Loss: 4.680567
+Train Epoch: 128 dl: 80/84 Loss: 4.867417
+0it [00:00, ?it/s]1it [00:00, 11.24it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 128, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 8.12)
+R10: 31.25 (window: 31.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.00 (window: 15.20)
+MeanR: 16.62 (window: 16.61)
+AVG: 240.59 (window: 239.94)
+Loss: 8.2097
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 129 dl: 0/84 Loss: 5.085491
+Train Epoch: 129 dl: 20/84 Loss: 5.168373
+Train Epoch: 129 dl: 40/84 Loss: 5.265278
+Train Epoch: 129 dl: 60/84 Loss: 4.838170
+Train Epoch: 129 dl: 80/84 Loss: 5.478368
+0it [00:00, ?it/s]1it [00:00, 11.95it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 129, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 7.50)
+R10: 34.38 (window: 33.12)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.00 (window: 15.00)
+MeanR: 16.41 (window: 16.53)
+AVG: 240.71 (window: 240.60)
+Loss: 8.1762
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 130 dl: 0/84 Loss: 5.629617
+Train Epoch: 130 dl: 20/84 Loss: 4.895275
+Train Epoch: 130 dl: 40/84 Loss: 5.706807
+Train Epoch: 130 dl: 60/84 Loss: 4.986080
+Train Epoch: 130 dl: 80/84 Loss: 5.118527
+0it [00:00, ?it/s]1it [00:00, 11.66it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 130, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 7.50)
+R10: 31.25 (window: 33.12)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.50 (window: 15.10)
+MeanR: 16.62 (window: 16.56)
+AVG: 237.41 (window: 240.58)
+Loss: 8.2006
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 131 dl: 0/84 Loss: 5.028368
+Train Epoch: 131 dl: 20/84 Loss: 5.036437
+Train Epoch: 131 dl: 40/84 Loss: 5.100086
+Train Epoch: 131 dl: 60/84 Loss: 5.350322
+Train Epoch: 131 dl: 80/84 Loss: 4.651188
+0it [00:00, ?it/s]1it [00:00, 11.66it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 131, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 7.50)
+R10: 28.12 (window: 31.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.50 (window: 15.30)
+MeanR: 16.84 (window: 16.69)
+AVG: 237.39 (window: 239.30)
+Loss: 8.2371
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 132 dl: 0/84 Loss: 4.756225
+Train Epoch: 132 dl: 20/84 Loss: 5.137506
+Train Epoch: 132 dl: 40/84 Loss: 5.420177
+Train Epoch: 132 dl: 60/84 Loss: 5.692645
+Train Epoch: 132 dl: 80/84 Loss: 5.682616
+0it [00:00, ?it/s]1it [00:00, 11.08it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 132, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 7.50)
+R10: 34.38 (window: 31.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.90)
+MeanR: 16.47 (window: 16.59)
+AVG: 240.65 (window: 239.35)
+Loss: 8.2206
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 133 dl: 0/84 Loss: 5.023623
+Train Epoch: 133 dl: 20/84 Loss: 4.871622
+Train Epoch: 133 dl: 40/84 Loss: 5.323481
+Train Epoch: 133 dl: 60/84 Loss: 4.425517
+Train Epoch: 133 dl: 80/84 Loss: 5.095810
+0it [00:00, ?it/s]1it [00:00, 11.89it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 133, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 6.88)
+R10: 34.38 (window: 32.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.80)
+MeanR: 16.59 (window: 16.59)
+AVG: 240.64 (window: 239.36)
+Loss: 8.2767
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 134 dl: 0/84 Loss: 5.276617
+Train Epoch: 134 dl: 20/84 Loss: 4.967091
+Train Epoch: 134 dl: 40/84 Loss: 5.298369
+Train Epoch: 134 dl: 60/84 Loss: 4.919965
+Train Epoch: 134 dl: 80/84 Loss: 5.975825
+0it [00:00, ?it/s]1it [00:00, 11.85it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 134, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 6.88)
+R10: 31.25 (window: 31.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.90)
+MeanR: 16.34 (window: 16.57)
+AVG: 237.54 (window: 238.73)
+Loss: 8.2993
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 135 dl: 0/84 Loss: 4.844449
+Train Epoch: 135 dl: 20/84 Loss: 4.816818
+Train Epoch: 135 dl: 40/84 Loss: 4.921980
+Train Epoch: 135 dl: 60/84 Loss: 4.905447
+Train Epoch: 135 dl: 80/84 Loss: 4.784375
+0it [00:00, ?it/s]1it [00:00, 11.95it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 135, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 6.88)
+R10: 34.38 (window: 32.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 15.00 (window: 14.80)
+MeanR: 16.50 (window: 16.55)
+AVG: 240.60 (window: 239.37)
+Loss: 8.3169
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 136 dl: 0/84 Loss: 5.470987
+Train Epoch: 136 dl: 20/84 Loss: 4.773488
+Train Epoch: 136 dl: 40/84 Loss: 5.576592
+Train Epoch: 136 dl: 60/84 Loss: 5.394639
+Train Epoch: 136 dl: 80/84 Loss: 5.192770
+0it [00:00, ?it/s]1it [00:00, 12.70it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 136, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 6.25)
+R10: 34.38 (window: 33.75)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.00 (window: 14.50)
+MeanR: 16.41 (window: 16.46)
+AVG: 240.71 (window: 240.03)
+Loss: 8.2544
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 137 dl: 0/84 Loss: 5.102376
+Train Epoch: 137 dl: 20/84 Loss: 4.889141
+Train Epoch: 137 dl: 40/84 Loss: 4.942460
+Train Epoch: 137 dl: 60/84 Loss: 5.243666
+Train Epoch: 137 dl: 80/84 Loss: 5.493973
+0it [00:00, ?it/s]1it [00:00, 11.83it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 137, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 6.25)
+R10: 34.38 (window: 33.75)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.00 (window: 14.40)
+MeanR: 16.34 (window: 16.44)
+AVG: 240.72 (window: 240.04)
+Loss: 8.2960
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 138 dl: 0/84 Loss: 5.388010
+Train Epoch: 138 dl: 20/84 Loss: 6.075723
+Train Epoch: 138 dl: 40/84 Loss: 5.636575
+Train Epoch: 138 dl: 60/84 Loss: 4.974946
+Train Epoch: 138 dl: 80/84 Loss: 4.732177
+0it [00:00, ?it/s]1it [00:00, 11.64it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 138, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 6.25)
+R10: 31.25 (window: 33.12)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.40)
+MeanR: 16.44 (window: 16.41)
+AVG: 237.53 (window: 239.42)
+Loss: 8.2913
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 139 dl: 0/84 Loss: 5.329507
+Train Epoch: 139 dl: 20/84 Loss: 4.907576
+Train Epoch: 139 dl: 40/84 Loss: 4.959249
+Train Epoch: 139 dl: 60/84 Loss: 4.901358
+Train Epoch: 139 dl: 80/84 Loss: 5.025393
+0it [00:00, ?it/s]1it [00:00, 11.44it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 139, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 6.25)
+R10: 34.38 (window: 33.75)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.40)
+MeanR: 16.41 (window: 16.42)
+AVG: 240.66 (window: 240.04)
+Loss: 8.2726
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 140 dl: 0/84 Loss: 4.663882
+Train Epoch: 140 dl: 20/84 Loss: 5.016843
+Train Epoch: 140 dl: 40/84 Loss: 4.900583
+Train Epoch: 140 dl: 60/84 Loss: 5.286921
+Train Epoch: 140 dl: 80/84 Loss: 5.196425
+0it [00:00, ?it/s]1it [00:00, 11.46it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 140, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 7.50)
+R10: 31.25 (window: 33.12)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.30)
+MeanR: 16.25 (window: 16.37)
+AVG: 243.80 (window: 240.68)
+Loss: 8.2530
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 141 dl: 0/84 Loss: 5.996099
+Train Epoch: 141 dl: 20/84 Loss: 4.689528
+Train Epoch: 141 dl: 40/84 Loss: 4.673031
+Train Epoch: 141 dl: 60/84 Loss: 4.988899
+Train Epoch: 141 dl: 80/84 Loss: 4.758470
+0it [00:00, ?it/s]1it [00:00, 11.61it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 141, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 7.50)
+R10: 34.38 (window: 33.12)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.40)
+MeanR: 16.41 (window: 16.37)
+AVG: 240.66 (window: 240.67)
+Loss: 8.3134
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 142 dl: 0/84 Loss: 4.941578
+Train Epoch: 142 dl: 20/84 Loss: 4.609485
+Train Epoch: 142 dl: 40/84 Loss: 5.555888
+Train Epoch: 142 dl: 60/84 Loss: 4.582243
+Train Epoch: 142 dl: 80/84 Loss: 4.796079
+0it [00:00, ?it/s]1it [00:00, 11.83it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 142, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 12.50 (window: 8.75)
+R10: 31.25 (window: 32.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.50)
+MeanR: 16.28 (window: 16.36)
+AVG: 243.80 (window: 241.29)
+Loss: 8.3034
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 143 dl: 0/84 Loss: 5.086682
+Train Epoch: 143 dl: 20/84 Loss: 4.931648
+Train Epoch: 143 dl: 40/84 Loss: 4.846690
+Train Epoch: 143 dl: 60/84 Loss: 5.388943
+Train Epoch: 143 dl: 80/84 Loss: 5.779183
+0it [00:00, ?it/s]1it [00:00, 11.67it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 143, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 9.38)
+R10: 31.25 (window: 32.50)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.50)
+MeanR: 16.38 (window: 16.34)
+AVG: 240.66 (window: 241.92)
+Loss: 8.3033
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 144 dl: 0/84 Loss: 4.852963
+Train Epoch: 144 dl: 20/84 Loss: 4.826949
+Train Epoch: 144 dl: 40/84 Loss: 5.463410
+Train Epoch: 144 dl: 60/84 Loss: 4.725409
+Train Epoch: 144 dl: 80/84 Loss: 4.304178
+0it [00:00, ?it/s]1it [00:00, 11.60it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 144, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 10.00)
+R10: 31.25 (window: 31.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.50)
+MeanR: 16.41 (window: 16.34)
+AVG: 240.66 (window: 241.92)
+Loss: 8.2965
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 145 dl: 0/84 Loss: 5.042483
+Train Epoch: 145 dl: 20/84 Loss: 4.392911
+Train Epoch: 145 dl: 40/84 Loss: 4.396601
+Train Epoch: 145 dl: 60/84 Loss: 5.117453
+Train Epoch: 145 dl: 80/84 Loss: 5.245590
+0it [00:00, ?it/s]1it [00:00, 10.52it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 145, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 9.38)
+R10: 31.25 (window: 31.88)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.50)
+MeanR: 16.38 (window: 16.37)
+AVG: 240.66 (window: 241.29)
+Loss: 8.2793
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 146 dl: 0/84 Loss: 5.421474
+Train Epoch: 146 dl: 20/84 Loss: 4.753842
+Train Epoch: 146 dl: 40/84 Loss: 5.011508
+Train Epoch: 146 dl: 60/84 Loss: 5.240459
+Train Epoch: 146 dl: 80/84 Loss: 5.168219
+0it [00:00, ?it/s]1it [00:00, 11.55it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 146, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 10.00)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.50)
+MeanR: 16.41 (window: 16.37)
+AVG: 240.66 (window: 241.29)
+Loss: 8.2778
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 147 dl: 0/84 Loss: 5.611638
+Train Epoch: 147 dl: 20/84 Loss: 5.107390
+Train Epoch: 147 dl: 40/84 Loss: 4.734379
+Train Epoch: 147 dl: 60/84 Loss: 5.316806
+Train Epoch: 147 dl: 80/84 Loss: 5.212964
+0it [00:00, ?it/s]1it [00:00, 11.61it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 147, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 6.25 (window: 8.75)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.50)
+MeanR: 16.41 (window: 16.39)
+AVG: 237.53 (window: 240.04)
+Loss: 8.2821
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 148 dl: 0/84 Loss: 5.237983
+Train Epoch: 148 dl: 20/84 Loss: 5.173593
+Train Epoch: 148 dl: 40/84 Loss: 4.903640
+Train Epoch: 148 dl: 60/84 Loss: 4.655479
+Train Epoch: 148 dl: 80/84 Loss: 5.366492
+0it [00:00, ?it/s]1it [00:00, 11.02it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 148, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 8.75)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.50)
+MeanR: 16.38 (window: 16.39)
+AVG: 240.66 (window: 240.04)
+Loss: 8.2856
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 149 dl: 0/84 Loss: 5.229598
+Train Epoch: 149 dl: 20/84 Loss: 5.229563
+Train Epoch: 149 dl: 40/84 Loss: 4.815231
+Train Epoch: 149 dl: 60/84 Loss: 5.552944
+Train Epoch: 149 dl: 80/84 Loss: 5.224965
+0it [00:00, ?it/s]1it [00:00, 11.77it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 149, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 8.75)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.50)
+MeanR: 16.38 (window: 16.39)
+AVG: 240.66 (window: 240.04)
+Loss: 8.2856
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Train Epoch: 150 dl: 0/84 Loss: 5.636337
+Train Epoch: 150 dl: 20/84 Loss: 5.295656
+Train Epoch: 150 dl: 40/84 Loss: 4.987930
+Train Epoch: 150 dl: 60/84 Loss: 4.972414
+Train Epoch: 150 dl: 80/84 Loss: 5.137698
+0it [00:00, ?it/s]1it [00:00, 11.44it/s]
+sims dimension torch.Size([32, 1, 32])
+-----Val Epoch: 150, dl: 84/84-----
+R1: 3.12 (window: 3.12)
+R5: 9.38 (window: 8.75)
+R10: 31.25 (window: 31.25)
+R50: 100.00 (window: 100.00)
+R100: 100.00 (window: 100.00)
+MedR: 14.50 (window: 14.50)
+MeanR: 16.38 (window: 16.39)
+AVG: 240.66 (window: 240.04)
+Loss: 8.2856
+ Current Best Window Average R@1 is 247.96875
+ Current Best R@1 is 262.140625
+
+Saving checkpoint: /home/sangheon/Desktop/AudioLDM-ControlNet/BeatDance/outputs/seglen110_L110_batchsize32_framewise/checkpoint-epoch150.pth ...

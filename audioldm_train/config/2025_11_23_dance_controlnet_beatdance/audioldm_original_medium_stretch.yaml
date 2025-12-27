@@ -4,7 +4,7 @@ project: "audioldm_controlnet"
 precision: "high"
 
 variables:
-  sampling_rate: &sampling_rate 16000 
+  sampling_rate: &sampling_rate 16000
   mel_bins: &mel_bins 64
   latent_embed_dim: &latent_embed_dim 8 # TODO might need to change
   latent_t_size: &latent_t_size 128 # TODO might need to change
@@ -15,9 +15,9 @@ variables:
   optimize_gpt: &optimize_gpt true
   warmup_steps: &warmup_steps 2000
   default_unet_params: &default_unet_params
-    image_size: 64 
+    image_size: 64
     extra_film_condition_dim: 512 # If you use film as extra condition, set this parameter. For example if you have two conditioning vectors each have dimension 512, then this number would be 1024
-    # context_dim: 
+    # context_dim:
     # - 768
     in_channels: *unet_in_channels
     out_channels: *latent_embed_dim
@@ -27,7 +27,7 @@ variables:
     - 4
     - 2
     num_res_blocks: 2
-    channel_mult: 
+    channel_mult:
     - 1
     - 2
     - 3
@@ -37,12 +37,12 @@ variables:
     transformer_depth: 1
     extra_sa_layer: False
 
-data: 
+data:
   train: ["aist"]
   val: "aist"
   test: "aist"
   class_label_indices: ""
-  dataloader_add_ons: [] 
+  dataloader_add_ons: []
 
 step:
   validation_every_n_epochs: 10
@@ -63,7 +63,7 @@ preprocessing:
   mel:
     n_mel_channels: *mel_bins
     mel_fmin: 0
-    mel_fmax: 8000 
+    mel_fmax: 8000
   # added for dance-controlnet
   stretch_augmentation:
     additional_stretch_rate: 0.2
@@ -82,12 +82,12 @@ augmentation:
 
 model:
   target: audioldm_train.modules.latent_diffusion.controlnet.ControlLDM
-  params: 
+  params:
     # Autoencoder
     first_stage_config:
       base_learning_rate: 8.0e-06
       target: audioldm_train.modules.latent_encoder.autoencoder.AutoencoderKL
-      params: 
+      params:
         reload_from_ckpt: "data/checkpoints/vae_mel_16k_64bins.ckpt"
         sampling_rate: *sampling_rate
         batchsize: 8
@@ -103,7 +103,7 @@ model:
             kl_weight: 1000.0
             disc_weight: 0.5
             disc_in_channels: 1
-        ddconfig: 
+        ddconfig:
           double_z: true
           mel_bins: *mel_bins # The frequency bins of mel spectrogram
           z_channels: 8
@@ -111,7 +111,7 @@ model:
           downsample_time: false
           in_channels: 1
           out_ch: 1
-          ch: 128 
+          ch: 128
           ch_mult:
           - 1
           - 2
@@ -173,7 +173,7 @@ model:
                   mlp_ratio: 2 # default value
                   maxlen: 243 # default value
                   num_joints: &num_joints 17
-              motion_bert_pretrained_weights_path: data/checkpoints/latest_epoch.bin
+              motion_bert_pretrained_weights_path: # data/checkpoints/latest_epoch.bin
               feature_mapper_config:
                 target: audioldm_train.modules.motion_encoder.encoder.MotionBERT2BeatDance2AudioLDMEncoder
                 params:
@@ -185,7 +185,7 @@ model:
                   beatdance_config:
                     target: audioldm_train.modules.motion_encoder.BeatDance.model.clip_transformer.DanceOnlyBeatDanceWrapper
                     params:
-                      beatdance_config_path: audioldm_train/config/2025_11_23_dance_controlnet_beatdance/aist_seg10_L10.json
+                      beatdance_config_path: /home/sangheon/Desktop/AudioLDM-ControlNet/BeatDance/config/aist_seg10_L10.json
                       kpt_num_joints: *num_joints
                       kpt_feat_dim: *dim_rep
                       beat_dim: 2
