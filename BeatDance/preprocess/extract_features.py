@@ -194,7 +194,7 @@ class Extractor_fbm:
     def extract(self, y, sr, target_fps: float=21.5):
         _, beats_time = librosa.beat.beat_track(y=y, sr=sr, units='time', hop_length=512)
         duration = librosa.get_duration(y=y, sr=sr)
-        L = 128 
+        L = 128
 
         # Beat Presence Calculation
         sr_original = 44100
@@ -206,7 +206,7 @@ class Extractor_fbm:
         beat_presence[detailed_beats_idx] = 1
 
         # 3. Resample
-        target_total = 3 * 128  # 384 
+        target_total = 3 * 128  # 384
         if beat_presence_length >= target_total:
             resampled_beats = beat_presence[:target_total]
         else:
@@ -257,8 +257,8 @@ class Extractor_fd:
         self.model = self.model.to(self.device)
 
         # Load checkpoint
-        checkpoint = torch.load(motionbert_ckpt, map_location='cpu')
-        self.model.load_state_dict(checkpoint['model_pos'], strict=True)
+        # checkpoint = torch.load(motionbert_ckpt, map_location='cpu')
+        # self.model.load_state_dict(checkpoint['model_pos'], strict=True)
         self.model.eval()
 
         self.maxlen = 243
@@ -319,7 +319,7 @@ class Extractor_fd:
         motion_features_resampled = motion_features[indices_floor] * (1 - weight) + motion_features[indices_ceil] * weight
         motion_features_flattened = motion_features_resampled.reshape(target_length, -1)
 
-        return motion_features_flattened 
+        return motion_features_flattened
 
 class Extractor_fbd:
     """
@@ -407,7 +407,7 @@ class Extractor_fbd:
 
         # Reshape to [target_length, beat_dim]
         beats_feature = torch.tensor(beats_vector).view(target_length, beat_dim)
-        print(f"Beats_feature shape: {beats_feature.shape}") [128, 2 ]
+        print(f"Beats_feature shape: {beats_feature.shape}")  # Expected: [128, 2]
         return beats_feature
 
 def main():

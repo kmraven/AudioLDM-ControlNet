@@ -173,7 +173,7 @@ model:
                   mlp_ratio: 2 # default value
                   maxlen: 243 # default value
                   num_joints: &num_joints 17
-              motion_bert_pretrained_weights_path: data/checkpoints/latest_epoch.bin
+              motion_bert_pretrained_weights_path: # data/checkpoints/latest_epoch.bin
               feature_mapper_config:
                 target: audioldm_train.modules.motion_encoder.encoder.MotionBERT2BeatDance2AudioLDMEncoder
                 params:

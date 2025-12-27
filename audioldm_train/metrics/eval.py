@@ -15,17 +15,23 @@ class CorrespondedWaveDataset(WaveDataset):
     def __init__(self, generated_path, groundtruth_path, sampling_rate, limit_num=None):
         self.sr = sampling_rate
 
-        generated_datalist = [
-            os.path.join(generated_path, x)
-            for x in os.listdir(generated_path)
-        ]
-        groundtruth_datalist = [
-            os.path.join(groundtruth_path, x)
-            for x in os.listdir(groundtruth_path)
-        ]
+        # Helper function to collect all audio files, handling both flat and nested structures
+        def collect_audio_files(base_path):
+            audio_files = []
+            for item in os.listdir(base_path):
+                item_path = os.path.join(base_path, item)
+                if os.path.isdir(item_path):
+                    # If it's a directory, collect all .wav files inside
+                    for audio_file in os.listdir(item_path):
+                        if audio_file.endswith('.wav'):
+                            audio_files.append(os.path.join(item_path, audio_file))
+                elif item_path.endswith('.wav'):
+                    # If it's a .wav file directly
+                    audio_files.append(item_path)
+            return sorted(audio_files)
 
-        generated_datalist = sorted(generated_datalist)
-        groundtruth_datalist = sorted(groundtruth_datalist)
+        generated_datalist = collect_audio_files(generated_path)
+        groundtruth_datalist = collect_audio_files(groundtruth_path)
 
         def to_key(path):
             return os.path.splitext(os.path.basename(path))[0]
@@ -76,6 +82,21 @@ class ControlNetEvaluationHelper(EvaluationHelper):
         self.beat_score_calculator = BeatScoreCalculator()
         self.clap_score_calculator = CLAPScoreCalculator()
 
+    def _collect_audio_files(self, base_path):
+        """Collect all .wav files from a directory, handling nested structures."""
+        audio_files = []
+        for item in os.listdir(base_path):
+            item_path = os.path.join(base_path, item)
+            if os.path.isdir(item_path):
+                # If it's a directory, collect all .wav files inside
+                for audio_file in os.listdir(item_path):
+                    if audio_file.endswith('.wav'):
+                        audio_files.append(os.path.join(item_path, audio_file))
+            elif item_path.endswith('.wav'):
+                # If it's a .wav file directly
+                audio_files.append(item_path)
+        return sorted(audio_files)
+
     def calculate_metrics(self, generate_files_path, groundtruth_path, same_name, limit_num=None, calculate_psnr_ssim=False, calculate_lsd=False, recalculate=False):
         torch.manual_seed(0)
         num_workers = 6
@@ -97,8 +118,59 @@ class ControlNetEvaluationHelper(EvaluationHelper):
         ######################################################################################################################
         if(recalculate):
             print("Calculate FAD score from scratch")
-        fad_score = self.frechet.score(generate_files_path, groundtruth_path, limit_num=limit_num)
-        out.update(fad_score)
+        try:
+            import soundfile as sf
+            import resampy
+
+            # Collect audio files from both directories (handles nested structures)
+            gen_files = self._collect_audio_files(generate_files_path)
+            gt_files = self._collect_audio_files(groundtruth_path)
+
+            if limit_num is not None:
+                gen_files = gen_files[:limit_num]
+                gt_files = gt_files[:limit_num]
+
+            # Load audio files and prepare them as (audio, sr) tuples
+            def load_audio_files(file_list):
+                audio_list = []
+                for fpath in tqdm(file_list, desc="Loading audio files"):
+                    try:
+                        wav_data, sr = sf.read(fpath, dtype="int16")
+                        wav_data = wav_data / 32768.0  # Convert to [-1.0, +1.0]
+
+                        # Convert to mono
+                        if len(wav_data.shape) > 1:
+                            wav_data = wav_data.mean(axis=1)
+
+                        # Resample to 16kHz for VGGish
+                        if sr != 16000:
+                            wav_data = resampy.resample(wav_data, sr, 16000)
+
+                        audio_list.append((wav_data, 16000))
+                    except Exception as e:
+                        print(f"Error loading {fpath}: {e}")
+                        continue
+                return audio_list
+
+            print(f"Calculating FAD: {len(gen_files)} generated files, {len(gt_files)} ground truth files")
+            gen_audio_list = load_audio_files(gen_files)
+            gt_audio_list = load_audio_files(gt_files)
+
+            # Get embeddings
+            gen_embd = self.frechet.get_embeddings(gen_audio_list, sr=16000)
+            gt_embd = self.frechet.get_embeddings(gt_audio_list, sr=16000)
+
+            # Calculate statistics and FAD score
+            mu_gen, sigma_gen = self.frechet.calculate_embd_statistics(gen_embd)
+            mu_gt, sigma_gt = self.frechet.calculate_embd_statistics(gt_embd)
+            fad_score_value = self.frechet.calculate_frechet_distance(mu_gen, sigma_gen, mu_gt, sigma_gt)
+
+            out['frechet_audio_distance'] = float(fad_score_value)
+        except Exception as e:
+            print(f"Error calculating FAD score: {e}")
+            import traceback
+            traceback.print_exc()
+            out['frechet_audio_distance'] = float('nan')
 
         # Beat Score & CLAP Score
         ######################################################################################################################

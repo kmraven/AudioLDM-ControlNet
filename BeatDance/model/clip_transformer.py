@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
-from ..config.base_config import Config
-from ..config.all_config import CusConfig
-from ..modules.transformer import PoseTransformer, PositionalEncoding
-from ..modules.metrics import sim_matrix_training, sim_matrix_inference, generate_embeds_per_video_id, beat_similarity, qb_norm
+from config.base_config import Config
+from config.all_config import CusConfig
+from modules.transformer import PoseTransformer, PositionalEncoding
+from modules.metrics import sim_matrix_training, sim_matrix_inference, generate_embeds_per_video_id, beat_similarity, qb_norm
 from torch import nn
 import torch
 from einops import rearrange
