@@ -7,40 +7,53 @@ from audioldm_eval.audio.tools import write_json
 from audioldm_eval import EvaluationHelper
 from audioldm_eval.metrics.fad import FrechetAudioDistance
 from tqdm import tqdm
-from audioldm_train.metrics.beat_score import BeatScoreCalculator
+from audioldm_train.metrics.beat_score import calculate_beat_score
 from audioldm_train.metrics.clap import CLAPScoreCalculator
+from audioldm_train.utilities.data.keypoints import (
+    load_keypoints,
+    interp_nan_keypoints,
+    resample_keypoints_1d,
+    resample_keypoints_2d
+)
 
 
 class CorrespondedWaveDataset(WaveDataset):
-    def __init__(self, generated_path, groundtruth_path, sampling_rate, limit_num=None):
+    def __init__(self, gen_music_path, gt_music_path, sampling_rate, gt_motion_path, limit_num=None):
         self.sr = sampling_rate
 
-        generated_datalist = [
-            os.path.join(generated_path, x)
-            for x in os.listdir(generated_path)
+        gen_music_datalist = [
+            os.path.join(gen_music_path, x)
+            for x in os.listdir(gen_music_path)
         ]
-        groundtruth_datalist = [
-            os.path.join(groundtruth_path, x)
-            for x in os.listdir(groundtruth_path)
+        gt_music_datalist = [
+            os.path.join(gt_music_path, x)
+            for x in os.listdir(gt_music_path)
+        ]
+        gt_motion_datalist = [
+            os.path.join(gt_motion_path, x)
+            for x in os.listdir(gt_motion_path)
         ]
 
-        generated_datalist = sorted(generated_datalist)
-        groundtruth_datalist = sorted(groundtruth_datalist)
+        gen_music_datalist = sorted(gen_music_datalist)
+        gt_music_datalist = sorted(gt_music_datalist)
+        gt_motion_datalist = sorted(gt_motion_datalist)
 
         def to_key(path):
             return os.path.splitext(os.path.basename(path))[0]
 
-        gen_map = {to_key(p): p for p in generated_datalist}
-        gt_map  = {to_key(p): p for p in groundtruth_datalist}
-        common_keys = sorted(set(gen_map.keys()) & set(gt_map.keys()))
+        gen_map = {to_key(p): p for p in gen_music_datalist}
+        gt_map  = {to_key(p): p for p in gt_music_datalist}
+        gt_motion_map  = {to_key(p): p for p in gt_motion_datalist}
+        common_keys = sorted(set(gen_map.keys()) & set(gt_map.keys()) & set(gt_motion_map.keys()))
 
         if limit_num is not None:
             common_keys = common_keys[:limit_num]
 
         self.datalist = [
             {
-                "generated": gen_map[k],
-                "groundtruth": gt_map[k],
+                "gen_music": gen_map[k],
+                "gt_music": gt_map[k],
+                "gt_motion": gt_motion_map[k],
             }
             for k in common_keys
         ]
@@ -51,9 +64,17 @@ class CorrespondedWaveDataset(WaveDataset):
                 file_dict = self.datalist[index]
                 waveform_dict = {}
                 for key, filename in file_dict.items():
-                    w = self.read_from_file(filename)
-                    if w.size(-1) < 1:
-                        raise ValueError("empty file %s" % filename)
+                    if "music" in key:
+                        w = self.read_from_file(filename)
+                        if w.size(-1) < 1:
+                            raise ValueError("empty file %s" % filename)
+                    elif "motion" in key:
+                        w = load_keypoints(filename)
+                        w = interp_nan_keypoints(w)
+                        w = resample_keypoints_2d(w, T_target=int(5.12 * 60))  # TODO fix hardcoding
+                        w = w[:, :, :2]  # remove confidence channel
+                        if w.shape[0] < 1:
+                            raise ValueError("empty file %s" % filename)
                     waveform_dict[key] = w
                 break
             except Exception as e:
@@ -73,18 +94,18 @@ class ControlNetEvaluationHelper(EvaluationHelper):
             verbose=True,
         )
         self.frechet.model = self.frechet.model.to(self.device)
-        self.beat_score_calculator = BeatScoreCalculator()
         self.clap_score_calculator = CLAPScoreCalculator()
 
-    def calculate_metrics(self, generate_files_path, groundtruth_path, same_name, limit_num=None, calculate_psnr_ssim=False, calculate_lsd=False, recalculate=False):
+    def calculate_metrics(self, gen_music_path, gt_music_path, gt_motion_path, same_name, limit_num=None, calculate_psnr_ssim=False, calculate_lsd=False, recalculate=False):
         torch.manual_seed(0)
         num_workers = 6
 
         dataloader = DataLoader(
             CorrespondedWaveDataset(
-                generate_files_path,
-                groundtruth_path,
+                gen_music_path,
+                gt_music_path,
                 self.sampling_rate,
+                gt_motion_path,
                 limit_num=limit_num,
             ),
             batch_size=1,
@@ -97,7 +118,7 @@ class ControlNetEvaluationHelper(EvaluationHelper):
         ######################################################################################################################
         if(recalculate): 
             print("Calculate FAD score from scratch")
-        fad_score = self.frechet.score(generate_files_path, groundtruth_path, limit_num=limit_num, recalculate=recalculate)
+        fad_score = self.frechet.score(gen_music_path, gt_music_path, limit_num=limit_num, recalculate=recalculate)
         out.update(fad_score)
 
         # Beat Score & CLAP Score
@@ -118,14 +139,16 @@ class ControlNetEvaluationHelper(EvaluationHelper):
             "clap_score": [],
         }
         for waveform_dict, _ in tqdm(dataloader):
-            generated = waveform_dict["generated"].squeeze(0)
-            groundtruth = waveform_dict["groundtruth"].squeeze(0)
-            cover_rate, hit_rate, f1, td = self.beat_score_calculator.calculate(groundtruth, generated, self.sampling_rate)
-            clap_score = self.clap_score_calculator.calculate(generated, groundtruth)
-            scores["beat_coverage_score"].append(cover_rate)
-            scores["beat_hit_score"].append(hit_rate)
+            gen_music = waveform_dict["gen_music"].squeeze(0)
+            gt_music = waveform_dict["gt_music"].squeeze(0)
+            gt_motion = waveform_dict["gt_motion"]
+            bcs, bhs, f1, td, bas = calculate_beat_score(gt_motion, gt_music, gen_music, self.sampling_rate)
+            clap_score = self.clap_score_calculator.calculate(gen_music, gt_music)
+            scores["beat_coverage_score"].append(bcs)
+            scores["beat_hit_score"].append(bhs)
             scores["f1_score"].append(f1)
             scores["tempo_difference"].append(td)
+            scores["beat_alignment_score"].append(bas)
             scores["clap_score"].append(clap_score)
         avg_scores = {k: sum(v) / len(v) for k, v in scores.items()}
         return avg_scores
