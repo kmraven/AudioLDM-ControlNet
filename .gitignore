@@ -25,3 +25,4 @@ BeatDance/outputs/MotionBERT_pos/*.pth
 *.pth
 *.ckpt
 BeatDance/outputs/
+data/AIST
