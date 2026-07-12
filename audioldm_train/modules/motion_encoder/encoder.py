@@ -81,9 +81,9 @@ class MotionEncoderWrapper(nn.Module):
             print("Reload MotionBERT (DSTformer) from %s" % motion_bert_pretrained_weights_path)
             checkpoint = torch.load(motion_bert_pretrained_weights_path, map_location=lambda storage, loc: storage)
             self.motion_bert.load_state_dict(checkpoint['model_pos'], strict=True)
-        self.motion_bert.eval()
-        for param in self.motion_bert.parameters():
-            param.requires_grad = False
+            self.motion_bert.eval()
+            for param in self.motion_bert.parameters():
+                param.requires_grad = False
         self.motion_encoder: Any = instantiate_from_config(feature_mapper_config)
 
     def forward(self, keypoints):
