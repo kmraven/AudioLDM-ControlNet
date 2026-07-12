@@ -128,10 +128,9 @@ Paper configurations are mapped as follows:
 
 | Paper variant | Configuration |
 | --- | --- |
-| Full model | `audioldm_original_medium_stretch_pretrained_frozen.yaml` |
-| w/o Contrastive Pretraining | `audioldm_original_medium.yaml` |
+| Full model | `audioldm_original_medium_stretch_pretrained.yaml` |
+| w/o Contrastive Pretraining | `audioldm_original_medium_stretch.yaml` |
 | w/o MotionBERT | `audioldm_original_medium_stretch_wo_mb.yaml` |
-| AudioLDM default | `2025_11_08_dance_controlnet/audioldm_original_medium_stretch.yaml` |
 
 The first three files are under
 `audioldm_train/config/2025_11_23_dance_controlnet_beatdance/`.

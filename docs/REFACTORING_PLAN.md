@@ -16,8 +16,8 @@
 - 現在削除状態の `keypoints.py` を復元し、公開関数のシグネチャを維持したまま、入力検証、命名、mutable default、重複したピーク検出計算を整理する。
 - Dance-only BeatDanceエンコーダーを単一実装へ統合する。音楽側モジュールを生成後に削除する処理や、出力に使われないattention計算を除去し、既存チェックポイントのキー互換性と旧クラス名のaliasを残す。
 - 全設定のBeatDance targetと相対パスを統一し、`sys.path`変更や個人環境の絶対パスを除去する。設定対応は以下で固定する。
-  - Full: `audioldm_original_medium_stretch_pretrained_frozen.yaml`
-  - w/o Contrastive Pretraining: `audioldm_original_medium.yaml`
+  - Full: `audioldm_original_medium_stretch_pretrained.yaml`
+  - w/o Contrastive Pretraining: `audioldm_original_medium_stretch.yaml`
   - w/o MotionBERT: `audioldm_original_medium_stretch_wo_mb.yaml`
   - AudioLDM default: `2025_11_08_dance_controlnet/audioldm_original_medium_stretch.yaml`
 - 全Pythonコードを監査し、未使用・重複import、未使用変数、placeholderのないf-string、`raise NotImplemented`、実行中の`pdb`/`ipdb`、コメントアウトされたデバッグ処理を手動確認後に除去する。アルゴリズム説明、shape、出典、互換性上必要なコメントは残す。

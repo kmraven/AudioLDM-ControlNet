@@ -45,7 +45,7 @@ class ConfigTargetTests(unittest.TestCase):
                 "dance_controlnet"
             ]["params"]["feature_encoder_config"]["params"]
 
-        full = encoder_params("audioldm_original_medium_stretch_pretrained_frozen.yaml")
+        full = encoder_params("audioldm_original_medium_stretch_pretrained.yaml")
         full_mapper = full["feature_mapper_config"]["params"]
         self.assertEqual(
             full["motion_bert_pretrained_weights_path"],
@@ -55,9 +55,9 @@ class ConfigTargetTests(unittest.TestCase):
             full_mapper["beatdance_pretrained_weights_path"],
             "data/checkpoints/model_best.pth",
         )
-        self.assertTrue(full_mapper["freeze_beatdance"])
+        self.assertFalse(full_mapper["freeze_beatdance"])
 
-        without_contrastive = encoder_params("audioldm_original_medium.yaml")
+        without_contrastive = encoder_params("audioldm_original_medium_stretch.yaml")
         self.assertNotIn(
             "beatdance_pretrained_weights_path",
             without_contrastive["feature_mapper_config"]["params"],
