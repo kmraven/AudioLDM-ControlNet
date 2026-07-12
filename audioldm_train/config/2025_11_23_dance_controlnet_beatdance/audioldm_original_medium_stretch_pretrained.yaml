@@ -45,9 +45,9 @@ data:
   dataloader_add_ons: []
 
 step:
-  validation_every_n_epochs: 10
-  save_checkpoint_every_n_steps: 10000
-  limit_val_batches: 4
+  validation_every_n_epochs: 100
+  save_checkpoint_every_n_steps: 100000
+  # limit_val_batches: 2
   max_steps: 1000000
   save_top_k: 1
 
@@ -191,7 +191,7 @@ model:
                       beat_dim: 2
                       beatdance_output_dim: *beatdance_output_dim
                       num_frames: *latent_t_size
-                  beatdance_pretrained_weights_path: /home/sangheon/Desktop/AudioLDM-ControlNet/BeatDance/outputs/MotionBERT_pos/model_best.pth
+                  beatdance_pretrained_weights_path: data/checkpoints/model_best.pth
                   freeze_beatdance: false
           controlnet_model_config:
             target: audioldm_train.modules.latent_diffusion.controlnet.ControlNet

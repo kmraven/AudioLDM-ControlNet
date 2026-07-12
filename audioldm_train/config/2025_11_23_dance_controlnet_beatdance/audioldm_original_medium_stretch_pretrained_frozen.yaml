@@ -65,9 +65,9 @@ preprocessing:
     mel_fmin: 0
     mel_fmax: 8000
   # added for dance-controlnet
-  stretch_augmentation:
-    additional_stretch_rate: 0
-    stretch_prob: 0
+  strech_augmentation:
+    additional_strech_rate: 0.2
+    stretch_prob: 0.7
   motion:
     target_length: *latent_t_size
     camera_height: 1080
@@ -183,14 +183,16 @@ model:
                   audio_freq: *latent_f_size
                   beatdance_output_dim: &beatdance_output_dim 256
                   beatdance_config:
-                    target: audioldm_train.modules.motion_encoder.BeatDance.model.clip_transformer.DanceOnlyBeatDanceWrapper
+                    target: BeatDance.model.clip_transformer.DanceOnlyBeatDanceWrapper
                     params:
-                      beatdance_config_path: /home/sangheon/Desktop/AudioLDM-ControlNet/BeatDance/config/aist_seg10_L10.json
+                      beatdance_config_path: audioldm_train/config/2025_11_23_dance_controlnet_beatdance/aist_seg10_L10.json
                       kpt_num_joints: *num_joints
                       kpt_feat_dim: *dim_rep
                       beat_dim: 2
                       beatdance_output_dim: *beatdance_output_dim
                       num_frames: *latent_t_size
+                  beatdance_pretrained_weights_path: data/checkpoints/model_best.pth
+                  freeze_beatdance: true
           controlnet_model_config:
             target: audioldm_train.modules.latent_diffusion.controlnet.ControlNet
             params:

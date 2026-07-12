@@ -6,6 +6,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--generated", required=True, help="Path to generated audio folder")
     parser.add_argument("--groundtruth", required=True, help="Path to ground truth audio folder")
+    parser.add_argument("--motion", help="Path to matching ground truth motion files")
     parser.add_argument("--sr", type=int, default=16000, help="Sampling rate")
     parser.add_argument("--limit", type=int, default=None, help="Limit number of files")
     parser.add_argument("--recalculate", action="store_true", help="Recalculate FAD embeddings")
@@ -19,7 +20,8 @@ if __name__ == "__main__":
         groundtruth_path=args.groundtruth,
         same_name=True,
         limit_num=args.limit,
-        recalculate=args.recalculate
+        recalculate=args.recalculate,
+        gt_motion_path=args.motion,
     )
 
     print("\n=== Evaluation Results ===")
