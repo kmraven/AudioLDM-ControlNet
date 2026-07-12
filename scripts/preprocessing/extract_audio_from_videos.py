@@ -1,5 +1,5 @@
 """
-Extract audio from AIST++ video files and organize in audio_clips directory.
+Extract audio from AIST++ videos into the matching audio_clips tree.
 This script processes all videos in video_clips/{train,val,test} and extracts
 audio to audio_clips/{train,val,test} maintaining the same folder structure.
 """

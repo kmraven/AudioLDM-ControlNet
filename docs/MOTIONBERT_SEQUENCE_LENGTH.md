@@ -1,4 +1,4 @@
-# MotionBERT sequence-length handling
+# MotionBERT Sequence-Length Handling
 
 The pretrained MotionBERT configuration has a maximum positional length of 243
 frames, while AIST++ clips can be longer. Feature extraction therefore uses the

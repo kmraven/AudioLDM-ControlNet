@@ -1,4 +1,4 @@
-# MotionBERT extraction verification
+# MotionBERT Extraction Verification
 
 The smoke test loads one COCO keypoint pickle, applies the same normalization as
 the dataset pipeline, loads the pretrained MotionBERT checkpoint, and verifies
@@ -9,7 +9,7 @@ conda activate audioldm_train
 KEYPOINTS=data/dataset/aist/keypoints_clips/test/example.pkl \
 CHECKPOINT=data/checkpoints/latest_epoch.bin \
 CUDA_VISIBLE_DEVICES=0 \
-bash run_motionbert_test.sh
+bash scripts/testing/run_motionbert_test.sh
 ```
 
 The equivalent Python entry point is:
@@ -29,4 +29,4 @@ Requirements:
 Sequences longer than MotionBERT's 243-frame positional limit are first
 resampled to 243 frames. The representation is then resampled to the fixed
 128-frame BeatDance input used by the paper configs. See
-[MOTIONBERT_MAXLEN_HANDLING.md](MOTIONBERT_MAXLEN_HANDLING.md) for details.
+[MOTIONBERT_SEQUENCE_LENGTH.md](MOTIONBERT_SEQUENCE_LENGTH.md) for details.

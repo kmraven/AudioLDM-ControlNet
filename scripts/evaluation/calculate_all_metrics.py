@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Calculate audio metrics and optional motion beat alignment."""
+
 from audioldm_train.metrics.eval import ControlNetEvaluationHelper
 import argparse
 

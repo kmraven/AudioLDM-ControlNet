@@ -1,4 +1,4 @@
-"""Compatibility entry point for the MotionBERT extraction smoke test."""
+"""Compatibility entry point for the MotionBERT feature smoke test."""
 
 from BeatDance.preprocess.test_motionbert_extraction import main
 

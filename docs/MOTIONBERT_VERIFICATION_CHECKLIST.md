@@ -1,4 +1,4 @@
-# MotionBERT verification checklist
+# MotionBERT Verification Checklist
 
 This file is retained as the verification checklist for the preprocessing
 pipeline. Run the current smoke test rather than relying on historical output:
@@ -6,7 +6,7 @@ pipeline. Run the current smoke test rather than relying on historical output:
 ```bash
 KEYPOINTS=path/to/keypoints.pkl \
 CHECKPOINT=data/checkpoints/latest_epoch.bin \
-bash run_motionbert_test.sh
+bash scripts/testing/run_motionbert_test.sh
 ```
 
 Expected invariants:

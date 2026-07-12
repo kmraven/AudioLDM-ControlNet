@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Combine generated WAV files with matching AIST++ video files."""
+"""Combine generated WAV files with their matching AIST++ videos."""
 
 import argparse
 import subprocess

@@ -12,11 +12,31 @@ The system is trained in two stages:
 2. The pretrained dance encoder conditions a frozen AudioLDM backbone through a
    ControlNet adapter.
 
+## Repository layout
+
+- `audioldm_train/`: AudioLDM and ControlNet training code
+- `BeatDance/`: contrastive dance-encoder training and feature extraction
+- `scripts/`: training, evaluation, preprocessing, demo, and smoke-test commands
+- `docs/`: implementation notes and reproducibility documentation
+- `tests/`: automated regression tests
+
 ## Environment
 
-The reference environment uses Python 3.10 and CUDA. Create it with:
+The project uses Python 3.10 and CUDA. Either environment definition can be
+used:
+
+- Poetry: `pyproject.toml` and `poetry.lock`, prepared by
+  [@michspark](https://github.com/michspark)
+- Conda: `environment.yaml`, prepared by
+  [@kmraven](https://github.com/kmraven)
+
+Choose whichever workflow is more convenient:
 
 ```bash
+# Poetry
+poetry install
+
+# Conda
 conda env create -f environment.yaml
 conda activate audioldm_train
 ```
@@ -92,7 +112,7 @@ cp log/beatdance/MotionBERT_pos/model_best.pth data/checkpoints/model_best.pth
 The default wrapper trains the full model from the paper:
 
 ```bash
-bash bash_train_controlnet_beatdance.sh
+bash scripts/training/train_controlnet_beatdance.sh
 ```
 
 The wrapper accepts environment overrides without editing source files:
@@ -101,7 +121,7 @@ The wrapper accepts environment overrides without editing source files:
 CUDA_VISIBLE_DEVICES=1 \
 CONFIG=path/to/config.yaml \
 CHECKPOINT=path/to/initial.ckpt \
-bash bash_train_controlnet_beatdance.sh
+bash scripts/training/train_controlnet_beatdance.sh
 ```
 
 Paper configurations are mapped as follows:
@@ -121,14 +141,14 @@ The first three files are under
 Generate the test-set outputs for the full model:
 
 ```bash
-bash bash_eval_controlnet_beatdance.sh
+bash scripts/evaluation/evaluate_controlnet_beatdance.sh
 ```
 
 Override `CONFIG`, `CHECKPOINT`, and `CUDA_VISIBLE_DEVICES` in the same way as
 the training wrapper. To calculate audio-reference metrics separately:
 
 ```bash
-python calculate_all_metrics.py \
+python -m scripts.evaluation.calculate_all_metrics \
   --generated path/to/generated_wavs \
   --groundtruth path/to/reference_wavs
 ```
@@ -138,9 +158,10 @@ Generated audio, reference audio, and motion files are matched by filename stem.
 
 ## Additional documentation
 
-- [MotionBERT feature extraction](TEST_MOTIONBERT.md)
-- [MotionBERT sequence-length handling](MOTIONBERT_MAXLEN_HANDLING.md)
-- [Quick feature-extraction guide](QUICK_START.md)
+- [MotionBERT feature extraction](docs/MOTIONBERT_VERIFICATION.md)
+- [MotionBERT sequence-length handling](docs/MOTIONBERT_SEQUENCE_LENGTH.md)
+- [Quick feature-extraction guide](docs/MOTIONBERT_QUICK_START.md)
+- [Refactoring plan](docs/REFACTORING_PLAN.md)
 - [BeatDance upstream documentation](BeatDance/README.md)
 
 ## Acknowledgements

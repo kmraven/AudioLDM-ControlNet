@@ -1,4 +1,4 @@
-# MotionBERT feature extraction quick start
+# MotionBERT Feature Extraction Quick Start
 
 From the repository root, activate the environment and run a one-file smoke test:
 
@@ -6,7 +6,7 @@ From the repository root, activate the environment and run a one-file smoke test
 conda activate audioldm_train
 KEYPOINTS=path/to/keypoints.pkl \
 CHECKPOINT=data/checkpoints/latest_epoch.bin \
-bash run_motionbert_test.sh
+bash scripts/testing/run_motionbert_test.sh
 ```
 
 The keypoint pickle must have shape `[frames, 17, 3]` in COCO order. A successful
@@ -30,4 +30,4 @@ data/dataset/aist/beatdance_features/
 └── video_beat/     # [128, 2]
 ```
 
-Continue with the Stage 1 and Stage 2 commands in [README.md](README.md).
+Continue with the Stage 1 and Stage 2 commands in [README.md](../README.md).

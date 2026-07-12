@@ -1,4 +1,4 @@
-# Preprocessing implementation notes
+# Preprocessing Notes
 
 The current preprocessing path uses the pretrained MotionBERT representation
 instead of handcrafted pose features. Shared keypoint operations live in
@@ -15,5 +15,5 @@ For every AIST++ clip, the pipeline writes:
 | Motion beat representation | `[128, 2]` |
 
 The MotionBERT checkpoint defaults to `data/checkpoints/latest_epoch.bin` and
-must contain the `model_pos` state dictionary. See [README.md](README.md) for the
+must contain the `model_pos` state dictionary. See [README.md](../README.md) for the
 complete two-stage reproduction workflow.
