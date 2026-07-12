@@ -5,6 +5,10 @@
 Official research code for **“Dance to Music Generation leveraging Pre-training
 with Unpaired data and Contrastive Alignment.”**
 
+Pretrained checkpoints and test-set dance videos paired with generated music
+will be published on
+[Google Drive](https://drive.google.com/drive/folders/1rhDqPitcFlthedr5vS6kG2PoNO_PW2it?usp=sharing).
+
 The system is trained in two stages:
 
 1. MotionBERT and MERT features are aligned with beat-guided contrastive
@@ -74,10 +78,8 @@ AudioLDM weights follow the upstream
 and `latest_epoch.bin` is the pretrained
 [MotionBERT](https://github.com/Walter0807/MotionBERT) checkpoint.
 
-Paper checkpoints will be published on
-[Google Drive (link placeholder)](https://drive.google.com/drive/folders/PLACEHOLDER).
-The same folder will include test-set dance videos paired with generated music.
-They should load normally for inference, evaluation, and weight-only fine-tuning.
+The published checkpoints should load normally for inference, evaluation, and
+weight-only fine-tuning.
 Exact training resume, including optimizer state and global step, may be
 incompatible with the refactored modules. If exact resume fails, use
 `git checkout 0c1f4e3197a7c339586ce5769c6a4510dfbc6f30`.
