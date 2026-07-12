@@ -10,7 +10,6 @@
 # --------------------------------------------------------
 
 from functools import partial
-from json import encoder
 
 import torch
 import torch.nn as nn
@@ -19,7 +18,6 @@ from timm.models.vision_transformer import Block
 from audioldm_train.modules.audiomae.util.pos_embed import (
     get_2d_sincos_pos_embed,
     get_2d_sincos_pos_embed_flexible,
-    get_1d_sincos_pos_embed_from_grid,
 )
 from audioldm_train.modules.audiomae.util.patch_embed import (
     PatchEmbed_new,
@@ -121,42 +119,8 @@ class MaskedAutoencoderViT(nn.Module):
         self.no_shift = no_shift
 
         self.decoder_mode = decoder_mode
-        if (
-            self.use_custom_patch
-        ):  # overlapped patches as in AST. Similar performance yet compute heavy
-            window_size = (6, 6)
-            feat_size = (102, 12)
-        else:
-            window_size = (4, 4)
-            feat_size = (64, 8)
         if self.decoder_mode == 1:
-            decoder_modules = []
-            for index in range(16):
-                if self.no_shift:
-                    shift_size = (0, 0)
-                else:
-                    if (index % 2) == 0:
-                        shift_size = (0, 0)
-                    else:
-                        shift_size = (2, 0)
-                    # shift_size = tuple([0 if ((index % 2) == 0) else w // 2 for w in window_size])
-                decoder_modules.append(
-                    SwinTransformerBlock(
-                        dim=decoder_embed_dim,
-                        num_heads=16,
-                        feat_size=feat_size,
-                        window_size=window_size,
-                        shift_size=shift_size,
-                        mlp_ratio=mlp_ratio,
-                        drop=0.0,
-                        drop_attn=0.0,
-                        drop_path=0.0,
-                        extra_norm=False,
-                        sequential_attn=False,
-                        norm_layer=norm_layer,  # nn.LayerNorm,
-                    )
-                )
-            self.decoder_blocks = nn.ModuleList(decoder_modules)
+            raise NotImplementedError("Swin decoder mode is not available")
         else:
             # Transfomer
             self.decoder_blocks = nn.ModuleList(
@@ -355,14 +319,12 @@ class MaskedAutoencoderViT(nn.Module):
             noise_t, dim=1
         )  # ascend: small is keep, large is remove
         ids_restore_t = torch.argsort(ids_shuffle_t, dim=1)
-        ids_keep_t = ids_shuffle_t[:, :len_keep_t]
         # noise mask in freq
         noise_f = torch.rand(N, F, device=x.device)  # noise in [0, 1]
         ids_shuffle_f = torch.argsort(
             noise_f, dim=1
         )  # ascend: small is keep, large is remove
         ids_restore_f = torch.argsort(ids_shuffle_f, dim=1)
-        ids_keep_f = ids_shuffle_f[:, :len_keep_f]  #
 
         # generate the binary mask: 0 is keep, 1 is remove
         # mask in freq

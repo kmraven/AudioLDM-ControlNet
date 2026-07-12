@@ -1,9 +1,6 @@
 import torch
 import torch.nn.functional as F
-import scipy.stats
 import numpy as np
-import concurrent.futures
-import time
 
 
 # Returns list of retrieved top k videos based on the sims matrix
@@ -131,8 +128,6 @@ def sim_matrix_training(text_embeds, vid_embeds_pooled, pooling_type='avg'):
     Output
         sims: num_texts x num_vids
     """
-    #import pdb
-    #pdb.set_trace()
     B, T, D  = text_embeds.shape
     text_embeds = text_embeds.reshape((B, T*D))
     vid_embeds_pooled = vid_embeds_pooled.reshape((B, T*D))
@@ -241,8 +236,6 @@ def sim_matrix_inference_per_frame_aspect_max(text_embeds_per_video_id, vid_embe
     # Normalize
     text_norm = text_embeds_per_video_id / text_embeds_per_video_id.norm(dim=-1, keepdim=True)  # (V_text, T, L, K, D)
     video_norm = vid_embeds_per_video_id / vid_embeds_per_video_id.norm(dim=-1, keepdim=True)  # (V_vid, L, K, D)
-    #import pdb
-    #pdb.set_trace()
     # Compute dot product per frame/aspect: einsum → (V_text, T, V_vid, L, K)
     sims = torch.einsum('atlkd,blkd->atblk', text_norm, video_norm)
 
@@ -423,5 +416,4 @@ def pad_and_stack_dict_to_tensor(input, order, d=512):
 
     padded_stacked_input = torch.stack([padded_input[k] for k in order], dim = 0)
     return padded_stacked_input
-
 

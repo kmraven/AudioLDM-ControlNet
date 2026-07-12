@@ -7,15 +7,15 @@
     "save_inference": 0,
 
     "dataset_name": "pdl",
-    "videos_dir": "/home/sangheon/Desktop/SonyCSL/dance2music/AIST/beatdance_features",
-    "ann_dir": "/home/sangheon/Desktop/SonyCSL/BeatDance/data/SonyData/dummy.csv",
+    "videos_dir": "./data/dataset/pdl/beatdance_features",
+    "ann_dir": "./data/dataset/pdl/annotations.csv",
     "msrvtt_train_file": "9k",
     "num_frames": 110,
     "video_sample_type": "uniform",
     "input_res": 224,
 
     "exp_name": "L110_batchsize32_framewise_v2",
-    "output_dir": "/home/sangheon/Desktop/SonyCSL/BeatDance/model",
+    "output_dir": "./log/beatdance",
     "save_every": 50,
     "log_step": 20,
     "evals_per_epoch": 1,

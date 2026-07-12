@@ -10,4 +10,4 @@ class ModelFactory:
         elif config.arch == 'clip_transformer':
             return CLIPTransformer(config)
         else:
-            raise NotImplemented
+            raise NotImplementedError

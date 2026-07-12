@@ -7,15 +7,15 @@
     "save_inference": 0,
 
     "dataset_name": "aist",
-    "videos_dir": "/home/sangheon/Desktop/AudioLDM-ControlNet/data/dataset/AIST/beatdance_features",
-    "ann_dir": "/home/sangheon/Desktop/SonyCSL/BeatDance/data/SonyData/dummy.csv",
+    "videos_dir": "./data/dataset/aist/beatdance_features",
+    "ann_dir": "",
     "msrvtt_train_file": "9k",
     "num_frames": 110,
     "video_sample_type": "uniform",
     "input_res": 224,
 
     "exp_name": "L10_batchsize32_framewise_v2",
-    "output_dir": "/home/sangheon/Desktop/AudioLDM-ControlNet/BeatDance/outputs",
+    "output_dir": "./log/beatdance",
     "save_every": 50,
     "log_step": 20,
     "evals_per_epoch": 1,
@@ -53,5 +53,5 @@
     "num_workers": 4,
     "seed": 24,
     "no_tensorboard": false,
-    "tb_log_dir": "/home/sangheon/Desktop/AudioLDM-ControlNet/BeatDance/logs"
+    "tb_log_dir": "./log/beatdance/logs"
   }

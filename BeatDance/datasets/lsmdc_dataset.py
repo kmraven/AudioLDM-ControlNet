@@ -1,16 +1,4 @@
 import os
-import cv2
-import sys
-import torch
-import random
-import itertools
-import numpy as np
-import pandas as pd
-import ujson as json
-from PIL import Image
-from torchvision import transforms
-from collections import defaultdict
-from modules.basic_utils import load_json
 from torch.utils.data import Dataset
 from config.base_config import Config
 from datasets.video_capture import VideoCapture

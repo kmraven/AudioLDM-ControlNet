@@ -1,5 +1,5 @@
 {
-    "audiocaps": "/data/rkimura/audioldm-controlnet/dataset/audioset",
+    "audiocaps": "./data/dataset/audioset",
     "aist": "./data/dataset/aist",
     "comments":{
     },

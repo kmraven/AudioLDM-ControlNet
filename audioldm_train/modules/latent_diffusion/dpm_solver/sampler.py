@@ -61,8 +61,6 @@ class DPMSolverSampler(object):
         C, H, W = shape
         size = (batch_size, C, H, W)
 
-        # print(f'Data shape for DPM-Solver sampling is {size}, sampling steps {S}')
-
         device = self.model.betas.device
         if x_T is None:
             img = torch.randn(size, device=device)

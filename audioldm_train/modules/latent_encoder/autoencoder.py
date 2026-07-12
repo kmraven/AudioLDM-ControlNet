@@ -1,14 +1,11 @@
-from email.policy import strict
 import torch
 import os
 
 import pytorch_lightning as pl
 import torch.nn.functional as F
-from contextlib import contextmanager
 import numpy as np
 from audioldm_train.modules.diffusionmodules.ema import *
 
-from torch.optim.lr_scheduler import LambdaLR
 from audioldm_train.modules.diffusionmodules.model import Encoder, Decoder
 from audioldm_train.modules.diffusionmodules.distributions import (
     DiagonalGaussianDistribution,
@@ -220,14 +217,10 @@ class AutoencoderKL(pl.LightningModule):
         return dec, posterior
 
     def get_input(self, batch):
-        fname, text, label_indices, waveform, stft, fbank = (
-            batch["fname"],
-            batch["text"],
-            batch["label_vector"],
-            batch["waveform"],
-            batch["stft"],
-            batch["log_mel_spec"],
-        )
+        fname = batch["fname"]
+        waveform = batch["waveform"]
+        stft = batch["stft"]
+        fbank = batch["log_mel_spec"]
         # if(self.time_shuffle != 1):
         #     if(fbank.size(1) % self.time_shuffle != 0):
         #         pad_len = self.time_shuffle - (fbank.size(1) % self.time_shuffle)
@@ -432,7 +425,6 @@ class AutoencoderKL(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         inputs_dict = self.get_input(batch)
         inputs = inputs_dict[self.image_key]
-        waveform = inputs_dict["waveform"]
         fnames = inputs_dict["fname"]
 
         reconstructions, posterior = self(inputs)
@@ -442,7 +434,6 @@ class AutoencoderKL(pl.LightningModule):
 
         if self.image_key == "stft":
             wav_prediction = self.decode_to_waveform(reconstructions)
-            wav_original = waveform
             self.save_wave(
                 wav_prediction, fnames, os.path.join(save_path, "stft_wav_prediction")
             )

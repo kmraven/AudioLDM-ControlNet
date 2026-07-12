@@ -82,11 +82,10 @@ class AudioMAE(nn.Module):
         )  # fixed sin-cos embedding
 
         checkpoint_path = (
-            "/mnt/bn/data-xubo/project/Masked_AudioEncoder/checkpoint/finetuned.pth"
+            "data/checkpoints/audiomae-finetuned.pth"
         )
         checkpoint = torch.load(checkpoint_path, map_location="cpu")
-        msg = model.load_state_dict(checkpoint["model"], strict=False)
-        # print(f'Load AudioMAE from {checkpoint_path} / message: {msg}')
+        model.load_state_dict(checkpoint["model"], strict=False)
 
         self.model = model
 
@@ -112,10 +111,7 @@ class Vanilla_AudioMAE(nn.Module):
 
         checkpoint_path = "data/checkpoints/audiomae_16k_128bins.ckpt"
         checkpoint = torch.load(checkpoint_path, map_location="cpu")
-        msg = model.load_state_dict(checkpoint["model"], strict=False)
-
-        # Skip the missing keys of decoder modules (not required)
-        # print(f'Load AudioMAE from {checkpoint_path} / message: {msg}')
+        model.load_state_dict(checkpoint["model"], strict=False)
 
         self.model = model.eval()
 

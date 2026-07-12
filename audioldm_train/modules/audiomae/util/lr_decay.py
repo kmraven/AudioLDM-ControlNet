@@ -9,7 +9,6 @@
 # BEiT: https://github.com/microsoft/unilm/tree/master/beit
 # --------------------------------------------------------
 
-import json
 
 
 def param_groups_lrd(
@@ -58,7 +57,6 @@ def param_groups_lrd(
         param_group_names[group_name]["params"].append(n)
         param_groups[group_name]["params"].append(p)
 
-    # print("parameter groups: \n%s" % json.dumps(param_group_names, indent=2))
 
     return list(param_groups.values())
 

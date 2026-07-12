@@ -23,8 +23,8 @@ class AllConfig(Config):
 
         # data parameters
         parser.add_argument('--dataset_name', type=str, default='pdl', help="Dataset name")
-        parser.add_argument('--videos_dir', type=str, default='/home/sangheon/Desktop/SonyCSL/dance2music/AIST/beatdance_features', help="Location of videos")
-        parser.add_argument('--ann_dir', type=str, default='/data/han_data/dance_data/pdl_chopped_2.csv', help='Location of annotation file')
+        parser.add_argument('--videos_dir', type=str, default='./data/dataset/aist/beatdance_features', help="Location of videos")
+        parser.add_argument('--ann_dir', type=str, default='./data/dataset/metadata/pdl_chopped_2.csv', help='Location of annotation file')
         parser.add_argument('--msrvtt_train_file', type=str, default='9k')
         parser.add_argument('--num_frames', type=int, default=110) # this is the L intervals
         parser.add_argument('--video_sample_type', default='uniform', help="'rand'/'uniform'")

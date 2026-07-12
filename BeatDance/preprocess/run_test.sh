@@ -1,29 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Script to run MotionBERT feature extraction test
-# Make sure to activate the conda environment first
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$ROOT_DIR"
 
-echo "=================================="
-echo "MotionBERT Feature Extraction Test"
-echo "=================================="
-echo ""
-echo "Usage:"
-echo "  conda activate audioldm_train"
-echo "  cd /home/sangheon/Desktop/AudioLDM-ControlNet/BeatDance/preprocess"
-echo "  bash run_test.sh"
-echo ""
-echo "Or run directly with conda:"
-echo "  conda run -n audioldm_train python test_motionbert_extraction.py"
-echo ""
+: "${KEYPOINTS:?Set KEYPOINTS to a COCO keypoint pickle}"
+CHECKPOINT="${CHECKPOINT:-data/checkpoints/latest_epoch.bin}"
+export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"
+export PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}"
 
-# Check if conda environment is activated
-if [ -z "$CONDA_DEFAULT_ENV" ]; then
-    echo "⚠ WARNING: No conda environment is activated"
-    echo "Attempting to run with conda..."
-    echo ""
-    conda run -n audioldm_train python test_motionbert_extraction.py
-else
-    echo "✓ Running in conda environment: $CONDA_DEFAULT_ENV"
-    echo ""
-    python test_motionbert_extraction.py
-fi
+python3 -m BeatDance.preprocess.test_motionbert_extraction \
+  --checkpoint "$CHECKPOINT" \
+  --keypoints "$KEYPOINTS"

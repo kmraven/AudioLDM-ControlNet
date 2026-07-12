@@ -10,7 +10,6 @@ from modules.metrics import t2v_metrics, v2t_metrics
 from modules.loss import LossFactory
 from trainer.trainer import Trainer
 from modules.optimization import AdamW, get_cosine_schedule_with_warmup
-import pdb
 
 # beat dimension
 batch_size = 32
@@ -54,7 +53,7 @@ def main():
     elif config.metric == 'v2t':
         metrics = v2t_metrics
     else:
-        raise NotImplemented
+        raise NotImplementedError
       
     params_optimizer = list(model.named_parameters())
     clip_params = [p for n, p in params_optimizer if "clip." in n]

@@ -66,12 +66,8 @@ class MusicOnlyData(Dataset):
         # resample the beat_indices (number of new samples / number of og samples)
         scale = self.frames * beat_dim / ((end-start) * fps)
         beat_indices = torch.round(beat_indices * scale).long()
-        beat_indices[beat_indices>=len(beats_vector)] = len(beats_vector) - 1 # safty precaution to avoid exceeding length
-        try:
-            beats_vector[beat_indices] = 1 #(along beat_dim, every vector is the same)
-        except:
-            import pdb
-            pdb.set_trace()
+        beat_indices = beat_indices[(beat_indices >= 0) & (beat_indices < len(beats_vector))]
+        beats_vector[beat_indices] = 1 #(along beat_dim, every vector is the same)
         return beats_vector.reshape((self.frames, int(beat_dim))) #reshape to (L, beat_dim)
 
     
@@ -169,7 +165,7 @@ class MusicOnlyDataset(Dataset):
     """
     def __init__(
             self,
-            data_dir,  # /data/rkimura/aist++/beatdance_features
+            data_dir,
             metadata,
             split,
         ):
@@ -199,7 +195,7 @@ class MusicOnlyDataset(Dataset):
 class MusicOnlyDataModule(pl.LightningDataModule):
     def __init__(
             self,
-            data_dir,  # /data/rkimura/aist++/beatdance_features
+            data_dir,
             metadata,
             batch_size,
             num_workers=0,

@@ -144,10 +144,11 @@ def get_tar_path_from_txts(txt_path, islocal, proportion=1):
         with open(txt_path) as f:
             lines = f.readlines()
         if islocal:
+            audio_root = os.environ.get("CLAP_AUDIO_ROOT", "data/dataset/clap")
             lines = [
                 lines[i]
                 .split("\n")[0]
-                .replace("pipe:aws s3 cp s3://s-laion-audio/", "/mnt/audio_clip/")
+                .replace("pipe:aws s3 cp s3://s-laion-audio/", f"{audio_root}/")
                 for i in range(len(lines))
             ]
         else:
@@ -213,8 +214,7 @@ def pad_framewise_output(framewise_output, frames_num):
     )
     """tensor for padding"""
 
-    output = torch.cat((framewise_output, pad), dim=1)
-    """(batch_size, frames_num, classes_num)"""
+    return torch.cat((framewise_output, pad), dim=1)
 
 
 def process_ipc(index_path, classes_num, filename):
@@ -317,9 +317,6 @@ def load_json(name):
     return data
 
 
-from multiprocessing import Process, Manager
-from multiprocessing import Process, Value, Array
-from ctypes import c_wchar
 
 
 def load_class_label(path):

@@ -45,7 +45,7 @@ def main():
     elif config.metric == 'v2t':
         metrics = v2t_metrics
     else:
-        raise NotImplemented
+        raise NotImplementedError
       
     params_optimizer = list(model.named_parameters())
     clip_params = [p for n, p in params_optimizer if "clip." in n]

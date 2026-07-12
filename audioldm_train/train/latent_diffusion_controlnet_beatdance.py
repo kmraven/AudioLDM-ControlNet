@@ -1,9 +1,7 @@
 import os
-import sys
 import warnings
 
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
-sys.path.append("./BeatDance")
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 import argparse
@@ -12,14 +10,17 @@ import shutil
 
 import torch
 import yaml
-from huggingface_hub import hf_hub_download
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.strategies.ddp import DDPStrategy
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
+from audioldm_train.train.checkpoint_utils import (
+    download_checkpoint,
+    filter_compatible_state_dict,
+    modify_state_dict,
+)
 from audioldm_train.utilities.data.dataset_aistpp import AISTBeatDanceDataset
 from audioldm_train.utilities.model_util import instantiate_from_config
 from audioldm_train.utilities.tools import (
@@ -30,45 +31,8 @@ from audioldm_train.utilities.tools import (
 logging.basicConfig(level=logging.WARNING)
 
 
-def download_checkpoint(checkpoint_name="audioldm2-full"):
-    """
-    https://github.com/haoheliu/AudioLDM2/blob/b5786c5dc0ae8f766337fdc1b67ab6046586d14d/audioldm2/utils.py#L209
-    """
-    if "audioldm2-speech" in checkpoint_name:
-        model_id = "haoheliu/audioldm2-speech"
-    else:
-        model_id = "haoheliu/%s" % checkpoint_name
-
-    checkpoint_path = hf_hub_download(
-        repo_id=model_id, filename=checkpoint_name + ".pth"
-    )
-    return checkpoint_path
-
-
-def modify_state_dict(state_dict, modify_dict):
-    """
-    modify_dict[target_key] = {
-        "new_key": str,
-        "duplicate": bool
-    }
-    """
-    for target_key in modify_dict.keys():
-        new_key = modify_dict[target_key]["new_key"]
-        duplicate = modify_dict[target_key]["duplicate"]
-
-        if target_key in state_dict.keys():
-            state_dict[new_key] = state_dict[target_key]
-            if not duplicate:
-                del state_dict[target_key]
-    return state_dict
-
-
-def print_on_rank0(msg):
-    if torch.distributed.get_rank() == 0:
-        print(msg)
-
-
 def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation):
+    del perform_validation
     if "seed" in configs.keys():
         seed_everything(configs["seed"])
     else:
@@ -83,10 +47,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     log_path = configs["log_directory"]
     batch_size = configs["model"]["params"]["batchsize"]
 
-    if "dataloader_add_ons" in configs["data"].keys():
-        dataloader_add_ons = configs["data"]["dataloader_add_ons"]
-    else:
-        dataloader_add_ons = []
+    dataloader_add_ons = configs["data"].get("dataloader_add_ons", [])
 
     dataset = AISTBeatDanceDataset(configs, split="train", add_ons=dataloader_add_ons)
 
@@ -110,7 +71,6 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
         batch_size=8,
     )
 
-    # Copy test data
     test_data_subset_folder = os.path.join(
         os.path.dirname(configs["log_directory"]),
         "valset_data",
@@ -119,24 +79,19 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     os.makedirs(test_data_subset_folder, exist_ok=True)
     copy_test_subset_data(val_dataset.data, test_data_subset_folder)
 
-    try:
-        config_reload_from_ckpt = configs["reload_from_ckpt"]
-    except:
-        config_reload_from_ckpt = None
-
-    try:
-        limit_val_batches = configs["step"]["limit_val_batches"]
-    except:
-        limit_val_batches = None
+    config_reload_from_ckpt = configs.get("reload_from_ckpt")
+    limit_val_batches = configs["step"].get("limit_val_batches")
 
     validation_every_n_epochs = configs["step"]["validation_every_n_epochs"]
     save_checkpoint_every_n_steps = configs["step"]["save_checkpoint_every_n_steps"]
     max_steps = configs["step"]["max_steps"]
 
-    checkpoint_path = os.path.join(log_path, exp_group_name, exp_name, "checkpoints")
-    # checkpoint_save_path = os.path.join(
-    #     configs.get("ckpt_save_path", log_path), exp_group_name, exp_name, "checkpoints"
-    # )
+    checkpoint_path = os.path.join(
+        configs.get("ckpt_save_path", log_path),
+        exp_group_name,
+        exp_name,
+        "checkpoints",
+    )
     wandb_path = os.path.join(log_path, exp_group_name, exp_name)
 
     checkpoint_callbacks = [
@@ -148,57 +103,17 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
             every_n_train_steps=save_checkpoint_every_n_steps,
             auto_insert_metric_name=False,
             save_last=True,
-            save_top_k=4,
+            save_top_k=configs["step"].get("save_top_k", 4),
         ),
-        # ModelCheckpoint(
-        #     # dirpath=checkpoint_save_path,
-        #     dirpath=checkpoint_path,
-        #     monitor="val/frechet_audio_distance",
-        #     mode="min",
-        #     filename="checkpoint-fad-{val/frechet_audio_distance:.2f}-global_step={global_step:.0f}",
-        #     auto_insert_metric_name=False,
-        #     save_weights_only=True,
-        #     save_last=False,
-        # ),
-        # ModelCheckpoint(
-        #     # dirpath=checkpoint_save_path,
-        #     dirpath=checkpoint_path,
-        #     monitor="val/f1_score",
-        #     mode="max",
-        #     filename="checkpoint-f1_score-{val/f1_score:.2f}-global_step={global_step:.0f}",
-        #     auto_insert_metric_name=False,
-        #     save_weights_only=True,
-        #     save_last=False,
-        # ),
-        # ModelCheckpoint(
-        #     # dirpath=checkpoint_save_path,
-        #     dirpath=checkpoint_path,
-        #     monitor="val/tempo_difference",
-        #     mode="min",
-        #     filename="checkpoint-tempo_difference-{val/tempo_difference:.2f}-global_step={global_step:.0f}",
-        #     auto_insert_metric_name=False,
-        #     save_weights_only=True,
-        #     save_last=False,
-        # ),
-        # ModelCheckpoint(
-        #     # dirpath=checkpoint_save_path,
-        #     dirpath=checkpoint_path,
-        #     monitor="val/clap_score",
-        #     mode="max",
-        #     filename="checkpoint-clap_score-{val/clap_score:.2f}-global_step={global_step:.0f}",
-        #     auto_insert_metric_name=False,
-        #     save_weights_only=True,
-        #     save_last=False,
-        # ),
     ]
     os.makedirs(checkpoint_path, exist_ok=True)
-    # os.makedirs(checkpoint_save_path, exist_ok=True)
+    os.makedirs(wandb_path, exist_ok=True)
     shutil.copy(config_yaml_path, wandb_path)
 
     is_external_checkpoints = False
     if len(os.listdir(checkpoint_path)) > 0:
         print("Load checkpoint from path: %s" % checkpoint_path)
-        restore_step, n_step = get_restore_step(checkpoint_path)
+        restore_step, _ = get_restore_step(checkpoint_path)
         resume_from_checkpoint = os.path.join(checkpoint_path, restore_step)
         print("Resume from checkpoint", resume_from_checkpoint)
     elif config_reload_from_ckpt is not None:
@@ -241,7 +156,9 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     if is_external_checkpoints:
         if resume_from_checkpoint is not None:
             try:
-                ckpt = torch.load(resume_from_checkpoint, weights_only=False)["state_dict"]
+                ckpt = torch.load(resume_from_checkpoint, weights_only=False)[
+                    "state_dict"
+                ]
             except FileNotFoundError:
                 ckpt_path = download_checkpoint(resume_from_checkpoint)
                 ckpt = torch.load(ckpt_path, weights_only=False)["state_dict"]
@@ -258,8 +175,6 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
                 }
                 ckpt = modify_state_dict(ckpt, modify_dict)
 
-            key_not_in_model_state_dict = []
-            size_mismatch_keys = []
             state_dict = latent_diffusion.state_dict()
             print("Filtering key for reloading:", resume_from_checkpoint)
             print(
@@ -267,25 +182,22 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
                 len(list(state_dict.keys())),
                 len(list(ckpt.keys())),
             )
-            for key in tqdm(list(ckpt.keys())):
-                if key not in state_dict.keys():
-                    key_not_in_model_state_dict.append(key)
-                    del ckpt[key]
-                    continue
-                if state_dict[key].size() != ckpt[key].size():
-                    del ckpt[key]
-                    size_mismatch_keys.append(key)
+            ckpt, key_not_in_model_state_dict, size_mismatch_keys = (
+                filter_compatible_state_dict(ckpt, state_dict)
+            )
 
-            # if(len(key_not_in_model_state_dict) != 0 or len(size_mismatch_keys) != 0):
-            # print("⛳", end=" ")
-
-            # print("==> Warning: The following key in the checkpoint is not presented in the model:", key_not_in_model_state_dict)
-            # print("==> Warning: These keys have different size between checkpoint and current model: ", size_mismatch_keys)
+            if key_not_in_model_state_dict:
+                print(
+                    "Skipped checkpoint keys missing from the model:",
+                    len(key_not_in_model_state_dict),
+                )
+            if size_mismatch_keys:
+                print(
+                    "Skipped checkpoint keys with incompatible shapes:",
+                    len(size_mismatch_keys),
+                )
 
             latent_diffusion.load_state_dict(ckpt, strict=False)
-
-        # if(perform_validation):
-        #     trainer.validate(latent_diffusion, val_loader)
 
         trainer.fit(latent_diffusion, loader, val_loader)
     else:
@@ -300,7 +212,7 @@ if __name__ == "__main__":
         "-c",
         "--config_yaml",
         type=str,
-        required=False,
+        required=True,
         help="path to config .yaml file",
     )
 
@@ -334,7 +246,8 @@ if __name__ == "__main__":
     exp_group_name = os.path.basename(os.path.dirname(config_yaml))
 
     config_yaml_path = os.path.join(config_yaml)
-    config_yaml = yaml.load(open(config_yaml_path, "r"), Loader=yaml.FullLoader)
+    with open(config_yaml_path) as config_file:
+        config_yaml = yaml.load(config_file, Loader=yaml.FullLoader)
 
     if args.reload_from_ckpt is not None:
         config_yaml["reload_from_ckpt"] = args.reload_from_ckpt

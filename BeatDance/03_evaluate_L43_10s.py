@@ -9,10 +9,6 @@ from model.model_factory import ModelFactory
 from modules.metrics import t2v_metrics, v2t_metrics
 from modules.loss import LossFactory
 from trainer.trainer_beatdance_frame import Trainer
-from modules.optimization import AdamW, get_cosine_schedule_with_warmup
-import pdb
-from tqdm import tqdm
-import pandas as pd
 
 # beat dimension
 
@@ -46,11 +42,7 @@ def main():
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
 
-    train_data_loader  = DataFactory.get_data_loader(config_test, split_type='train',
-                                                    lookup_dir=config_train.ann_dir) # stacked 2s segments into 10s in total
     test_data_loader  = DataFactory.get_data_loader(config_test, split_type='test', 
-                                                    lookup_dir=config_train.ann_dir) # 10s segments instead of 2s
-    val_data_loader  = DataFactory.get_data_loader(config_test, split_type='val', 
                                                     lookup_dir=config_train.ann_dir) # 10s segments instead of 2s
     model = ModelFactory.get_model(config_train)
     model.to(device)
@@ -60,7 +52,7 @@ def main():
     elif config_train.metric == 'v2t':
         metrics = v2t_metrics
     else:
-        raise NotImplemented
+        raise NotImplementedError
     
 
     loss = LossFactory.get_loss(config_train)

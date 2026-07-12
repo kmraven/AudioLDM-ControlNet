@@ -1,9 +1,7 @@
 import os
-import sys
 import warnings
 
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
-sys.path.append("src")
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 import shutil
@@ -272,12 +270,6 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
                 if state_dict[key].size() != ckpt[key].size():
                     del ckpt[key]
                     size_mismatch_keys.append(key)
-
-            # if(len(key_not_in_model_state_dict) != 0 or len(size_mismatch_keys) != 0):
-            # print("⛳", end=" ")
-
-            # print("==> Warning: The following key in the checkpoint is not presented in the model:", key_not_in_model_state_dict)
-            # print("==> Warning: These keys have different size between checkpoint and current model: ", size_mismatch_keys)
 
             latent_diffusion.load_state_dict(ckpt, strict=False)
 

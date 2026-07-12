@@ -7,7 +7,6 @@ import random
 import numpy as np
 
 from torch.utils.data import DistributedSampler
-from torch.utils.data.sampler import Sampler
 
 LOGGER = logging.getLogger(__name__)
 
@@ -363,11 +362,11 @@ class DynamicBalanceClassSampler(Sampler):
 
         if self.min_class_size < 100 and not ignore_warning:
             LOGGER.warning(
-                f"the smallest class contains only"
+                "the smallest class contains only"
                 f" {self.min_class_size} examples. At the end of"
-                f" training, epochs will contain only"
+                " training, epochs will contain only"
                 f" {self.min_class_size * len(samples_per_class)}"
-                f" examples"
+                " examples"
             )
 
         self.original_d = {

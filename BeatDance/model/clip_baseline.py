@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 from config.base_config import Config
 from modules.baseline_pooling import BaselinePooling

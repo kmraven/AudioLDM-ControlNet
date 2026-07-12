@@ -1,8 +1,5 @@
 import torch
-import torch.nn as nn
 import numpy as np
-from timm.models.layers import to_2tuple
-import models_vit
 from audiovisual_dataset import AudioVisualDataset, collate_fn
 from torch.utils.data import DataLoader
 from util.stat import calculate_stats
@@ -13,7 +10,7 @@ if __name__ == "__main__":
     device = "cuda"
     dataset = AudioVisualDataset(
         datafiles=[
-            "/mnt/bn/data-xubo/dataset/audioset_videos/datafiles/audioset_eval.json"
+            "data/dataset/metadata/audioset_eval.json"
         ],
         # disable SpecAug during evaluation
         freqm=0,

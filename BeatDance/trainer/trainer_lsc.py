@@ -1,9 +1,7 @@
 ################################## Trainer for Frame-wise Max-Concpet Learning w/ LSC ##################################
 import os
-import json
 import numpy as np
 import torch
-import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from collections import defaultdict, deque
@@ -11,16 +9,12 @@ from config.base_config import Config
 from trainer.base_trainer import BaseTrainer
 from modules.metrics import (
     sim_matrix_training_per_frame_aspect_max,
-    sim_matrix_training_per_frame,
     sim_matrix_inference_per_frame_aspect_max,
     sim_matrix_inference,
-    generate_embeds_per_video_id,
-    beat_similarity,
     qb_norm
 )
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
-import random
 
 
 class Trainer(BaseTrainer):
@@ -495,11 +489,11 @@ class Trainer(BaseTrainer):
             output_dir = "./probe_results"
             os.makedirs(output_dir, exist_ok=True)
 
-            def plot_scatter(embedding_2d, method, filename_suffix, prefix):
+            def plot_scatter(embedding_2d, method, filename_suffix, prefix, labels_2d=labels_np):
                 plt.figure(figsize=(10, 8))
-                unique_labels = sorted(set(labels_np))
+                unique_labels = sorted(set(labels_2d))
                 for label in unique_labels:
-                    idx = labels_np == label
+                    idx = labels_2d == label
                     plt.scatter(embedding_2d[idx, 0], embedding_2d[idx, 1], label=label, s=40, alpha=0.75)
                 plt.title(f"{title} ({method})")
                 plt.xlabel(f"{method} 1")
@@ -528,7 +522,7 @@ class Trainer(BaseTrainer):
 
             tsne = TSNE(n_components=2, perplexity=30, n_iter=500, init='random', learning_rate='auto')
             tsne_2d = tsne.fit_transform(tsne_input)
-            plot_scatter(tsne_2d, "t-SNE", "tsne", filename_prefix)
+            plot_scatter(tsne_2d, "t-SNE", "tsne", filename_prefix, tsne_labels)
 
         plot_embeddings(all_dance_embeddings, dance_labels, "Dance Embedding Variants", "dance_probe")
         plot_embeddings(all_music_embeddings, music_labels, "Music Embedding Variants", "music_probe")

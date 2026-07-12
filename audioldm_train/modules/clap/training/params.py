@@ -141,7 +141,7 @@ def parse_args():
     parser.add_argument(
         "--datasetpath",
         type=str,
-        default="/mnt/audio_clip/webdataset_tar",
+        default="data/dataset/clap/webdataset_tar",
         help="The path to the dataset",
     )
     parser.add_argument(

@@ -25,7 +25,17 @@ matplotlib = "^3.8.1"
 taming-transformers-rom1504 = "^0.0.6"
 ipdb = "^0.13.13"
 
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+extend-exclude = ["arxiv"]
+
+[tool.ruff.lint]
+select = ["F401", "F541", "F811", "F821", "F822", "F823", "F841", "F901"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["F401"]

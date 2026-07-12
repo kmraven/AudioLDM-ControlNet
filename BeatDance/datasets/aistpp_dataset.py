@@ -39,7 +39,7 @@ class aistppDataset(Dataset):
 class aistppDataModule(pl.LightningDataModule):
     def __init__(
             self,
-            data_dir,  # /data/rkimura/aist++/beatdance_features
+            data_dir,
             batch_size,
             num_workers=0,
         ):

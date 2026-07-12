@@ -423,7 +423,7 @@ def build_model(state_dict: dict):
     vocab_size = state_dict["token_embedding.weight"].shape[0]
     transformer_width = state_dict["ln_final.weight"].shape[0]
     transformer_heads = transformer_width // 64
-    transformer_layers = len(set(k.split(".")[2] for k in state_dict if k.startswith(f"transformer.resblocks")))
+    transformer_layers = len(set(k.split(".")[2] for k in state_dict if k.startswith("transformer.resblocks")))
 
     model = CLIP(
         embed_dim,
@@ -474,7 +474,7 @@ def _download(url: str, root: str = os.path.expanduser("~/.cache/clip")):
                 loop.update(len(buffer))
 
     if hashlib.sha256(open(download_target, "rb").read()).hexdigest() != expected_sha256:
-        raise RuntimeError(f"Model has been downloaded but the SHA256 checksum does not not match")
+        raise RuntimeError("Model has been downloaded but the SHA256 checksum does not not match")
 
     return download_target
 

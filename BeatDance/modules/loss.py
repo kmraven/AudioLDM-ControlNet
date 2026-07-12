@@ -80,4 +80,4 @@ class LossFactory:
         if config.loss == 'dbclip':
             return DBCLIPLoss(config.threshold)
         else:
-            raise NotImplemented
+            raise NotImplementedError

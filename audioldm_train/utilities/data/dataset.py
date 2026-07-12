@@ -1,9 +1,5 @@
-import sys
-
-sys.path.append("src")
 import os
 import pandas as pd
-import yaml
 import audioldm_train.utilities.audio as Audio
 from audioldm_train.utilities.tools import load_json
 from audioldm_train.dataset_plugin import *
@@ -15,7 +11,6 @@ import torch.nn.functional
 import torch
 import numpy as np
 import torchaudio
-import json
 
 
 def dynamic_range_compression_torch(x, C=1, clip_val=1e-5):
@@ -587,48 +582,3 @@ class AudioDataset(Dataset):
         mask_start = int(self.random_uniform(start=0, end=tsteps - mask_len))
         log_mel_spec[:, :, mask_start : mask_start + mask_len] *= 0.0
         return log_mel_spec
-
-
-if __name__ == "__main__":
-    import torch
-    from tqdm import tqdm
-    from pytorch_lightning import seed_everything
-    from torch.utils.data import DataLoader
-
-    seed_everything(0)
-
-    def write_json(my_dict, fname):
-        # print("Save json file at "+fname)
-        json_str = json.dumps(my_dict)
-        with open(fname, "w") as json_file:
-            json_file.write(json_str)
-
-    def load_json(fname):
-        with open(fname, "r") as f:
-            data = json.load(f)
-            return data
-
-    config = yaml.load(
-        open(
-            "/mnt/bn/lqhaoheliu/project/audio_generation_diffusion/config/vae_48k_256/ds_8_kl_1.0_ch_16.yaml",
-            "r",
-        ),
-        Loader=yaml.FullLoader,
-    )
-
-    add_ons = config["data"]["dataloader_add_ons"]
-
-    # load_json(data)
-    dataset = AudioDataset(
-        config=config, split="train", waveform_only=False, add_ons=add_ons
-    )
-
-    loader = DataLoader(dataset, batch_size=1, num_workers=0, shuffle=True)
-
-    for cnt, each in tqdm(enumerate(loader)):
-        # print(each["waveform"].size(), each["log_mel_spec"].size())
-        # print(each['freq_energy_percentile'])
-        import ipdb
-
-        ipdb.set_trace()
-        # pass

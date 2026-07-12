@@ -1,10 +1,5 @@
 import os
 import ujson as json
-import zipfile
-import numpy as np
-import pickle
-import random
-import torch
 import shutil
 
 # Only works with huggingface param names

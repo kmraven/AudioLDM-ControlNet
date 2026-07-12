@@ -1,40 +1,33 @@
 import os
-import sys
 import warnings
 
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
-sys.path.append("./BeatDance")
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
-import shutil
 import argparse
-import yaml
-import torch
-
-from tqdm import tqdm
-from pytorch_lightning.strategies.ddp import DDPStrategy
-from huggingface_hub import hf_hub_download
-from audioldm_train.utilities.data.dataset_aistpp import AISTBeatDanceDataset
-
-from torch.utils.data import DataLoader
-from pytorch_lightning import Trainer, seed_everything
-from pytorch_lightning.callbacks import ModelCheckpoint
-from pytorch_lightning.loggers import WandbLogger
-from audioldm_train.utilities.tools import (
-    get_restore_step,
-    copy_test_subset_data,
-)
-from audioldm_train.utilities.model_util import instantiate_from_config
-from audioldm_train.train.latent_diffusion_controlnet import modify_state_dict, download_checkpoint
 import logging
+import shutil
+
+import torch
+import yaml
+from pytorch_lightning import Trainer, seed_everything
+from pytorch_lightning.strategies.ddp import DDPStrategy
+from torch.utils.data import DataLoader
+
+from audioldm_train.train.checkpoint_utils import (
+    download_checkpoint,
+    filter_compatible_state_dict,
+    modify_state_dict,
+)
+from audioldm_train.utilities.data.dataset_aistpp import AISTBeatDanceDataset
+from audioldm_train.utilities.model_util import instantiate_from_config
+from audioldm_train.utilities.tools import copy_test_subset_data
 
 logging.basicConfig(level=logging.WARNING)
 
 
-use_text_condition = True
-
-
 def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation):
+    del perform_validation
     if "seed" in configs.keys():
         seed_everything(configs["seed"])
     else:
@@ -49,12 +42,13 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     log_path = configs["log_directory"]
     batch_size = configs["model"]["params"]["batchsize"]
 
-    if "dataloader_add_ons" in configs["data"].keys():
-        dataloader_add_ons = configs["data"]["dataloader_add_ons"]
-    else:
-        dataloader_add_ons = []
+    dataloader_add_ons = configs["data"].get("dataloader_add_ons", [])
 
-    val_dataset = AISTBeatDanceDataset(configs, split="test", add_ons=dataloader_add_ons) # , use_text_condition=use_text_condition)
+    val_dataset = AISTBeatDanceDataset(
+        configs,
+        split="test",
+        add_ons=dataloader_add_ons,
+    )
     val_loader = DataLoader(
         val_dataset,
         batch_size=8,
@@ -64,7 +58,6 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
         % (len(val_dataset), len(val_loader), batch_size)
     )
 
-    # Copy test data
     test_data_subset_folder = os.path.join(
         os.path.dirname(configs["log_directory"]),
         "testset_data",
@@ -73,15 +66,8 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     os.makedirs(test_data_subset_folder, exist_ok=True)
     copy_test_subset_data(val_dataset.data, test_data_subset_folder)
 
-    try:
-        config_reload_from_ckpt = configs["reload_from_ckpt"]
-    except:
-        config_reload_from_ckpt = None
-
-    try:
-        limit_val_batches = configs["step"]["limit_val_batches"]
-    except:
-        limit_val_batches = None
+    config_reload_from_ckpt = configs.get("reload_from_ckpt")
+    limit_val_batches = configs["step"].get("limit_val_batches")
 
     validation_every_n_epochs = configs["step"]["validation_every_n_epochs"]
     save_checkpoint_every_n_steps = configs["step"]["save_checkpoint_every_n_steps"]
@@ -92,6 +78,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     wandb_path = os.path.join(log_path, exp_group_name, exp_name)
 
     os.makedirs(checkpoint_path, exist_ok=True)
+    os.makedirs(wandb_path, exist_ok=True)
     shutil.copy(config_yaml_path, wandb_path)
 
     if config_reload_from_ckpt is not None:
@@ -121,11 +108,14 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
         strategy=DDPStrategy(find_unused_parameters=True),
     )
 
+    if resume_from_checkpoint is None:
+        raise ValueError("--reload_from_ckpt is required for evaluation")
+
     try:
-        ckpt = torch.load(resume_from_checkpoint)["state_dict"]
+        ckpt = torch.load(resume_from_checkpoint, weights_only=False)["state_dict"]
     except FileNotFoundError:
         ckpt_path = download_checkpoint(resume_from_checkpoint)
-        ckpt = torch.load(ckpt_path)["state_dict"]
+        ckpt = torch.load(ckpt_path, weights_only=False)["state_dict"]
 
     if not any("controlnet" in key for key in ckpt.keys()):
         modify_dict = {
@@ -136,12 +126,10 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
             "model.diffusion_model": {
                 "new_key": "controlnet_stage_models.0",
                 "duplicate": True,
-            }
+            },
         }
         ckpt = modify_state_dict(ckpt, modify_dict)
 
-    key_not_in_model_state_dict = []
-    size_mismatch_keys = []
     state_dict = latent_diffusion.state_dict()
     print("Filtering key for reloading:", resume_from_checkpoint)
     print(
@@ -149,20 +137,20 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
         len(list(state_dict.keys())),
         len(list(ckpt.keys())),
     )
-    for key in tqdm(list(ckpt.keys())):
-        if key not in state_dict.keys():
-            key_not_in_model_state_dict.append(key)
-            del ckpt[key]
-            continue
-        if state_dict[key].size() != ckpt[key].size():
-            del ckpt[key]
-            size_mismatch_keys.append(key)
+    ckpt, key_not_in_model_state_dict, size_mismatch_keys = (
+        filter_compatible_state_dict(ckpt, state_dict)
+    )
 
-    # if(len(key_not_in_model_state_dict) != 0 or len(size_mismatch_keys) != 0):
-    # print("⛳", end=" ")
-
-    # print("==> Warning: The following key in the checkpoint is not presented in the model:", key_not_in_model_state_dict)
-    # print("==> Warning: These keys have different size between checkpoint and current model: ", size_mismatch_keys)
+    if key_not_in_model_state_dict:
+        print(
+            "Skipped checkpoint keys missing from the model:",
+            len(key_not_in_model_state_dict),
+        )
+    if size_mismatch_keys:
+        print(
+            "Skipped checkpoint keys with incompatible shapes:",
+            len(size_mismatch_keys),
+        )
 
     latent_diffusion.load_state_dict(ckpt, strict=False)
 
@@ -175,15 +163,14 @@ if __name__ == "__main__":
         "-c",
         "--config_yaml",
         type=str,
-        required=False,
+        required=True,
         help="path to config .yaml file",
     )
 
     parser.add_argument(
         "--reload_from_ckpt",
         type=str,
-        required=False,
-        default=None,
+        required=True,
         help="path to pretrained checkpoint",
     )
 
@@ -201,7 +188,8 @@ if __name__ == "__main__":
     exp_group_name = os.path.basename(os.path.dirname(config_yaml))
 
     config_yaml_path = os.path.join(config_yaml)
-    config_yaml = yaml.load(open(config_yaml_path, "r"), Loader=yaml.FullLoader)
+    with open(config_yaml_path) as config_file:
+        config_yaml = yaml.load(config_file, Loader=yaml.FullLoader)
 
     if args.reload_from_ckpt is not None:
         config_yaml["reload_from_ckpt"] = args.reload_from_ckpt

@@ -7,7 +7,6 @@
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from itertools import repeat
 import collections.abc
 import math
@@ -21,7 +20,6 @@ import random
 from torchlibrosa.stft import Spectrogram, LogmelFilterBank
 from torchlibrosa.augmentation import SpecAugmentation
 
-from itertools import repeat
 from .utils import do_mixup, interpolate
 
 from .feature_fusion import iAFF, AFF, DAF
@@ -578,11 +576,7 @@ class SwinTransformerBlock(nn.Module):
         self.register_buffer("attn_mask", attn_mask)
 
     def forward(self, x):
-        # pdb.set_trace()
         H, W = self.input_resolution
-        # print("H: ", H)
-        # print("W: ", W)
-        # pdb.set_trace()
         B, L, C = x.shape
         # assert L == H * W, "input feature has wrong size"
 
@@ -1096,7 +1090,6 @@ class HTSAT_Swin_Transformer(nn.Module):
             self.freq_ratio,
             x.shape[3] // self.freq_ratio,
         )
-        # print(x.shape)
         x = x.permute(0, 1, 3, 2, 4).contiguous()
         x = x.reshape(x.shape[0], x.shape[1], x.shape[2] * x.shape[3], x.shape[4])
         return x

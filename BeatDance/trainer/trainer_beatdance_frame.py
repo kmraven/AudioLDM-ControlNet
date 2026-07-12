@@ -1,19 +1,12 @@
-import os
-import json
 import numpy as np
 import torch
-import torch.nn.functional as F
-import matplotlib.pyplot as plt
 from tqdm import tqdm
 from collections import defaultdict, deque
 from config.base_config import Config
 from trainer.base_trainer import BaseTrainer
 from modules.metrics import (
     sim_matrix_training_per_frame,
-    sim_matrix_inference,
     sim_matrix_inference_per_frame,
-    generate_embeds_per_video_id,
-    beat_similarity,
     qb_norm
 )
 
@@ -104,8 +97,6 @@ class Trainer(BaseTrainer):
         total_loss = 0.0
         num_steps = len(self.train_data_loader)
         eval_steps = np.linspace(0, num_steps - 1, self.evals_per_epoch + 1, dtype=int)[1:]
-        #print("eval steps", eval_steps, num_steps)
-        #print("training epoch started", time.time()-start)
         for batch_idx, data in enumerate(self.train_data_loader):
             # music: [32, L, 768], video: [32, L, 512], pose: [32, T, 138]
             # music_beat: [32, L, L], video_beat: [32, L, L]
@@ -210,7 +201,6 @@ class Trainer(BaseTrainer):
         self.model.eval()
         total_val_loss = 0.0
         fused_music_arr, fused_video_arr = [], []
-        import pdb
         with torch.no_grad():
             for _, data in tqdm(enumerate(self.valid_data_loader)):
                 for key in ['music', 'video', 'music_beat', 'video_beat']:

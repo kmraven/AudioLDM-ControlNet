@@ -1,17 +1,12 @@
-from inspect import getargs
 import logging
 import os
 import random
 from datetime import datetime
-import bisect
 import copy
 import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
-from torch import optim
 from torch.cuda.amp import GradScaler
-import faulthandler
-import pathlib
 
 try:
     import wandb
@@ -28,7 +23,7 @@ try:
 except ImportError:
     hvd = None
 
-from open_clip import create_model_and_transforms, trace_model, create_model
+from open_clip import trace_model, create_model
 from training.data import get_data
 from training.distributed import is_master, init_distributed_device, world_info_from_env
 from training.logger import setup_logging
@@ -134,7 +129,6 @@ def main():
     # download sizes.json file
 
     # (yusong): the below two lines are for debug
-    # print("setting up faulthandler")
     # faulthandler.register(10)
 
     random.seed(args.seed)
@@ -498,13 +492,11 @@ def main():
         return
     elif start_epoch == 0 and "val" in data and not args.no_eval:
         evaluate(model, data, 0, args, writer)
-        #  print(f'rank {args.rank}, Start First Evaluation')#  (yusong): for debug
     if args.save_top_performance:
         current_top_k_ckpt_metrics = {
             i: 0 for i in range(args.save_top_performance)
         }  # initialize the top-k metric for ckpts to 0
 
-    #  print(f'rank {args.rank}, Start Training') #  (yusong): for debug
     for epoch in range(start_epoch, args.epochs):
         # freeze the text param after (include) args.freeze_text_after, this is -1 by default
         if epoch == args.freeze_text_after:
@@ -557,7 +549,7 @@ def main():
             if args.save_most_recent:
                 torch.save(
                     checkpoint_dict,
-                    os.path.join(args.checkpoint_path, f"epoch_latest.pt"),
+                    os.path.join(args.checkpoint_path, "epoch_latest.pt"),
                 )
             if args.save_top_performance and not args.no_eval:
                 update_top_k_performance(

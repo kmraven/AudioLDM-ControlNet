@@ -1,19 +1,7 @@
 import os
-import cv2
-import sys
 import torch
-import random
-import itertools
-import numpy as np
-import pandas as pd
-import ujson as json
-from PIL import Image
-from torchvision import transforms
-from collections import defaultdict
-from modules.basic_utils import load_json
 from torch.utils.data import Dataset
 from config.base_config import Config
-from datasets.video_capture import VideoCapture
 
 
 class MSRVTTDataset(Dataset):
@@ -82,7 +70,6 @@ class MSRVTTDataset(Dataset):
 
     # to make video sequences evenly distributed in 30 portions
     def video_preprocess(self, video_feature):
-        fps = video_feature['fps']
         feature = video_feature['video_clip_feature']
         avg_pool = torch.zeros((self.frames, feature.shape[-1]))
         split_feature = torch.chunk(input=feature, chunks=self.frames, dim=0)
@@ -92,7 +79,6 @@ class MSRVTTDataset(Dataset):
 
     # to make music sequences evenly distributed in 30 portions
     def music_preprocess(self, music_feature):
-        fps = music_feature['fps']
         feature = music_feature['music_bert_feature']
         avg_pool = torch.zeros((self.frames, feature.shape[-1]))
         split_feature = torch.chunk(input=feature, chunks=self.frames, dim=0)
@@ -102,12 +88,10 @@ class MSRVTTDataset(Dataset):
 
     # to make video beat sequences evenly distributed in 30 portions
     def video_beat_preprocess(self, video_beat_feature):
-        fps = video_beat_feature['fps']
         feature = video_beat_feature['video_beat'][:100]
         return feature.reshape((self.frames, self.beat_dim)).float()
 
     # to make music beat sequences evenly distributed in 30 portions
     def music_beat_preprocess(self, music_beat_feature):
-        fps = music_beat_feature['fps']
         feature = music_beat_feature['music_beat'][:100]
         return feature.reshape((self.frames, self.beat_dim)).float()

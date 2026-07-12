@@ -1,5 +1,4 @@
 import os
-import yaml
 import torch
 from audioldm_eval import EvaluationHelper
 

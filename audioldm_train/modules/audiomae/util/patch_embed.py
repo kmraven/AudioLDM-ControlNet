@@ -113,7 +113,6 @@ if __name__ == "__main__":
     # patch_emb = PatchEmbed_new(img_size=224, patch_size=16, in_chans=1, embed_dim=64, stride=(16,16))
     # input = torch.rand(8,1,1024,128)
     # output = patch_emb(input)
-    # print(output.shape) # (8,512,64)
 
     patch_emb = PatchEmbed3D_new(
         video_size=(6, 224, 224),

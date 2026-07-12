@@ -416,8 +416,8 @@ class DDPM(pl.LightningModule):
 
     @torch.no_grad()
     def sample(self, batch_size=16, return_intermediates=False):
-        shape = (batch_size, channels, self.latent_t_size, self.latent_f_size)
         channels = self.channels
+        shape = (batch_size, channels, self.latent_t_size, self.latent_f_size)
         return self.p_sample_loop(shape, return_intermediates=return_intermediates)
 
     def q_sample(self, x_start, t, noise=None):
@@ -508,14 +508,11 @@ class DDPM(pl.LightningModule):
     def get_input(self, batch, k):
         # fbank, log_magnitudes_stft, label_indices, fname, waveform, clip_label, text = batch
         # fbank, stft, label_indices, fname, waveform, text = batch
-        fname, text, label_indices, waveform, stft, fbank = (
-            batch["fname"],
-            batch["text"],
-            batch["label_vector"],
-            batch["waveform"],
-            batch["stft"],
-            batch["log_mel_spec"],
-        )
+        fname = batch["fname"]
+        text = batch["text"]
+        waveform = batch["waveform"]
+        stft = batch["stft"]
+        fbank = batch["log_mel_spec"]
         # for i in range(fbank.size(0)):
         #     fb = fbank[i].numpy()
         #     seg_lb = seg_label[i].numpy()
@@ -602,19 +599,6 @@ class DDPM(pl.LightningModule):
         #         > 1e-7
         #     ), "Optimizer is not working"
 
-        # if len(self.metrics_buffer.keys()) > 0:
-        #     for k in self.metrics_buffer.keys():
-        #         self.log(
-        #             k,
-        #             self.metrics_buffer[k],
-        #             prog_bar=False,
-        #             logger=True,
-        #             on_step=True,
-        #             on_epoch=False,
-        #         )
-        #         # print(k, self.metrics_buffer[k])
-        #     self.metrics_buffer = {}
-
         loss, loss_dict = self.shared_step(batch)
 
         self.log_dict(
@@ -652,11 +636,7 @@ class DDPM(pl.LightningModule):
 
         for key in self.cond_stage_model_metadata.keys():
             metadata = self.cond_stage_model_metadata[key]
-            model_idx, cond_stage_key, conditioning_key = (
-                metadata["model_idx"],
-                metadata["cond_stage_key"],
-                metadata["conditioning_key"],
-            )
+            model_idx = metadata["model_idx"]
 
             # If we use CLAP as condition, we might use audio for training, but we also must use text for evaluation
             if isinstance(
@@ -679,11 +659,7 @@ class DDPM(pl.LightningModule):
         # Use text as condition during validation
         for key in self.cond_stage_model_metadata.keys():
             metadata = self.cond_stage_model_metadata[key]
-            model_idx, cond_stage_key, conditioning_key = (
-                metadata["model_idx"],
-                metadata["cond_stage_key"],
-                metadata["conditioning_key"],
-            )
+            model_idx = metadata["model_idx"]
 
             # If we use CLAP as condition, we might use audio for training, but we also must use text for evaluation
             if isinstance(
@@ -797,11 +773,7 @@ class DDPM(pl.LightningModule):
 
         for key in self.cond_stage_model_metadata.keys():
             metadata = self.cond_stage_model_metadata[key]
-            model_idx, cond_stage_key, conditioning_key = (
-                metadata["model_idx"],
-                metadata["cond_stage_key"],
-                metadata["conditioning_key"],
-            )
+            model_idx = metadata["model_idx"]
 
             if isinstance(
                 self.cond_stage_models[model_idx], CLAPAudioEmbeddingClassifierFreev2
@@ -1026,11 +998,6 @@ class LatentDiffusion(DDPM):
         super().__init__(conditioning_key=conditioning_key, *args, **kwargs)
 
         self.optimize_ddpm_parameter = optimize_ddpm_parameter
-        # if(not optimize_ddpm_parameter):
-        #     print("Warning: Close the optimization of the latent diffusion model")
-        #     for p in self.model.parameters():
-        #         p.requires_grad=False
-
         self.concat_mode = concat_mode
         self.cond_stage_key = cond_stage_key
         self.cond_stage_key_orig = cond_stage_key
@@ -1068,19 +1035,6 @@ class LatentDiffusion(DDPM):
             print("Diffusion model optimizing logvar")
             params.append(self.logvar)
         opt = torch.optim.AdamW(params, lr=lr)
-        # if self.use_scheduler:
-        #     assert "target" in self.scheduler_config
-        #     scheduler = instantiate_from_config(self.scheduler_config)
-
-        #     print("Setting up LambdaLR scheduler...")
-        #     scheduler = [
-        #         {
-        #             "scheduler": LambdaLR(opt, lr_lambda=scheduler.schedule),
-        #             "interval": "step",
-        #             "frequency": 1,
-        #         }
-        #     ]
-        #     return [opt], scheduler
         return opt
 
     def make_cond_schedule(
@@ -1430,7 +1384,6 @@ class LatentDiffusion(DDPM):
             target = self.get_v(x_start, noise, t)
         else:
             raise NotImplementedError()
-        # print(model_output.size(), target.size())
         loss_simple = self.get_loss(model_output, target, mean=False).mean([1, 2, 3])
         loss_dict.update({f"{prefix}/loss_simple": loss_simple.mean()})
 
@@ -2036,18 +1989,6 @@ class DiffusionWrapper(pl.LightningModule):
             else:
                 raise NotImplementedError()
 
-        # if not self.being_verbosed_once:
-        #     print("The input shape to the diffusion model is as follows:")
-        #     print("xc", xc.size())
-        #     print("t", t.size())
-        #     for i in range(len(context_list)):
-        #         print(
-        #             "context_%s" % i, context_list[i].size(), attn_mask_list[i].size()
-        #         )
-        #     if y is not None:
-        #         print("y", y.size())
-        #     self.being_verbosed_once = True
-
         out = self.diffusion_model(
             xc, t, context_list=context_list, y=y, context_attn_mask_list=attn_mask_list
         )
@@ -2297,16 +2238,3 @@ class LatentDiffusionVAELearnable(LatentDiffusion):
             on_step=True,
             on_epoch=False,
         )
-
-
-if __name__ == "__main__":
-    import yaml
-
-    model_config = "/mnt/fast/nobackup/users/hl01486/projects/general_audio_generation/stable-diffusion/models/ldm/text2img256/config.yaml"
-    model_config = yaml.load(open(model_config, "r"), Loader=yaml.FullLoader)
-
-    latent_diffusion = LatentDiffusion(**model_config["model"]["params"])
-
-    import ipdb
-
-    ipdb.set_trace()

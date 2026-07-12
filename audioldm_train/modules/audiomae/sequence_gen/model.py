@@ -2,15 +2,11 @@ import torch
 import torch.nn as nn
 import pytorch_lightning as pl
 from audioldm_train.utilities.model_util import (
-    exists,
-    default,
-    mean_flat,
-    count_params,
     instantiate_from_config,
 )
 
 # from audioldm_train.modules.encoders.modules import CLAPAudioEmbeddingClassifierFreev2
-from transformers import GPT2Config, GPT2Model
+from transformers import GPT2Model
 import torch.optim.lr_scheduler as lr_scheduler
 
 
@@ -182,22 +178,6 @@ class CLAP2AudioMAE(pl.LightningModule):
 
         return model_input[:, 1:], cond_dict
 
-    # def on_validation_epoch_start(self) -> None:
-    #     # Use text as condition during validation
-    #     for key in self.cond_stage_model_metadata.keys():
-    #         metadata = self.cond_stage_model_metadata[key]
-    #         model_idx, cond_stage_key, conditioning_key = metadata["model_idx"], metadata["cond_stage_key"], metadata["conditioning_key"]
-
-    #         # If we use CLAP as condition, we might use audio for training, but we also must use text for evaluation
-    #         # if(isinstance(self.cond_stage_models[model_idx], CLAPAudioEmbeddingClassifierFreev2)):
-    #         #     self.cond_stage_model_metadata[key]["cond_stage_key_orig"] = self.cond_stage_model_metadata[key]["cond_stage_key"]
-    #         #     self.cond_stage_model_metadata[key]["embed_mode_orig"] = self.cond_stage_models[model_idx].embed_mode
-    #         #     print("Change the model original cond_keyand embed_mode %s, %s to text during evaluation" % (self.cond_stage_model_metadata[key]["cond_stage_key_orig"], self.cond_stage_model_metadata[key]["embed_mode_orig"]))
-    #         #     self.cond_stage_model_metadata[key]["cond_stage_key"] = "text"
-    #         #     self.cond_stage_models[model_idx].embed_mode = "text"
-
-    #     return super().on_validation_epoch_start()
-
     def validation_step(self, batch, batch_idx):
         cond_dict = self.get_input(batch)
         # cond_dict['film_clap_cond1']: [2,1,512]
@@ -255,14 +235,11 @@ class CLAP2AudioMAE(pl.LightningModule):
         return {"loss": loss, "ar_gen_loss": ar_gen_loss}
 
     def get_input_item(self, batch, k):
-        fname, text, label_indices, waveform, stft, fbank = (
-            batch["fname"],
-            batch["text"],
-            batch["label_vector"],
-            batch["waveform"],
-            batch["stft"],
-            batch["log_mel_spec"],
-        )
+        fname = batch["fname"]
+        text = batch["text"]
+        waveform = batch["waveform"]
+        stft = batch["stft"]
+        fbank = batch["log_mel_spec"]
         ret = {}
 
         ret["fbank"] = (

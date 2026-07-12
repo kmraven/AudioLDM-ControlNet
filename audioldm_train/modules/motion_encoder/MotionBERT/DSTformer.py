@@ -6,11 +6,9 @@ import torch
 import torch.nn as nn
 import math
 import warnings
-import random
 import numpy as np
 from collections import OrderedDict
 from functools import partial
-from itertools import repeat
 
 from audioldm_train.modules.motion_encoder.MotionBERT.drop import DropPath
 
@@ -341,7 +339,6 @@ class DSTformer(nn.Module):
         x = x.reshape(-1, F, J, C) + self.temp_embed[:,:F,:,:]
         x = x.reshape(BF, J, C)
         x = self.pos_drop(x)
-        alphas = []
         for idx, (blk_st, blk_ts) in enumerate(zip(self.blocks_st, self.blocks_ts)):
             x_st = blk_st(x, F)
             x_ts = blk_ts(x, F)

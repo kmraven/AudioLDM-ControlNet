@@ -3,7 +3,6 @@
 import torch
 import numpy as np
 from tqdm import tqdm
-from functools import partial
 
 from audioldm_train.utilities.diffusion_util import (
     make_ddim_sampling_parameters,
@@ -114,23 +113,6 @@ class DDIMSampler(object):
         ucg_schedule=None,
         **kwargs,
     ):
-
-        # if conditioning is not None:
-        #     if isinstance(conditioning, dict):
-        #         ctmp = conditioning[list(conditioning.keys())[0]]
-        #         while isinstance(ctmp, list): ctmp = ctmp[0]
-        #         cbs = ctmp.shape[0]
-        #         if cbs != batch_size:
-        #             print(f"Warning: Got {cbs} conditionings but batch-size is {batch_size}")
-
-        #     elif isinstance(conditioning, list):
-        #         for ctmp in conditioning:
-        #             if ctmp.shape[0] != batch_size:
-        #                 print(f"Warning: Got {cbs} conditionings but batch-size is {batch_size}")
-
-        #     else:
-        #         if conditioning.shape[0] != batch_size:
-        #             print(f"Warning: Got {conditioning.shape[0]} conditionings but batch-size is {batch_size}")
 
         self.make_schedule(ddim_num_steps=S, ddim_eta=eta, verbose=verbose)
         # sampling

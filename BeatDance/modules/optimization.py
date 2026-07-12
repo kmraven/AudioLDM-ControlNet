@@ -15,7 +15,7 @@
 """PyTorch optimization for BERT model."""
 
 import math
-from typing import Callable, Iterable, Optional, Tuple, Union
+from typing import Callable, Iterable, Tuple
 
 import torch
 from torch import nn

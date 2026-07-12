@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from functools import partial
 from inspect import isfunction
 from collections import namedtuple
-from einops import rearrange, repeat, reduce
+from einops import rearrange, repeat
 
 # constants
 
@@ -419,8 +419,6 @@ class AttentionLayers(nn.Module):
         ff_kwargs, kwargs = groupby_prefix_and_trim("ff_", kwargs)
         attn_kwargs, _ = groupby_prefix_and_trim("attn_", kwargs)
 
-        dim_head = attn_kwargs.get("dim_head", DEFAULT_DIM_HEAD)
-
         self.dim = dim
         self.depth = depth
         self.layers = nn.ModuleList([])
@@ -659,7 +657,8 @@ class TransformerWrapper(nn.Module):
         mems=None,
         **kwargs,
     ):
-        b, n, device, num_mem = *x.shape, x.device, self.num_memory_tokens
+        b, _ = x.shape
+        num_mem = self.num_memory_tokens
         x = self.token_emb(x)
         x += self.pos_emb(x)
         x = self.emb_dropout(x)

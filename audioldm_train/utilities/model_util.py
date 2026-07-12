@@ -8,8 +8,6 @@ import audioldm_train.modules.hifigan as hifigan
 
 import importlib
 
-import torch
-import numpy as np
 from collections import abc
 
 import multiprocessing as mp
@@ -139,7 +137,7 @@ def parallel_data_prefetch(
     elif isinstance(data, abc.Iterable):
         if isinstance(data, dict):
             print(
-                f'WARNING:"data" argument passed to parallel_data_prefetch is a dict: Using only its values and disregarding keys.'
+                'WARNING:"data" argument passed to parallel_data_prefetch is a dict: Using only its values and disregarding keys.'
             )
             data = list(data.values())
         if target_data_type == "ndarray":
@@ -181,7 +179,7 @@ def parallel_data_prefetch(
         processes += [p]
 
     # start processes
-    print(f"Start prefetching...")
+    print("Start prefetching...")
     import time
 
     start = time.time()

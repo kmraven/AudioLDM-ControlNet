@@ -1,7 +1,6 @@
 import torch
 import numpy as np
 from scipy.io.wavfile import write
-import torchaudio
 
 from audioldm_train.utilities.audio.audio_processing import griffin_lim
 

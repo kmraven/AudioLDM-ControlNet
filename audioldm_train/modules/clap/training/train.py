@@ -16,7 +16,6 @@ except ImportError:
 
 from open_clip import ClipLoss, gather_features
 from .distributed import is_master
-from .zero_shot import zero_shot_eval
 
 
 class AverageMeter(object):
@@ -441,7 +440,6 @@ def evaluate(model, data, epoch, args, tb_writer=None):
                                             0, torch.tensor(idx).long()
                                         )
                                     )
-                        #  print(f'eval step {i}') #  (yusong): for debug
 
                 # cumulative_loss += total_loss * batch_size
                 # num_samples += batch_size
@@ -546,8 +544,8 @@ def get_metrics(
             + F.cross_entropy(t_logits_per_text, labels)
         ) / 4
 
-        metrics[f"cumulative_loss"] = total_loss.item()
-        metrics[f"num_samples"] = audio_features.shape[0]
+        metrics["cumulative_loss"] = total_loss.item()
+        metrics["num_samples"] = audio_features.shape[0]
 
         logits = {
             "audio_to_text": (a_logits_per_audio + t_logits_per_audio) / 2,
@@ -556,8 +554,6 @@ def get_metrics(
         ground_truth = torch.arange(len(text_features)).view(-1, 1)
 
     else:
-        # print("text_features", text_features)
-        # print("text_features.shape", text_features.shape)
         logits_per_audio = (
             (logit_scale_a * audio_features @ text_features.t()).detach().cpu()
         )
@@ -570,8 +566,8 @@ def get_metrics(
             + F.cross_entropy(logits_per_text, labels)
         ) / 2
 
-        metrics[f"cumulative_loss"] = total_loss.item()
-        metrics[f"num_samples"] = audio_features.shape[0]
+        metrics["cumulative_loss"] = total_loss.item()
+        metrics["num_samples"] = audio_features.shape[0]
 
         logits = {"audio_to_text": logits_per_audio, "text_to_audio": logits_per_text}
 
@@ -698,7 +694,7 @@ def evaluate_clotho_audiocaps(
 
             metrics = {}
             num_samples = audio_features.shape[0]
-            metrics[f"num_samples"] = num_samples
+            metrics["num_samples"] = num_samples
 
             # (yusong) the following code is very important, please double-check:
             # logits_per_audio.reshape(num_samples, num_samples, 5)[:, :, d]
@@ -721,7 +717,7 @@ def evaluate_clotho_audiocaps(
             ]
             total_loss = (np.mean(audio_to_text_loss) + np.mean(text_to_audio_loss)) / 2
 
-            metrics[f"cumulative_loss"] = total_loss.item()
+            metrics["cumulative_loss"] = total_loss.item()
 
             # text to audio: do 5 times
             pred_text = []
@@ -734,14 +730,14 @@ def evaluate_clotho_audiocaps(
                 preds = torch.where(ranking == ground_truth)[1]
                 pred_text.append(preds.detach().cpu().numpy())
             pred_text_concat = np.concatenate(pred_text, axis=0)  # [5*num_samples]
-            metrics[f"text_to_audio_mean_rank"] = pred_text_concat.mean() + 1
-            metrics[f"text_to_audio_median_rank"] = (
+            metrics["text_to_audio_mean_rank"] = pred_text_concat.mean() + 1
+            metrics["text_to_audio_median_rank"] = (
                 np.floor(np.median(pred_text_concat)) + 1
             )
             for k in [1, 5, 10]:
                 metrics[f"text_to_audio_R@{k}"] = np.mean(pred_text_concat < k)
             # map@10
-            metrics[f"text_to_audio_mAP@10"] = np.mean(
+            metrics["text_to_audio_mAP@10"] = np.mean(
                 np.where(pred_text_concat < 10, 1 / (pred_text_concat + 1), 0.0)
             )
 
@@ -774,7 +770,7 @@ def evaluate_clotho_audiocaps(
                     / 5
                 )
                 map_all.append(map_single)
-            metrics[f"audio_to_text_mAP@10"] = np.mean(map_all)
+            metrics["audio_to_text_mAP@10"] = np.mean(map_all)
             for k in [1, 5, 10]:
                 metrics[f"audio_to_text_R@{k}"] = np.mean(np.array(pred_audio_all) < k)
 

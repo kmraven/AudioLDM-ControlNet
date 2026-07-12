@@ -1,106 +1,84 @@
-import sys
+"""Minimal CLAP text and audio inference example."""
 
-sys.path.append("src/clap")
+import argparse
 
-import os
-import torch
 import librosa
-from open_clip import create_model
-from training.data import get_audio_features
-from training.data import int16_to_float32, float32_to_int16
+import torch
 from transformers import RobertaTokenizer
 
-tokenize = RobertaTokenizer.from_pretrained("roberta-base")
+from audioldm_train.modules.clap.open_clip import create_model
+from audioldm_train.modules.clap.training.data import (
+    float32_to_int16,
+    get_audio_features,
+    int16_to_float32,
+)
 
 
-def tokenizer(text):
-    result = tokenize(
+def tokenizer(text, tokenizer_model):
+    result = tokenizer_model(
         text,
         padding="max_length",
         truncation=True,
         max_length=77,
         return_tensors="pt",
     )
-    return {k: v.squeeze(0) for k, v in result.items()}
+    return {key: value.squeeze(0) for key, value in result.items()}
 
 
-PRETRAINED_PATH = "/mnt/fast/nobackup/users/hl01486/projects/contrastive_pretraining/CLAP/assets/checkpoints/epoch_top_0_audioset_no_fusion.pt"
-WAVE_48k_PATH = "/mnt/fast/nobackup/users/hl01486/projects/contrastive_pretraining/CLAP/assets/audio/machine.wav"
-
-
-def infer_text():
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
-    precision = "fp32"
-    amodel = "HTSAT-tiny"  # or 'PANN-14'
-    tmodel = "roberta"  # the best text encoder in our training
-    enable_fusion = False  # False if you do not want to use the fusion model
-    fusion_type = "aff_2d"
-    pretrained = PRETRAINED_PATH
-
-    model, model_cfg = create_model(
-        amodel,
-        tmodel,
-        pretrained,
-        precision=precision,
+def create_clap_model(pretrained_path, device):
+    return create_model(
+        "HTSAT-tiny",
+        "roberta",
+        pretrained_path,
+        precision="fp32",
         device=device,
-        enable_fusion=enable_fusion,
-        fusion_type=fusion_type,
-    )
-    # load the text, can be a list (i.e. batch size)
-    text_data = ["I love the contrastive learning", "I love the pretrain model"]
-    # tokenize for roberta, if you want to tokenize for another text encoder, please refer to data.py#L43-90
-    text_data = tokenizer(text_data)
-
-    text_embed = model.get_text_embedding(text_data)
-    print(text_embed.size())
-
-
-def infer_audio():
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
-    precision = "fp32"
-    amodel = "HTSAT-tiny"  # or 'PANN-14'
-    tmodel = "roberta"  # the best text encoder in our training
-    enable_fusion = False  # False if you do not want to use the fusion model
-    fusion_type = "aff_2d"
-    pretrained = PRETRAINED_PATH
-
-    model, model_cfg = create_model(
-        amodel,
-        tmodel,
-        pretrained,
-        precision=precision,
-        device=device,
-        enable_fusion=enable_fusion,
-        fusion_type=fusion_type,
+        enable_fusion=False,
+        fusion_type="aff_2d",
     )
 
-    # load the waveform of the shape (T,), should resample to 48000
-    audio_waveform, sr = librosa.load(WAVE_48k_PATH, sr=48000)
-    # quantize
-    audio_waveform = int16_to_float32(float32_to_int16(audio_waveform))
-    audio_waveform = torch.from_numpy(audio_waveform).float()
-    audio_dict = {}
 
-    # the 'fusion' truncate mode can be changed to 'rand_trunc' if run in unfusion mode
-    import ipdb
+def infer_text(pretrained_path, device):
+    model, _ = create_clap_model(pretrained_path, device)
+    tokenizer_model = RobertaTokenizer.from_pretrained("roberta-base")
+    text_data = tokenizer(
+        ["I love contrastive learning", "I love the pretrained model"],
+        tokenizer_model,
+    )
+    print(model.get_text_embedding(text_data).size())
 
-    ipdb.set_trace()
-    audio_dict = get_audio_features(
-        audio_dict,
-        audio_waveform,
-        480000,
+
+def infer_audio(pretrained_path, audio_path, device):
+    model, model_cfg = create_clap_model(pretrained_path, device)
+    waveform, _ = librosa.load(audio_path, sr=48_000)
+    waveform = torch.from_numpy(int16_to_float32(float32_to_int16(waveform))).float()
+    audio_features = get_audio_features(
+        {},
+        waveform,
+        480_000,
         data_truncating="fusion",
         data_filling="repeatpad",
         audio_cfg=model_cfg["audio_cfg"],
     )
-    # can send a list to the model, to process many audio tracks in one time (i.e. batch size)
-    audio_embed = model.get_audio_embedding([audio_dict])
-    print(audio_embed.size())
-    import ipdb
+    print(model.get_audio_embedding([audio_features]).size())
 
-    ipdb.set_trace()
+
+def parse_args():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--pretrained", required=True, help="CLAP checkpoint path")
+    parser.add_argument("--audio", help="Optional audio file for audio inference")
+    parser.add_argument(
+        "--device",
+        default="cuda:0" if torch.cuda.is_available() else "cpu",
+    )
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+    infer_text(args.pretrained, args.device)
+    if args.audio:
+        infer_audio(args.pretrained, args.audio, args.device)
 
 
 if __name__ == "__main__":
-    infer_text()
-    infer_audio()
+    main()

@@ -1,28 +1,41 @@
-__pycache__
-taming
-log
-esc50.zip
-ESC-50-master
-*.wav
-ckpt
-lightning_logs
+# Python and tooling
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.pytest_cache/
+.DS_Store
+arxiv/
+
+# Training and experiment output
+log/
+logs/
+lightning_logs/
+wandb/
+BeatDance/logs/
+BeatDance/outputs/
+BeatDance/result/*.log
 mlx_submit_*
 job_queue.sh
-*.txt
-*.cleaned
-audiocaps_train.json
-dataset
-checkpoints
-*.tar
 condor*
-wandbBeatDance/outputs/MotionBERT_pos/*.pth
-*.pth
+
+# Model and generated audio artifacts
 *.ckpt
-BeatDance/outputs/MotionBERT_pos/*.pth
 *.pth
-*.ckpt
-BeatDance/outputs/MotionBERT_pos/*.pth
-*.pth
-*.ckpt
-BeatDance/outputs/
-data/AIST
+*.wav
+*.tar
+*.cleaned
+data/checkpoints/*
+!data/checkpoints/.gitkeep
+
+# Local datasets and downloaded packages
+data/dataset/aist/
+data/dataset/pdl/
+data/AIST/
+dataset/
+taming/
+ESC-50-master/
+esc50.zip
+audiocaps_train.json
+
+# Editor and merge backups
+*.origin

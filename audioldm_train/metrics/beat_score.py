@@ -76,9 +76,7 @@ def estimate_bpm(x, sr, aggregate=np.mean):
     if onset_env is None or np.allclose(onset_env.sum(), 0.0):
         return 0.0
     # Global tempo (BPM): aggregate with median for robustness
-    bpm_arr = librosa.beat.tempo(
-        onset_envelope=onset_env, sr=sr, aggregate=aggregate
-    )
+    bpm_arr = librosa.beat.tempo(onset_envelope=onset_env, sr=sr, aggregate=aggregate)
     # librosa returns a 1-element array for global tempo
     bpm = float(np.squeeze(bpm_arr))
     # Guard against NaN/Inf
@@ -133,7 +131,12 @@ def motion_peak_onehot(joints):
     envelope = np.sum(velocity_norms, axis=1)  # (seq_len,)
 
     # Find local minima in velocity -- beats
-    peak_idxs = scisignal.argrelextrema(envelope, np.less, axis=0, order=10) # 10 for 60FPS
+    peak_idxs = scisignal.argrelextrema(
+        envelope,
+        np.less,
+        axis=0,
+        order=10,
+    )  # 10 for 60 FPS
     peak_onehot = np.zeros_like(envelope, dtype=bool)
     peak_onehot[peak_idxs] = 1
 
@@ -162,7 +165,7 @@ def alignment_score(music_beats, motion_beats, sigma=3):
     for motion_beat_idx in motion_beat_idxs:
         dists = np.abs(music_beat_idxs - motion_beat_idx).astype(np.float32)
         ind = np.argmin(dists)
-        score = np.exp(- dists[ind]**2 / 2 / sigma**2)
+        score = np.exp(-(dists[ind] ** 2) / (2 * sigma**2))
         score_all.append(score)
     return sum(score_all) / len(score_all)
 
@@ -179,14 +182,12 @@ def calculate_audio_beat_score(gt_audio, gen_audio, sr):
 
 
 def calculate_beat_score(gt_motion, gt_audio, gen_audio, sr):
-    cover_rate, hit_rate, f1, td = calculate_audio_beat_score(
-        gt_audio, gen_audio, sr
-    )
+    cover_rate, hit_rate, f1, td = calculate_audio_beat_score(gt_audio, gen_audio, sr)
     gen_audio = _to_numpy(gen_audio)
     bas = alignment_score(
         music_peak_onehot(gen_audio, sr),
         motion_peak_onehot(gt_motion),
-        sigma=3
+        sigma=3,
     )
     return cover_rate, hit_rate, f1, td, bas
 

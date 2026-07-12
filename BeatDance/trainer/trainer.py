@@ -3,7 +3,7 @@ import numpy as np
 import torch
 from collections import defaultdict, deque
 from trainer.base_trainer import BaseTrainer
-from modules.metrics import sim_matrix_training, sim_matrix_inference, generate_embeds_per_video_id, beat_similarity, qb_norm, sim_matrix_inference_per_frame, sim_matrix_training_per_frame
+from modules.metrics import qb_norm, sim_matrix_inference_per_frame, sim_matrix_training_per_frame
 from tqdm import tqdm
 
 
@@ -107,7 +107,6 @@ class Trainer(BaseTrainer):
         self.model.eval()
         total_val_loss = 0.0
         music_embed_arr, vid_embed_arr = [], []
-        mus_beat_arr, vid_beat_arr = [], []
         music_id_arr, video_id_arr = [], []
 
         with torch.no_grad():
@@ -123,8 +122,6 @@ class Trainer(BaseTrainer):
 
                 music_embed, vid_embed = self.model(data)
 
-                mus_beat_arr.append(music_embed['music_beat'])
-                vid_beat_arr.append(vid_embed['video_beat'])
                 music_embed_arr.append(music_embed['music_fuse'])
                 vid_embed_arr.append(vid_embed['video_fuse'])
                 sims_batch = sim_matrix_training_per_frame(music_embed['music_fuse'], vid_embed['video_fuse'])
@@ -139,8 +136,6 @@ class Trainer(BaseTrainer):
             music_ids = music_id_arr
             video_ids = video_id_arr
 
-            mus_beats = torch.cat(mus_beat_arr)
-            vid_beats = torch.cat(vid_beat_arr)
             V_text = music_embeds.shape[0]
             V_vid = vid_embeds.shape[0]
             print(f"Total Validation Population (N): music clip length: {V_text} video clip length:{V_vid}")
@@ -160,7 +155,7 @@ class Trainer(BaseTrainer):
             ranks = np.array(ranks)
 
             # Print rank statistics
-            print(f"\n=== Rank Distribution ===")
+            print("\n=== Rank Distribution ===")
             print(f"Mean Rank: {ranks.mean():.2f}")
             print(f"Median Rank: {np.median(ranks):.2f}")
             print(f"Min Rank: {ranks.min()}")
@@ -171,15 +166,15 @@ class Trainer(BaseTrainer):
             from modules.metrics import compute_directory_based_metrics
             dir_metrics, avg_ranks_per_query, all_correct_ranks = compute_directory_based_metrics(sims, music_ids, video_ids)
 
-            print(f"\n=== Directory-Based Metrics ===")
-            print(f"Average Rank Metrics (per query, averaged over all correct videos):")
+            print("\n=== Directory-Based Metrics ===")
+            print("Average Rank Metrics (per query, averaged over all correct videos):")
             print(f"  Dir_R@1:  {dir_metrics['Dir_R1']:.2f}%")
             print(f"  Dir_R@5:  {dir_metrics['Dir_R5']:.2f}%")
             print(f"  Dir_R@10: {dir_metrics['Dir_R10']:.2f}%")
             print(f"  Dir_R@50: {dir_metrics['Dir_R50']:.2f}%")
             print(f"  Dir_MedR: {dir_metrics['Dir_MedR']:.2f}")
             print(f"  Dir_MeanR: {dir_metrics['Dir_MeanR']:.2f}")
-            print(f"\nIndividual Correct Video Metrics (all correct videos across all queries):")
+            print("\nIndividual Correct Video Metrics (all correct videos across all queries):")
             print(f"  All_R@1:  {dir_metrics['All_R1']:.2f}%")
             print(f"  All_R@5:  {dir_metrics['All_R5']:.2f}%")
             print(f"  All_R@10: {dir_metrics['All_R10']:.2f}%")
@@ -202,20 +197,20 @@ class Trainer(BaseTrainer):
             video_counter = Counter(all_top10_videos)
             most_common_videos = video_counter.most_common(10)
 
-            print(f"\n=== Top-10 Most Frequently Retrieved Videos (Across All Queries) ===")
+            print("\n=== Top-10 Most Frequently Retrieved Videos (Across All Queries) ===")
             for rank, (video_id, count) in enumerate(most_common_videos, 1):
                 percentage = (count / len(sims_squeezed)) * 100
                 print(f"  {rank}. {video_id}: appears {count} times ({percentage:.1f}% of queries)")
 
             # Also show which query music IDs are most common
-            print(f"\n=== Top-10 Most Common Query Music IDs (Original Files) ===")
+            print("\n=== Top-10 Most Common Query Music IDs (Original Files) ===")
             music_counter = Counter(music_ids)
             most_common_music = music_counter.most_common(10)
             for rank, (music_id, count) in enumerate(most_common_music, 1):
                 print(f"  {rank}. {music_id}: {count} queries")
 
             # Print detailed top-10 retrievals for each query
-            print(f"\n=== Top-10 Retrieved Videos for Each Music Query ===")
+            print("\n=== Top-10 Retrieved Videos for Each Music Query ===")
             for i in range(len(sims_squeezed)): # Show first 10 queries
                 print(f"\n[Query {i+1}] Music: {music_ids[i]}")
                 print(f"Ground Truth Video: {video_ids[i]} (should match music ID)")
@@ -237,7 +232,7 @@ class Trainer(BaseTrainer):
 
                 print(f"Exact match rank: {correct_rank}")
                 print(f"Same directory videos found: {len(same_dir_ranks)}, Average rank: {np.mean(same_dir_ranks):.2f}")
-                print(f"Top-10 Retrieved Videos:")
+                print("Top-10 Retrieved Videos:")
                 for rank_pos, idx in enumerate(top10_indices, 1):
                     idx = idx.item()
                     is_exact_match = "✓ EXACT" if idx == i else ""
@@ -336,7 +331,7 @@ class Trainer(BaseTrainer):
                     music_ids = music_id_arr
                     video_ids = video_id_arr
 
-                    train_embed_sims = train_sims = sim_matrix_inference_per_frame(vid_embeds.unsqueeze(1), music_embeds)
+                    train_embed_sims = sim_matrix_inference_per_frame(vid_embeds.unsqueeze(1), music_embeds)
                     train_embed_sims = train_embed_sims.cpu().detach()
                     train_embed_sims, test_embed_sims = np.squeeze(np.array(train_embed_sims), axis=1), np.squeeze(np.array(test_embed_sims), axis=1)
                     test_embed_sims = np.transpose(test_embed_sims, (1, 0))
@@ -415,7 +410,7 @@ class Trainer(BaseTrainer):
             ranks = np.array(ranks)
 
             # Print rank statistics
-            print(f"\n=== Rank Distribution ===")
+            print("\n=== Rank Distribution ===")
             print(f"Mean Rank: {ranks.mean():.2f}")
             print(f"Median Rank: {np.median(ranks):.2f}")
             print(f"Min Rank: {ranks.min()}")
@@ -426,15 +421,15 @@ class Trainer(BaseTrainer):
             from modules.metrics import compute_directory_based_metrics
             dir_metrics, avg_ranks_per_query, all_correct_ranks = compute_directory_based_metrics(sims, music_ids, video_ids)
 
-            print(f"\n=== Directory-Based Metrics ===")
-            print(f"Average Rank Metrics (per query, averaged over all correct videos):")
+            print("\n=== Directory-Based Metrics ===")
+            print("Average Rank Metrics (per query, averaged over all correct videos):")
             print(f"  Dir_R@1:  {dir_metrics['Dir_R1']:.2f}%")
             print(f"  Dir_R@5:  {dir_metrics['Dir_R5']:.2f}%")
             print(f"  Dir_R@10: {dir_metrics['Dir_R10']:.2f}%")
             print(f"  Dir_R@50: {dir_metrics['Dir_R50']:.2f}%")
             print(f"  Dir_MedR: {dir_metrics['Dir_MedR']:.2f}")
             print(f"  Dir_MeanR: {dir_metrics['Dir_MeanR']:.2f}")
-            print(f"\nIndividual Correct Video Metrics (all correct videos across all queries):")
+            print("\nIndividual Correct Video Metrics (all correct videos across all queries):")
             print(f"  All_R@1:  {dir_metrics['All_R1']:.2f}%")
             print(f"  All_R@5:  {dir_metrics['All_R5']:.2f}%")
             print(f"  All_R@10: {dir_metrics['All_R10']:.2f}%")
@@ -457,20 +452,20 @@ class Trainer(BaseTrainer):
             video_counter = Counter(all_top10_videos)
             most_common_videos = video_counter.most_common(10)
 
-            print(f"\n=== Top-10 Most Frequently Retrieved Videos (Across All Queries) ===")
+            print("\n=== Top-10 Most Frequently Retrieved Videos (Across All Queries) ===")
             for rank, (video_id, count) in enumerate(most_common_videos, 1):
                 percentage = (count / len(sims_squeezed)) * 100
                 print(f"  {rank}. {video_id}: appears {count} times ({percentage:.1f}% of queries)")
 
             # Also show which query music IDs are most common
-            print(f"\n=== Top-10 Most Common Query Music IDs (Original Files) ===")
+            print("\n=== Top-10 Most Common Query Music IDs (Original Files) ===")
             music_counter = Counter(music_ids)
             most_common_music = music_counter.most_common(10)
             for rank, (music_id, count) in enumerate(most_common_music, 1):
                 print(f"  {rank}. {music_id}: {count} queries")
 
             # Print detailed top-10 retrievals for each query
-            print(f"\n=== Top-10 Retrieved Videos for Each Music Query ===")
+            print("\n=== Top-10 Retrieved Videos for Each Music Query ===")
             for i in range(min(32, len(sims_squeezed))):  # Show first 32 queries
                 print(f"\n[Query {i+1}] Music: {music_ids[i]}")
                 print(f"Ground Truth Video: {video_ids[i]} (should match music ID)")
@@ -492,7 +487,7 @@ class Trainer(BaseTrainer):
 
                 print(f"Exact match rank: {correct_rank}")
                 print(f"Same directory videos found: {len(same_dir_ranks)}, Average rank: {np.mean(same_dir_ranks):.2f}")
-                print(f"Top-10 Retrieved Videos:")
+                print("Top-10 Retrieved Videos:")
                 for rank_pos, idx in enumerate(top10_indices, 1):
                     idx = idx.item()
                     is_exact_match = "✓ EXACT" if idx == i else ""

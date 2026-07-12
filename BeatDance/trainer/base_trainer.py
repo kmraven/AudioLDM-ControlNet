@@ -71,7 +71,7 @@ class BaseTrainer:
 
     def train(self, seglen):
         for epoch in range(self.start_epoch, self.num_epochs + 1):
-            result = self._train_epoch(epoch, seglen)
+            self._train_epoch(epoch, seglen)
             if epoch % self.config.save_every == 0:
                     self._save_checkpoint(epoch, save_best=False)
 
@@ -129,4 +129,3 @@ class BaseTrainer:
             self.optimizer.load_state_dict(checkpoint['optimizer'])
 
         print("Checkpoint loaded")
-

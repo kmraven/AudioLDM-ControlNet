@@ -5,10 +5,7 @@ Author: ArrowLuo
 import os
 import argparse
 import subprocess
-import time
-import multiprocessing
 from multiprocessing import Pool
-import shutil
 try:
     from psutil import cpu_count
 except:
@@ -29,7 +26,6 @@ def compress(paras):
                    ]
         ffmpeg = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = ffmpeg.communicate()
-        retcode = ffmpeg.poll()
         # print something above for debug
     except Exception as e:
         raise e

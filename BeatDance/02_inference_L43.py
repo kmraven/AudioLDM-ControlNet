@@ -10,15 +10,13 @@ from modules.metrics import t2v_metrics, v2t_metrics
 from modules.loss import LossFactory
 from trainer.trainer_beatdance_frame import Trainer
 from modules.optimization import AdamW, get_cosine_schedule_with_warmup
-import pdb
-from tqdm import tqdm
 import pandas as pd
 
 # beat dimension
 
-data_dir = "/data/han_data/dance_data/beatdance"
-output_dir = "/data/han_data/dance_data/beatdance/models"
-ann_dir = "/data/han_data/dance_data/pdl_chopped_2.csv"
+data_dir = "./data/dataset/pdl/beatdance_features"
+output_dir = "./log/beatdance/models"
+ann_dir = "./data/dataset/metadata/pdl_chopped_2.csv"
 os.makedirs(output_dir, exist_ok=True)
 batch_size = 32
 seglen = 2
@@ -78,11 +76,8 @@ def beat_preprocess(beat_indices, fps, target_fps, start, end):
     # resample the beat_indices (number of new samples / number of og samples)
     scale = frames * beat_dim / ((end-start) * fps)
     beat_indices = torch.round(beat_indices * scale).long()
-    try:
-        beats_vector[beat_indices] = 1 #(along beat_dim, every vector is the same)
-    except:
-        import pdb
-        pdb.set_trace()
+    beat_indices = beat_indices[(beat_indices >= 0) & (beat_indices < len(beats_vector))]
+    beats_vector[beat_indices] = 1 #(along beat_dim, every vector is the same)
     return beats_vector.reshape((frames, int(beat_dim))) #reshape to (L, beat_dim)
 
 def main():
@@ -124,7 +119,6 @@ def main():
 
     train_data_loader = DataFactory.get_data_loader(config, split_type='train')
     valid_data_loader  = DataFactory.get_data_loader(config, split_type='val')
-    test_data_loader  = DataFactory.get_data_loader(config, split_type='test')
     model = ModelFactory.get_model(config)
     model.to(device)
     
@@ -133,7 +127,7 @@ def main():
     elif config.metric == 'v2t':
         metrics = v2t_metrics
     else:
-        raise NotImplemented
+        raise NotImplementedError
       
     params_optimizer = list(model.named_parameters())
     clip_params = [p for n, p in params_optimizer if "clip." in n]
@@ -162,8 +156,6 @@ def main():
     
     trainer.load_checkpoint("model_best.pth")   
     # do inference and save the embeddings
-    #import pdb
-    
     trainer.model.eval()
     os.makedirs(os.path.join(data_dir, "fm_L43"), exist_ok=True)
     os.makedirs(os.path.join(data_dir, "fd_L43"), exist_ok=True)
@@ -186,8 +178,6 @@ def main():
             torch.save(music_embed["music_fuse"][0,:,:], os.path.join(data_dir, "fm_L43", "{}.pt".format(int(row["sample_id"]))))
             torch.save(video_embed["video_fuse"][0,:,:], os.path.join(data_dir, "fd_L43", "{}.pt".format(int(row["sample_id"]))))
     
-            #print(row["sample_id"])
-    
     
 
     """
@@ -198,7 +188,6 @@ def main():
             ids = data["id"]
             music_embed, video_embed = trainer.model(data) # EACH FEATURE WITHIN IS (B, L, D)
             for i, id in enumerate(ids):
-                #pdb.set_trace()
                 torch.save(music_embed["music_fuse"][i,:,:], os.path.join(data_dir, "fm_L43", "{}.pt".format(id)))
                 torch.save(video_embed["video_fuse"][i,:,:], os.path.join(data_dir, "fd_L43", "{}.pt".format(id)))
         

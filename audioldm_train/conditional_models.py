@@ -1,6 +1,3 @@
-import sys
-
-sys.path.append("src")
 import torch
 import logging
 import torch.nn as nn
@@ -12,13 +9,12 @@ from transformers import (
     RobertaTokenizer,
     AutoTokenizer,
     T5EncoderModel,
-    MT5EncoderModel,
 )
 import torch.nn.functional as F
 from audioldm_train.modules.audiomae.AudioMAE import Vanilla_AudioMAE
 from audioldm_train.modules.phoneme_encoder.encoder import TextEncoder
 
-from transformers import SpeechT5Processor, AutoTokenizer, GPT2Model, GPT2Tokenizer
+from transformers import SpeechT5Processor, GPT2Model, GPT2Tokenizer
 from transformers.models.speecht5.modeling_speecht5 import SpeechT5EncoderWithTextPrenet
 
 from audioldm_train.modules.audiomae.sequence_gen.model import CLAP2AudioMAE
@@ -155,7 +151,6 @@ class PhonemeEncoder(nn.Module):
             encoder = PhonemeEncoder(40)
             data = torch.randint(0, 39, (2, 250))
             output = encoder(data)
-            import ipdb;ipdb.set_trace()
         """
         assert pad_token_id is not None
 
@@ -234,7 +229,6 @@ class FlanT5HiddenState(nn.Module):
     llama = FlanT5HiddenState()
     data = ["","this is not an empty sentence"]
     encoder_hidden_states = llama(data)
-    import ipdb;ipdb.set_trace()
     """
 
     def __init__(
@@ -280,7 +274,6 @@ class FlanT5HiddenState(nn.Module):
         if self.device is None:
             self.device = param.device
 
-        # print("Manually change text")
         # for i in range(len(batch)):
         #     batch[i] = "dog barking"
         try:
@@ -322,7 +315,6 @@ class FlanT5HiddenStatePaddedSameLength(nn.Module):
     llama = FlanT5HiddenState()
     data = ["","this is not an empty sentence"]
     encoder_hidden_states = llama(data)
-    import ipdb;ipdb.set_trace()
     """
 
     def __init__(
@@ -368,7 +360,6 @@ class FlanT5HiddenStatePaddedSameLength(nn.Module):
         if self.device is None:
             self.device = param.device
 
-        # print("Manually change text")
         # for i in range(len(batch)):
         #     batch[i] = "dog barking"
         try:
@@ -576,7 +567,6 @@ class SequenceGenAudioMAECond(Sequence2AudioMAE):
             if not self.training:
                 print("--------------> Generate !!!!!!!!!!!!")
             input_embeds, cond_dict = self.generate(batch)
-            # print("Generate Partial!!!!"); input_embeds, cond_dict = self.generate_partial(batch)
             input_embeds_mask = (
                 torch.ones((input_embeds.size(0), input_embeds.size(1)))
                 .to(input_embeds.device)
@@ -725,8 +715,6 @@ class AudioMAEConditionCTPoolRandTFSeparated(nn.Module):
     audiomae = AudioMAEConditionCTPool2x2()
     data = torch.randn((4, 1024, 128))
     output = audiomae(data)
-    import ipdb;ipdb.set_trace()
-    exit(0)
     """
 
     def __init__(
@@ -849,8 +837,6 @@ class AudioMAEConditionCTPoolRand(nn.Module):
     audiomae = AudioMAEConditionCTPool2x2()
     data = torch.randn((4, 1024, 128))
     output = audiomae(data)
-    import ipdb;ipdb.set_trace()
-    exit(0)
     """
 
     def __init__(
@@ -997,8 +983,6 @@ class AudioMAEConditionCTPoolRandV2(nn.Module):
     audiomae = AudioMAEConditionCTPool2x2()
     data = torch.randn((4, 1024, 128))
     output = audiomae(data)
-    import ipdb;ipdb.set_trace()
-    exit(0)
     """
 
     def __init__(
@@ -1335,17 +1319,3 @@ class CLAPAudioEmbeddingClassifierFreev2(nn.Module):
             return_tensors="pt",
         )
         return {k: v.squeeze(0) for k, v in result.items()}
-
-
-if __name__ == "__main__":
-    model = CLAPAudioEmbeddingClassifierFreev2(
-        pretrained_path="/mnt/bn/lqhaoheliu/exps/checkpoints/audioldm/ckpt/CLAP.pt",
-        embed_mode="text",
-        amodel="HTSAT-tiny",
-    )
-    # data = torch.randn((6, 1, int(16000*10.24)))
-    data = ["text", "text"]
-    res = model(data)
-    import ipdb
-
-    ipdb.set_trace()

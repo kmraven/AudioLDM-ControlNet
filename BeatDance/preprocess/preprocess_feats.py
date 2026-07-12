@@ -114,8 +114,8 @@ def vitpose_preprocess(pose_feature):
 
 
 if __name__ == "__main__":
-    data_dir = "/data/han_data/dance_data/"
-    ann_dir = os.path.join(data_dir, "pdl_chopped_2.csv")
+    data_dir = "./data/dataset/pdl"
+    ann_dir = "./data/dataset/metadata/pdl_chopped_2.csv"
     df = pd.read_csv(ann_dir)
     out_dir = os.path.join(data_dir, "beatdance", "pdl_pose")
     os.makedirs(out_dir, exist_ok=True)
@@ -128,4 +128,3 @@ if __name__ == "__main__":
             # preprocess pose 
             torch.save(pose_feature, os.path.join(out_dir, "{}.pt".format(file_id)))
 
-      

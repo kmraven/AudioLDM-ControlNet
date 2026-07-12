@@ -15,7 +15,6 @@ from matplotlib import pyplot as plt
 matplotlib.use("Agg")
 
 import hashlib
-import os
 
 import requests
 from tqdm import tqdm
@@ -465,14 +464,13 @@ def synth_samples(targets, predictions, vocoder, model_config, preprocess_config
             # energy = expand(energy, duration)
         else:
             energy = predictions[3][i, :mel_len].detach().cpu().numpy()
-        # import ipdb; ipdb.set_trace()
         with open(
             os.path.join(preprocess_config["path"]["preprocessed_path"], "stats.json")
         ) as f:
             stats = json.load(f)
             stats = stats["pitch"] + stats["energy"][:2]
 
-        fig = plot_mel(
+        plot_mel(
             [
                 (mel_prediction.cpu().numpy(), pitch, energy),
             ],

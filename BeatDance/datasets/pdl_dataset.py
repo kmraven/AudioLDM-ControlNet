@@ -1,20 +1,8 @@
 import os
 import torch, math
 
-import pandas as pd
-import ujson as json
-from PIL import Image
-from torchvision import transforms
-from collections import defaultdict
-from modules.basic_utils import load_json
 from torch.utils.data import Dataset, DataLoader
-from config.base_config import Config
-from transformers import AutoModel, Wav2Vec2FeatureExtractor
-import pandas as pd
 import pytorch_lightning as pl
-import torch.nn as nn
-import torchaudio
-import torchaudio.transforms as T
 import numpy as np
 
 HEIGHT = 1080
@@ -88,7 +76,7 @@ class pdlDataset(Dataset):
                  img_transforms=None, 
                  ):
 
-        self.data_dir = config.videos_dir # /data/han_data/dance_data/beatdance
+        self.data_dir = config.videos_dir
         self.img_transforms = img_transforms
         self.split_type = split
         self.frames = config.num_frames # number of temporal frames, L
@@ -198,12 +186,8 @@ class pdlDataset(Dataset):
         # resample the beat_indices (number of new samples / number of og samples)
         scale = self.frames * beat_dim / ((end-start) * fps)
         beat_indices = torch.round(beat_indices * scale).long()
-        beat_indices[beat_indices>=len(beats_vector)] = len(beats_vector) - 1 # safty precaution to avoid exceeding length
-        try:
-            beats_vector[beat_indices] = 1 #(along beat_dim, every vector is the same)
-        except:
-            import pdb
-            pdb.set_trace()
+        beat_indices = beat_indices[(beat_indices >= 0) & (beat_indices < len(beats_vector))]
+        beats_vector[beat_indices] = 1 #(along beat_dim, every vector is the same)
         return beats_vector.reshape((self.frames, int(beat_dim))) #reshape to (L, beat_dim)
 
     def vitpose_preprocess(self, pose_feature, t_start, t_end):
@@ -356,4 +340,3 @@ class PdLDataModule(pl.LightningDataModule):
                           collate_fn=self.collate_batch,
                           num_workers=self.num_workers)
     
-   

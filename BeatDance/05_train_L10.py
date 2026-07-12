@@ -10,13 +10,12 @@ from modules.metrics import t2v_metrics, v2t_metrics
 from modules.loss import LossFactory
 from trainer.trainer_beatdance_frame import Trainer
 from modules.optimization import AdamW, get_cosine_schedule_with_warmup
-import pdb
 
 # beat dimension
 
-data_dir = "/data/han_data/dance_data/beatdance"
-output_dir = "/data/han_data/dance_data/beatdance/models"
-ann_dir = "/data/han_data/dance_data/pdl_chopped_10.csv"
+data_dir = "./data/dataset/pdl/beatdance_features"
+output_dir = "./log/beatdance/models"
+ann_dir = "./data/dataset/metadata/pdl_chopped_10.csv"
 os.makedirs(output_dir, exist_ok=True)
 batch_size = 32
 seglen = 10
@@ -70,7 +69,7 @@ def main():
     elif config.metric == 'v2t':
         metrics = v2t_metrics
     else:
-        raise NotImplemented
+        raise NotImplementedError
 
     params_optimizer = list(model.named_parameters())
     clip_params = [p for n, p in params_optimizer if "clip." in n]

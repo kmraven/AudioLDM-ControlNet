@@ -1,13 +1,12 @@
 import json
 import random
-from tqdm import tqdm
 import torch
 import decord
 
 decord.bridge.set_bridge("torch")
 import torchaudio
 from math import ceil
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 import pandas as pd
 import numpy as np
 
@@ -25,7 +24,7 @@ class AudioVisualDataset(Dataset):
     def __init__(
         self,
         datafiles=[
-            "/mnt/bn/data-xubo/dataset/audioset_videos/datafiles/audioset_balanced_train.json",
+            "data/dataset/metadata/audioset_balanced_train.json",
         ],
         min_video_frames=30,
         video_resize=[224, 224],
@@ -97,7 +96,7 @@ class AudioVisualDataset(Dataset):
 
     def _prepare_audioset(self):
         df1 = pd.read_csv(
-            "/mnt/bn/lqhaoheliu/datasets/audioset/metadata/class_labels_indices.csv",
+            "data/dataset/metadata/class_labels_indices.csv",
             delimiter=",",
             skiprows=0,
         )

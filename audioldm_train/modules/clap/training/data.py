@@ -6,15 +6,11 @@ import os
 import random
 import h5py
 from dataclasses import dataclass
-from audioldm_train.modules.clap.training.params import parse_args
 import braceexpand
 import numpy as np
 import pandas as pd
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
 import torchvision.datasets as datasets
-import torchvision.transforms
 import webdataset as wds
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader, SubsetRandomSampler
@@ -29,8 +25,7 @@ from audioldm_train.modules.clap.open_clip.utils import (
     get_tar_path_from_dataset_name,
     dataset_split,
 )
-from audioldm_train.modules.clap.open_clip.utils import load_p, load_class_label
-import tempfile
+from audioldm_train.modules.clap.open_clip.utils import load_class_label
 import copy
 
 try:
@@ -42,13 +37,6 @@ try:
     import torchaudio
 except ImportError:
     torchaudio = None
-
-from audioldm_train.modules.clap.open_clip import tokenize
-
-
-def tokenizer(text):
-    return tokenize(text).squeeze(0)
-
 
 from transformers import RobertaTokenizer
 
@@ -165,15 +153,10 @@ class ToyDataset(Dataset):
         s_index = self.queue[index]
 
         audio_name = self.fp["audio_name"][s_index].decode()
-        # Hardcode here CHANGE
-        hdf5_path = (
-            self.fp["hdf5_path"][s_index]
-            .decode()
-            .replace(
-                "../workspace",
-                "/home/la/kechen/Research/ke_zsasp/workspace",
-            )
-        )
+        hdf5_path = self.fp["hdf5_path"][s_index].decode()
+        workspace_root = os.environ.get("CLAP_WORKSPACE_ROOT")
+        if workspace_root:
+            hdf5_path = hdf5_path.replace("../workspace", workspace_root)
         r_idx = self.fp["index_in_hdf5"][s_index]
         target = self.fp["target"][s_index].astype(np.float32)
         text = self.prompt_text(target)

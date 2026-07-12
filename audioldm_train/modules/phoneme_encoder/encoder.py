@@ -1,8 +1,6 @@
-import copy
 import math
 import torch
 from torch import nn
-from torch.nn import functional as F
 
 import audioldm_train.modules.phoneme_encoder.commons as commons
 import audioldm_train.modules.phoneme_encoder.attentions as attentions

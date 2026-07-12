@@ -1,20 +1,12 @@
-from cmath import cos
-from inspect import getargs
 import logging
 import os
 import random
 from datetime import datetime
-import bisect
 import copy
-from sched import scheduler
 import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
-from torch import optim
 from torch.cuda.amp import GradScaler
-import faulthandler
-import pathlib
-import argparse
 import time
 
 try:
@@ -32,15 +24,15 @@ try:
 except ImportError:
     hvd = None
 
-from open_clip import create_model_and_transforms, trace_model, create_model
+from open_clip import trace_model, create_model
 from training.data import get_data
 from training.params import parse_args
 from training.distributed import is_master, init_distributed_device, world_info_from_env
 from training.logger import setup_logging
 from training.scheduler import cosine_lr
 from training.lp_train import train_one_epoch, evaluate
-from open_clip.utils import get_tar_path_from_dataset_name, dataset_split, get_optimizer
-from open_clip.utils import load_p, load_class_label
+from open_clip.utils import dataset_split, get_optimizer
+from open_clip.utils import load_class_label
 from open_clip.linear_probe import LinearProbe
 
 
@@ -322,7 +314,6 @@ def main():
     # download sizes.json file
 
     # (yusong): the below two lines are for debug
-    # print("setting up faulthandler")
     # faulthandler.register(10)
 
     random.seed(args.seed)
@@ -337,7 +328,7 @@ def main():
         args.name = "-".join(
             [
                 datetime.now().strftime("%Y_%m_%d-%H_%M_%S"),
-                f"linear_probe" f"model_{args.amodel}",
+                f"linear_probemodel_{args.amodel}",
                 f"lr_{args.lr}",
                 f"b_{args.batch_size}",
                 f"j_{args.workers}",
@@ -373,11 +364,6 @@ def main():
             os.makedirs(log_base_path_new, exist_ok=True)
             log_filename = f"out-{args.rank}" if args.log_local else "out.log"
             args.log_path = os.path.join(log_base_path_new, log_filename)
-            # print(
-            #     "Error. Experiment already exists. Use --name {} to specify a new experiment."
-            # )
-            # return -1
-
     # Set logger
     args.log_level = logging.DEBUG if args.debug else logging.INFO
     setup_logging(args.log_path, args.log_level)
@@ -630,7 +616,7 @@ def main():
             if args.save_most_recent:
                 torch.save(
                     checkpoint_dict,
-                    os.path.join(args.checkpoint_path, f"epoch_latest.pt"),
+                    os.path.join(args.checkpoint_path, "epoch_latest.pt"),
                 )
             if args.save_top_performance and not args.no_eval:
                 update_top_k_performance(

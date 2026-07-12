@@ -36,7 +36,7 @@ def main():
     elif config.metric == 'v2t':
         metrics = v2t_metrics
     else:
-        raise NotImplemented
+        raise NotImplementedError
 
     loss = LossFactory.get_loss(config)
 

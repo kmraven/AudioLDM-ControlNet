@@ -88,7 +88,7 @@ nohup python test.py \
   --load_epoch -1 \
   --dataset_name=aist \
   --num_frames 128 \
-  --videos_dir=/home/sangheon/Desktop/AudioLDM-ControlNet/data/dataset/AIST/beatdance_features \
+  --videos_dir=./data/dataset/aist/beatdance_features \
   > ./result/m2v_test.log 2>&1 &
 
 For Video-Music Retrieval:
@@ -103,7 +103,7 @@ nohup python test.py \
   --dataset_name=aist \
   --metric v2t \
   --num_frames 128 \
-  --videos_dir=/home/sangheon/Desktop/AudioLDM-ControlNet/data/dataset/AIST/beatdance_features \
+  --videos_dir=./data/dataset/aist/beatdance_features \
   > ./result/v2m_test.log 2>&1 &
 
 
@@ -123,7 +123,7 @@ nohup python test_qb_norm.py \
   --qbnorm_k 1 \
   --qbnorm_beta 20 \
   --qbnorm_mode train \
-  --videos_dir=/home/sangheon/Desktop/AudioLDM-ControlNet/data/dataset/AIST/beatdance_features \
+  --videos_dir=./data/dataset/aist/beatdance_features \
   > ./result/m2v_test_qbnorm.log 2>&1 &
 
 For Video-Music Retrieval:
@@ -139,7 +139,7 @@ nohup python test_qb_norm.py \
   --load_epoch -1 \
   --dataset_name=aist \
   --num_frames 128 \
-  --videos_dir=/home/sangheon/Desktop/AudioLDM-ControlNet/data/dataset/AIST/beatdance_features \
+  --videos_dir=./data/dataset/aist/beatdance_features \
   > ./result/v2m_test_qbnorm.log 2>&1 &
 
 
@@ -160,4 +160,3 @@ Our code is based on [XPool](https://github.com/layer6ai-labs/xpool) . We sincer
       pages={11--19},
       year={2024}
     }
-

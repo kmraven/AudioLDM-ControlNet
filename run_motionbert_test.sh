@@ -1,14 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Script to test MotionBERT feature extraction
-# Run from AudioLDM-ControlNet directory
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$ROOT_DIR"
 
-echo "Testing MotionBERT Feature Extraction"
-echo "======================================"
-echo ""
+: "${KEYPOINTS:?Set KEYPOINTS to a COCO keypoint pickle}"
+CHECKPOINT="${CHECKPOINT:-data/checkpoints/latest_epoch.bin}"
+export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"
+export PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}"
 
-# Set GPU device
-export CUDA_VISIBLE_DEVICES=0
-
-# Activate conda environment and run test
-conda run -n audioldm_train python test_motionbert_simple.py
+python3 -m BeatDance.preprocess.test_motionbert_extraction \
+  --checkpoint "$CHECKPOINT" \
+  --keypoints "$KEYPOINTS"

@@ -13,13 +13,7 @@ from functools import partial
 
 import torch
 import torch.nn as nn
-import numpy as np
 import timm.models.vision_transformer
-from timm.models.vision_transformer import PatchEmbed, Block
-from audioldm_train.modules.audiomae.util.patch_embed import (
-    PatchEmbed_new,
-    PatchEmbed3D_new,
-)
 
 
 class VisionTransformer(timm.models.vision_transformer.VisionTransformer):
@@ -38,10 +32,6 @@ class VisionTransformer(timm.models.vision_transformer.VisionTransformer):
         del self.norm  # remove the original norm
         self.mask_2d = mask_2d
         self.use_custom_patch = use_custom_patch
-        num_heads = 12
-        depth = 12
-        mlp_ratio = 4
-
     def forward_features(self, x):
         B = x.shape[0]
         x = self.patch_embed(x)
