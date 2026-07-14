@@ -1,6 +1,6 @@
 # Dance-to-Music Generation with Contrastive Pretraining
 
-[![arXiv](https://img.shields.io/badge/arXiv-ARXIV_ID-b31b1b.svg)](https://arxiv.org/abs/ARXIV_ID)
+[![arXiv](https://img.shields.io/badge/arXiv-2607.10537-b31b1b.svg)](https://arxiv.org/abs/2607.10537)
 
 Official research code for **“Dance to Music Generation leveraging Pre-training
 with Unpaired data and Contrastive Alignment.”**
