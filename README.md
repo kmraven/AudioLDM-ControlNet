@@ -1,6 +1,7 @@
 # Dance-to-Music Generation with Contrastive Pretraining
 
 [![arXiv](https://img.shields.io/badge/arXiv-2607.10537-b31b1b.svg)](https://arxiv.org/abs/2607.10537)
+[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-Model-FFD21E?logo=huggingface&logoColor=000)](https://huggingface.co/kmraven/AudioLDM-ControlNet)
 
 Official research code for **“Dance to Music Generation leveraging Pre-training
 with Unpaired data and Contrastive Alignment.”**
@@ -167,5 +168,23 @@ Generated audio, reference audio, and motion files are matched by filename stem.
 
 ## Acknowledgements
 
-This repository builds on AudioLDM, ControlNet, MotionBERT, MERT, and BeatDance.
+This repository builds on the following projects:
+
+- [AudioLDM](https://github.com/haoheliu/AudioLDM-training-finetuning)
+- [ControlNet](https://github.com/lllyasviel/ControlNet)
+- [MotionBERT](https://github.com/Walter0807/MotionBERT)
+- [MERT](https://github.com/yizhilll/MERT)
+- [BeatDance](https://github.com/XulongT/BeatDance)
+
 Please cite the corresponding projects as well as this work when using the code.
+
+## Citation
+
+```bibtex
+@article{kimura2026dance,
+  title={Dance to Music Generation leveraging Pre-training with Unpaired data and Contrastive Alignment},
+  author={Kimura, Ryota and Park, Sangheon and Polouliakh, Natalia and Akama, Taketo},
+  journal={arXiv preprint arXiv:2607.10537},
+  year={2026}
+}
+```
